@@ -1,9 +1,8 @@
 package org.metafetish.buttplug.core.Messages;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class VorzeA10CycloneCmd extends ButtplugDeviceMessage {
 
@@ -44,5 +43,11 @@ public class VorzeA10CycloneCmd extends ButtplugDeviceMessage {
         super(ButtplugConsts.DefaultMsgId, deviceIndex);
         SetSpeed(speed);
         this.clockwise = clockwise;
+    }
+
+    private VorzeA10CycloneCmd() {
+        super(ButtplugConsts.DefaultMsgId, -1);
+        SetSpeed(0);
+        this.clockwise = false;
     }
 }

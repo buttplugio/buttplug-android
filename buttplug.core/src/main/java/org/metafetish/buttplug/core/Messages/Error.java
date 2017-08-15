@@ -1,9 +1,9 @@
 package org.metafetish.buttplug.core.Messages;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugMessage;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Error extends ButtplugMessage {
     
@@ -17,6 +17,7 @@ public class Error extends ButtplugMessage {
     }
 
     @JsonProperty(value="ErrorCode", required = true)
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     public ErrorClass errorCode;
     
     @JsonProperty(value = "ErrorMessage", required = true)
@@ -40,5 +41,11 @@ public class Error extends ButtplugMessage {
         super(id);
         this.errorMessage = errorMessage;
         this.errorCode = errorCode;
+    }
+
+    private Error() {
+        super(ButtplugConsts.DefaultMsgId);
+        this.errorMessage = "";
+        this.errorCode = ErrorClass.ERROR_UNKNOWN;
     }
 }

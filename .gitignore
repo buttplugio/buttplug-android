@@ -1,0 +1,14 @@
+bin/
+build/
+.settings/
+*.iml
+idea/
+.gradle/
+.idea/compiler.xml
+.idea/gradle.xml
+.idea/libraries/Gradle__com_fasterxml_jackson_core_jackson_annotations_2_8_9.xml
+.idea/libraries/Gradle__com_fasterxml_jackson_core_jackson_core_2_8_9.xml
+.idea/libraries/Gradle__com_google_code_findbugs_jsr305_1_3_9.xml
+.idea/libraries/Gradle__com_google_errorprone_error_prone_annotations_2_0_18.xml
+.idea/libraries/Gradle__com_google_guava_guava_23_0_android.xml
+.idea/libraries/Gradle__com_google_j2objc_j2objc_annotations_1_1.xml

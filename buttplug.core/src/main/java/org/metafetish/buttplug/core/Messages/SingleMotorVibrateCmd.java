@@ -1,9 +1,8 @@
 package org.metafetish.buttplug.core.Messages;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SingleMotorVibrateCmd extends ButtplugDeviceMessage {
 
@@ -39,5 +38,10 @@ public class SingleMotorVibrateCmd extends ButtplugDeviceMessage {
     public SingleMotorVibrateCmd(long deviceIndex, double speed) {
         super(ButtplugConsts.DefaultMsgId, deviceIndex);
         SetSpeed(speed);
+    }
+
+    private SingleMotorVibrateCmd() {
+        super(ButtplugConsts.DefaultMsgId, -1);
+        SetSpeed(0);
     }
 }

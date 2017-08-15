@@ -1,9 +1,8 @@
 package org.metafetish.buttplug.core.Messages;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class FleshlightLaunchFW12Cmd extends ButtplugDeviceMessage {
 
@@ -66,8 +65,14 @@ public class FleshlightLaunchFW12Cmd extends ButtplugDeviceMessage {
     public FleshlightLaunchFW12Cmd(long deviceIndex, int speed, int position) {
         super(ButtplugConsts.DefaultMsgId, deviceIndex);
 
-        this.speed = speed;
         SetSpeed(speed);
         SetPosition(position);
+    }
+
+    private FleshlightLaunchFW12Cmd() {
+        super(ButtplugConsts.DefaultMsgId, -1);
+
+        SetSpeed(0);
+        SetPosition(0);
     }
 }

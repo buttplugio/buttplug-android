@@ -9,9 +9,12 @@ public class StopDeviceCmd extends ButtplugDeviceMessage
     { 
         super(ButtplugConsts.DefaultMsgId, deviceIndex);
     }
-    
-    public StopDeviceCmd(long deviceIndex, long id)
-    { 
+
+    public StopDeviceCmd(long deviceIndex, long id) {
         super(id, deviceIndex);
+    }
+
+    private StopDeviceCmd() {
+        super(ButtplugConsts.DefaultMsgId, -1);
     }
 }

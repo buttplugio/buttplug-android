@@ -9,4 +9,8 @@ public class DeviceRemoved extends ButtplugDeviceMessage
     { 
         super(ButtplugConsts.SystemMsgId, deviceMessage);
     }
+
+    private DeviceRemoved() {
+        super(ButtplugConsts.SystemMsgId, -1);
+    }
 }

@@ -1,9 +1,8 @@
 package org.metafetish.buttplug.core.Messages;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LovenseCmd extends ButtplugDeviceMessage {
 
@@ -15,10 +14,14 @@ public class LovenseCmd extends ButtplugDeviceMessage {
         super(id, deviceIndex);
         this.deviceCmd = deviceCmd;
     }
-    
-    public LovenseCmd(long deviceIndex, String deviceCmd)
-    {
+
+    public LovenseCmd(long deviceIndex, String deviceCmd) {
         super(ButtplugConsts.DefaultMsgId, deviceIndex);
         this.deviceCmd = deviceCmd;
+    }
+
+    private LovenseCmd() {
+        super(ButtplugConsts.DefaultMsgId, -1);
+        this.deviceCmd = "";
     }
 }

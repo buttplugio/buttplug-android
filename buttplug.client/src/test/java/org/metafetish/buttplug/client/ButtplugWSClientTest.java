@@ -1,5 +1,6 @@
 package org.metafetish.buttplug.client;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.metafetish.buttplug.core.Messages.SingleMotorVibrateCmd;
@@ -25,7 +26,7 @@ public class ButtplugWSClientTest {
         }
 
         Thread.sleep(1000);
-        client.SendMessageExpectOk(new StopAllDevices());
+        Assert.assertTrue(client.SendMessageExpectOk(new StopAllDevices()));
 
         client.Disconnect();
     }

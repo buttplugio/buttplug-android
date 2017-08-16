@@ -107,9 +107,9 @@ public class ButtplugWSClient {
         ButtplugMessage res = SendMessage(new RequestServerInfo(_clientName)).get();
         if (res instanceof ServerInfo) {
             if (((ServerInfo) res).maxPingTime > 0) {
-                _pingTimer = new Timer(true);
+                _pingTimer = new Timer("pingTimer", true);
                 //onPingTimer, null, 0,  0)));
-                _pingTimer.schedule(new TimerTask() {
+                _pingTimer.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
                         try {
@@ -119,7 +119,6 @@ public class ButtplugWSClient {
                         }
                     }
                 }, 0, Math.round(((double) ((ServerInfo) res).maxPingTime) / 2));
-
             }
 
         } else if (res instanceof org.metafetish.buttplug.core.Messages.Error) {
@@ -227,10 +226,11 @@ public class ButtplugWSClient {
             if (msg instanceof org.metafetish.buttplug.core.Messages.Error) {
                 throw new Exception(((org.metafetish.buttplug.core.Messages.Error) msg).getErrorMessage());
             }
-        } finally {
+        } catch (Throwable e) {
             if (client != null) {
                 Disconnect();
             }
+            throw e;
         }
     }
 
@@ -302,12 +302,18 @@ public class ButtplugWSClient {
         SettableFuture<ButtplugMessage> promise = SettableFuture.create();
 
         _waitingMsgs.put(aMsg.id, promise);
+        if (session == null) {
+            promise.set(new org.metafetish.buttplug.core.Messages.Error("Bad WS state!", Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.SystemMsgId));
+            return promise;
+        }
+
         try {
             Future<Void> fut = session.getRemote().sendStringByFuture(_parser.formatJson(aMsg));
             fut.get();
         } catch (WebSocketException e) {
             promise.set(new org.metafetish.buttplug.core.Messages.Error(e.getMessage(), org.metafetish.buttplug.core.Messages.Error.ErrorClass.ERROR_UNKNOWN, aMsg.id));
         }
+
         return promise;
     }
 }

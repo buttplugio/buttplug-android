@@ -3,5 +3,10 @@ language: java
 jdk:
 - oraclejdk8
 
+script:
+  - ./gradlew check
+  - ./gradlew codeCoverageReport
+
 after_success:
-- ./gradlew coberturaReport coveralls
+  - ./gradlew coveralls
+  - bash <(curl -s https://codecov.io/bash)

@@ -1,22 +1,21 @@
 package org.metafetish.buttplug.core.Messages;
 
-import java.io.IOException;
-import java.util.List;
-
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.metafetish.buttplug.core.ButtplugJsonMessageParser;
 import org.metafetish.buttplug.core.ButtplugMessage;
 import org.metafetish.buttplug.core.Messages.RequestLog.ButtplugLogLevel;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import java.io.IOException;
+import java.util.List;
 
 public class LogTest {
 
     @Test
     public void test() throws JsonParseException, JsonMappingException, IOException {
-        String testStr = "[{\"Log\":{\"Id\":7,\"LogLevel\":3,\"LogMessage\":\"TestLog\"}}]";
+        String testStr = "[{\"Log\":{\"Id\":7,\"LogLevel\":\"Warn\",\"LogMessage\":\"TestLog\"}}]";
         
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
         List<ButtplugMessage> msgs = parser.parseJson(testStr);

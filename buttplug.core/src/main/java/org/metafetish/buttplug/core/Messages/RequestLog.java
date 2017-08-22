@@ -1,27 +1,33 @@
 package org.metafetish.buttplug.core.Messages;
 
-import org.metafetish.buttplug.core.ButtplugConsts;
-import org.metafetish.buttplug.core.ButtplugMessage;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.metafetish.buttplug.core.ButtplugConsts;
+import org.metafetish.buttplug.core.ButtplugMessage;
 
 public class RequestLog extends ButtplugMessage
 {
     
     public enum ButtplugLogLevel
     {
-        OFF,
-        FATAL,
-        ERROR,
-        WARN,
-        INFO,
-        DEBUG,
-        TRACE;
-        
+        OFF("Off"),
+        FATAL("Fatal"),
+        ERROR("Error"),
+        WARN("Warn"),
+        INFO("Info"),
+        DEBUG("Debug"),
+        TRACE("Trace");
+
+        public String jsonName;
+
+        ButtplugLogLevel(String jsonName) {
+            this.jsonName = jsonName;
+        }
+
         @JsonValue
-        public int toValue() {
-            return ordinal();
+        @Override
+        public String toString() {
+            return jsonName;
         }
     }
 

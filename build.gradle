@@ -59,7 +59,7 @@ subprojects {
 
                 scm {
                     connection "scm:git:git://github.com/metafetish/buttplug4j.git"
-                    developerConnection "scm:git:git@github.com:metafetish/buttplug4j.git"
+                    developerConnection "scm:git:ssh@github.com:metafetish/buttplug4j.git"
                     url "https://github.com/metafetish/buttplug4j"
                 }
 

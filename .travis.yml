@@ -8,5 +8,5 @@ script:
   - ./gradlew codeCoverageReport
 
 after_success:
-  - ./gradlew coveralls
   - bash <(curl -s https://codecov.io/bash)
+  - ./gradlew uploadArchives

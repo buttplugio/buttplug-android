@@ -6,8 +6,23 @@ import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 
 public class VorzeA10CycloneCmd extends ButtplugDeviceMessage {
 
+    @JsonProperty(value = "Clockwise", required = true)
+    public boolean clockwise;
     @JsonProperty(value = "Speed", required = true)
     private int speed;
+
+    public VorzeA10CycloneCmd(long deviceIndex, int speed, boolean clockwise, long id) {
+        super(id, deviceIndex);
+        SetSpeed(speed);
+        this.clockwise = clockwise;
+    }
+
+    @SuppressWarnings("unused")
+    private VorzeA10CycloneCmd() {
+        super(ButtplugConsts.DefaultMsgId, -1);
+        SetSpeed(0);
+        this.clockwise = false;
+    }
 
     public int GetSpeed() {
         if (speed > 99 || speed < 0) {
@@ -28,26 +43,5 @@ public class VorzeA10CycloneCmd extends ButtplugDeviceMessage {
         }
 
         this.speed = speed;
-    }
-
-    @JsonProperty(value = "Clockwise", required = true)
-    public boolean clockwise;
-
-    public VorzeA10CycloneCmd(long deviceIndex, int speed, boolean clockwise, long id) {
-        super(id, deviceIndex);
-        SetSpeed(speed);
-        this.clockwise = clockwise;
-    }
-
-    public VorzeA10CycloneCmd(long deviceIndex, int speed, boolean clockwise) {
-        super(ButtplugConsts.DefaultMsgId, deviceIndex);
-        SetSpeed(speed);
-        this.clockwise = clockwise;
-    }
-
-    private VorzeA10CycloneCmd() {
-        super(ButtplugConsts.DefaultMsgId, -1);
-        SetSpeed(0);
-        this.clockwise = false;
     }
 }

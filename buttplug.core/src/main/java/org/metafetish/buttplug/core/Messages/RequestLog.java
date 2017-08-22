@@ -5,11 +5,23 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugMessage;
 
-public class RequestLog extends ButtplugMessage
-{
-    
-    public enum ButtplugLogLevel
-    {
+public class RequestLog extends ButtplugMessage {
+
+    @JsonProperty(value = "LogLevel", required = true)
+    public ButtplugLogLevel logLevel;
+
+    @SuppressWarnings("unused")
+    private RequestLog() {
+        super(ButtplugConsts.DefaultMsgId);
+        logLevel = ButtplugLogLevel.OFF;
+    }
+
+    public RequestLog(ButtplugLogLevel logLevel, long id) {
+        super(id);
+        this.logLevel = logLevel;
+    }
+
+    public enum ButtplugLogLevel {
         OFF("Off"),
         FATAL("Fatal"),
         ERROR("Error"),
@@ -18,7 +30,7 @@ public class RequestLog extends ButtplugMessage
         DEBUG("Debug"),
         TRACE("Trace");
 
-        public String jsonName;
+        private String jsonName;
 
         ButtplugLogLevel(String jsonName) {
             this.jsonName = jsonName;
@@ -29,32 +41,5 @@ public class RequestLog extends ButtplugMessage
         public String toString() {
             return jsonName;
         }
-    }
-
-    @JsonProperty(value="LogLevel", required = true)
-    public ButtplugLogLevel logLevel;
-
-    public RequestLog()
-    {
-        super(ButtplugConsts.DefaultMsgId);
-        logLevel = ButtplugLogLevel.OFF;
-    }
-    
-    public RequestLog(long id)
-    { 
-        super(id);
-        logLevel = ButtplugLogLevel.OFF;
-    }
-
-    public RequestLog(ButtplugLogLevel logLevel, long id)
-    { 
-        super(id);
-        this.logLevel = logLevel;
-    }
-    
-    public RequestLog(ButtplugLogLevel logLevel)
-    { 
-        super(ButtplugConsts.DefaultMsgId);
-        this.logLevel = logLevel;
     }
 }

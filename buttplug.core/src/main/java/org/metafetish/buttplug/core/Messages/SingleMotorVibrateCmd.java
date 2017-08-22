@@ -9,6 +9,17 @@ public class SingleMotorVibrateCmd extends ButtplugDeviceMessage {
     @JsonProperty(value = "Speed", required = true)
     private double speed;
 
+    public SingleMotorVibrateCmd(long deviceIndex, double speed, long id) {
+        super(id, deviceIndex);
+        SetSpeed(speed);
+    }
+
+    @SuppressWarnings("unused")
+    private SingleMotorVibrateCmd() {
+        super(ButtplugConsts.DefaultMsgId, -1);
+        SetSpeed(0);
+    }
+
     public double GetSpeed() {
         if (speed > 1 || speed < 0) {
             return 0;
@@ -28,20 +39,5 @@ public class SingleMotorVibrateCmd extends ButtplugDeviceMessage {
         }
 
         this.speed = speed;
-    }
-
-    public SingleMotorVibrateCmd(long deviceIndex, double speed, long id) {
-        super(id, deviceIndex);
-        SetSpeed(speed);
-    }
-
-    public SingleMotorVibrateCmd(long deviceIndex, double speed) {
-        super(ButtplugConsts.DefaultMsgId, deviceIndex);
-        SetSpeed(speed);
-    }
-
-    private SingleMotorVibrateCmd() {
-        super(ButtplugConsts.DefaultMsgId, -1);
-        SetSpeed(0);
     }
 }

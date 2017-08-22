@@ -8,6 +8,23 @@ public class FleshlightLaunchFW12Cmd extends ButtplugDeviceMessage {
 
     @JsonProperty(value = "Speed", required = true)
     private int speed;
+    @JsonProperty(value = "Position", required = true)
+    private int position;
+
+    public FleshlightLaunchFW12Cmd(long deviceIndex, int speed, int position, long id) {
+        super(id, deviceIndex);
+
+        SetSpeed(speed);
+        SetPosition(position);
+    }
+
+    @SuppressWarnings("unused")
+    private FleshlightLaunchFW12Cmd() {
+        super(ButtplugConsts.DefaultMsgId, -1);
+
+        SetSpeed(0);
+        SetPosition(0);
+    }
 
     public int GetSpeed() {
         if (speed > 99 || speed < 0) {
@@ -29,9 +46,6 @@ public class FleshlightLaunchFW12Cmd extends ButtplugDeviceMessage {
 
         this.speed = speed;
     }
-    
-    @JsonProperty(value = "Position", required = true)
-    private int position;
 
     public int GetPosition() {
         if (position > 99 || position < 0) {
@@ -52,27 +66,5 @@ public class FleshlightLaunchFW12Cmd extends ButtplugDeviceMessage {
         }
 
         this.position = position;
-    }
-
-
-    public FleshlightLaunchFW12Cmd(long deviceIndex, int speed, int position, long id) {
-        super(id, deviceIndex);
-
-        SetSpeed(speed);
-        SetPosition(position);
-    }
-
-    public FleshlightLaunchFW12Cmd(long deviceIndex, int speed, int position) {
-        super(ButtplugConsts.DefaultMsgId, deviceIndex);
-
-        SetSpeed(speed);
-        SetPosition(position);
-    }
-
-    private FleshlightLaunchFW12Cmd() {
-        super(ButtplugConsts.DefaultMsgId, -1);
-
-        SetSpeed(0);
-        SetPosition(0);
     }
 }

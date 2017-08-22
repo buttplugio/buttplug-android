@@ -5,7 +5,8 @@ import org.metafetish.buttplug.core.ButtplugMessage;
 
 public class StopScanning extends ButtplugMessage {
 
-    public StopScanning() {
+    @SuppressWarnings("unused")
+    private StopScanning() {
         super(ButtplugConsts.DefaultMsgId);
     }
 

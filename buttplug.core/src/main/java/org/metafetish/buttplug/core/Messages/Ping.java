@@ -5,7 +5,8 @@ import org.metafetish.buttplug.core.ButtplugMessage;
 
 public class Ping extends ButtplugMessage {
 
-    public Ping() {
+    @SuppressWarnings("unused")
+    private Ping() {
         super(ButtplugConsts.DefaultMsgId);
     }
 

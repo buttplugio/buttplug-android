@@ -1,20 +1,17 @@
 package org.metafetish.buttplug.core.Messages;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.metafetish.buttplug.core.ButtplugJsonMessageParser;
 import org.metafetish.buttplug.core.ButtplugMessage;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import java.io.IOException;
+import java.util.List;
 
 public class TestTest {
 
     @Test
-    public void test() throws JsonParseException, JsonMappingException, IOException {
+    public void test() throws IOException {
         String testStr = "[{\"Test\":{\"Id\":7,\"TestString\":\"TestText\"}}]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();

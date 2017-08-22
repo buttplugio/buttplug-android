@@ -30,48 +30,33 @@ import java.util.concurrent.atomic.AtomicLong;
 @WebSocket(maxTextMessageSize = 64 * 1024)
 public class ButtplugWSClient {
 
-    private ButtplugJsonMessageParser _parser;
+    public IDeviceEvent deviceAdded;
 
     //private IButtplugLog _bpLogger;
 
     //private IButtplugLogManager _bpLogManager;
-
-    private Object sendLock = new Object();
-
-    private String _clientName;
-
-    private int _messageSchemaVersion;
-
-    private ConcurrentHashMap<Long, SettableFuture<ButtplugMessage>> _waitingMsgs = new ConcurrentHashMap<>();
-
-    private ConcurrentHashMap<Long, ButtplugClientDevice> _devices = new ConcurrentHashMap<>();
-
-    private WebSocketClient client;
-
-    private Session session;
-
-    private Timer _pingTimer;
-
-    public IDeviceEvent deviceAdded;
-
     public IDeviceEvent deviceRemoved;
-
     public IScanningEvent scanningFinished;
-
     public IErrorEvent erorReceived;
-
     public ILogEvent logReceived;
-
+    private ButtplugJsonMessageParser _parser;
+    private Object sendLock = new Object();
+    private String _clientName;
+    private int _messageSchemaVersion;
+    private ConcurrentHashMap<Long, SettableFuture<ButtplugMessage>> _waitingMsgs = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long, ButtplugClientDevice> _devices = new ConcurrentHashMap<>();
+    private WebSocketClient client;
+    private Session session;
+    private Timer _pingTimer;
     private AtomicLong msgId = new AtomicLong(1);
 
     public ButtplugWSClient(String aClientName) {
         _clientName = aClientName;
-        //_bpLogManager = new ButtplugLogManager();
-        //_bpLogger = _bpLogManager.GetLogger(GetType());
         _parser = new ButtplugJsonMessageParser();
-        //_bpLogger.Info("Finished setting up ButtplugClient");
-        //_owningDispatcher = Dispatcher.CurrentDispatcher;
-        //_tokenSource = new CancellationTokenSource();
+    }
+
+    public long getNextMsgId() {
+        return msgId.getAndIncrement();
     }
 
     public void Connect(URI url) throws Exception {
@@ -89,11 +74,10 @@ public class ButtplugWSClient {
         client.start();
         client.connect(this, url, new ClientUpgradeRequest()).get();
 
-        ButtplugMessage res = sendMessage(new RequestServerInfo(_clientName)).get();
+        ButtplugMessage res = sendMessage(new RequestServerInfo(_clientName, getNextMsgId())).get();
         if (res instanceof ServerInfo) {
             if (((ServerInfo) res).maxPingTime > 0) {
                 _pingTimer = new Timer("pingTimer", true);
-                //onPingTimer, null, 0,  0)));
                 _pingTimer.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
@@ -107,18 +91,20 @@ public class ButtplugWSClient {
             }
 
         } else if (res instanceof org.metafetish.buttplug.core.Messages.Error) {
-            throw new Exception(((org.metafetish.buttplug.core.Messages.Error) res).getErrorMessage());
+            throw new Exception(((org.metafetish.buttplug.core.Messages.Error) res).errorMessage);
         } else {
             throw new Exception("Unexpected message returned: " + res.getClass().getName());
         }
     }
 
     @OnWebSocketClose
+    @SuppressWarnings("unused")
     public void onClose(int statusCode, String reason) {
         this.session = null;
     }
 
     @OnWebSocketConnect
+    @SuppressWarnings("unused")
     public void onConnect(Session session) {
         this.session = session;
     }
@@ -153,6 +139,7 @@ public class ButtplugWSClient {
     }
 
     @OnWebSocketMessage
+    @SuppressWarnings("unused")
     public void onMessage(String buf) {
         try {
             List<ButtplugMessage> msgs = _parser.parseJson(buf);
@@ -195,7 +182,7 @@ public class ButtplugWSClient {
         } catch (IOException e) {
             if (erorReceived != null) {
                 erorReceived.errorReceived(new org.metafetish.buttplug.core.Messages.Error(e.getMessage(),
-                        Error.ErrorClass.ERROR_UNKNOWN));
+                        Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.SystemMsgId));
             } else {
                 e.printStackTrace();
             }
@@ -206,7 +193,7 @@ public class ButtplugWSClient {
         try {
             ButtplugMessage msg = sendMessage(new Ping(msgId.incrementAndGet())).get();
             if (msg instanceof org.metafetish.buttplug.core.Messages.Error) {
-                throw new Exception(((org.metafetish.buttplug.core.Messages.Error) msg).getErrorMessage());
+                throw new Exception(((org.metafetish.buttplug.core.Messages.Error) msg).errorMessage);
             }
         } catch (Throwable e) {
             if (client != null) {
@@ -220,7 +207,7 @@ public class ButtplugWSClient {
         ButtplugMessage res = sendMessage(new RequestDeviceList(msgId.incrementAndGet())).get();
         if (!(res instanceof DeviceList) || ((DeviceList) res).devices == null) {
             if (res instanceof org.metafetish.buttplug.core.Messages.Error) {
-                throw new Exception(((org.metafetish.buttplug.core.Messages.Error) res).getErrorMessage());
+                throw new Exception(((org.metafetish.buttplug.core.Messages.Error) res).errorMessage);
             }
             return;
         }
@@ -264,14 +251,16 @@ public class ButtplugWSClient {
         ButtplugClientDevice dev = _devices.get(device.index);
         if (dev != null) {
             if (!dev.allowedMessages.contains(deviceMsg.getClass().getSimpleName())) {
-                return null;//new org.metafetish.buttplug.core.Messages.Error("Device does not accept message type: " + aDeviceMsg.getClass().getSimpleName(), org.metafetish.buttplug.core.Messages.Error.ErrorClass.ERROR_DEVICE, ButtplugConsts.SystemMsgId);
+                promise.set(new org.metafetish.buttplug.core.Messages.Error("Device does not accept message type: " + deviceMsg.getClass().getSimpleName(), org.metafetish.buttplug.core.Messages.Error.ErrorClass.ERROR_DEVICE, ButtplugConsts.SystemMsgId));
+                return promise;
             }
 
             deviceMsg.deviceIndex = device.index;
             deviceMsg.id = msgId.incrementAndGet();
             return sendMessage(deviceMsg);
         } else {
-            return null;//new org.metafetish.buttplug.core.Messages.Error("Device not available.", org.metafetish.buttplug.core.Messages.Error.ErrorClass.ERROR_DEVICE, ButtplugConsts.SystemMsgId);
+            promise.set(new org.metafetish.buttplug.core.Messages.Error("Device not available.", org.metafetish.buttplug.core.Messages.Error.ErrorClass.ERROR_DEVICE, ButtplugConsts.SystemMsgId));
+            return promise;
         }
     }
 

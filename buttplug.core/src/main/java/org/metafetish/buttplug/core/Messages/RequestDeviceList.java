@@ -5,7 +5,8 @@ import org.metafetish.buttplug.core.ButtplugMessage;
 
 public class RequestDeviceList extends ButtplugMessage {
 
-    public RequestDeviceList() {
+    @SuppressWarnings("unused")
+    private RequestDeviceList() {
         super(ButtplugConsts.DefaultMsgId);
     }
 

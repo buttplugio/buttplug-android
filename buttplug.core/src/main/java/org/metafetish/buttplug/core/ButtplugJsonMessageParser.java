@@ -1,21 +1,19 @@
 package org.metafetish.buttplug.core;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTypeResolverBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 public class ButtplugJsonMessageParser {
 
-    ObjectMapper mapper;
+    private ObjectMapper mapper;
 
     public ButtplugJsonMessageParser() {
         mapper = new ObjectMapper();
@@ -27,17 +25,17 @@ public class ButtplugJsonMessageParser {
     }
 
     public List<ButtplugMessage> parseJson(String json)
-            throws JsonParseException, JsonMappingException, IOException {
+            throws IOException {
         return Arrays.asList(mapper.readValue(json, ButtplugMessage[].class));
     }
 
     public String formatJson(List<ButtplugMessage> msgs)
-            throws JsonParseException, JsonMappingException, IOException {
+            throws IOException {
         return mapper.writeValueAsString(msgs);
     }
 
     public String formatJson(ButtplugMessage msgs)
-            throws JsonParseException, JsonMappingException, IOException {
-        return mapper.writeValueAsString(new ButtplugMessage[] { msgs });
+            throws IOException {
+        return mapper.writeValueAsString(new ButtplugMessage[]{msgs});
     }
 }

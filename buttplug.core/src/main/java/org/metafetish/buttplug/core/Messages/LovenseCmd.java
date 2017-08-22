@@ -6,20 +6,15 @@ import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 
 public class LovenseCmd extends ButtplugDeviceMessage {
 
-    @JsonProperty(value="Command", required = true)
+    @JsonProperty(value = "Command", required = true)
     public String deviceCmd;
-    
-    public LovenseCmd(long deviceIndex, String deviceCmd, long id)
-    {
+
+    public LovenseCmd(long deviceIndex, String deviceCmd, long id) {
         super(id, deviceIndex);
         this.deviceCmd = deviceCmd;
     }
 
-    public LovenseCmd(long deviceIndex, String deviceCmd) {
-        super(ButtplugConsts.DefaultMsgId, deviceIndex);
-        this.deviceCmd = deviceCmd;
-    }
-
+    @SuppressWarnings("unused")
     private LovenseCmd() {
         super(ButtplugConsts.DefaultMsgId, -1);
         this.deviceCmd = "";

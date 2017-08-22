@@ -6,7 +6,7 @@ public class DeviceMessageInfo {
 
     @JsonProperty(value = "DeviceIndex", required = true)
     public long deviceIndex;
-    
+
     @JsonProperty(value = "DeviceName", required = true)
     public String deviceName;
 
@@ -23,6 +23,6 @@ public class DeviceMessageInfo {
     private DeviceMessageInfo() {
         this.deviceName = "";
         this.deviceIndex = -1;
-        this.deviceMessages = new String[] {};
+        this.deviceMessages = new String[]{};
     }
 }

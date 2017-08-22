@@ -12,7 +12,7 @@ public class VorzeA10CycloneCmdTest {
 
     @Test
     public void test() throws IOException {
-        String testStr = "[{\"VorzeA10CycloneCmd\":{\"Id\":7,\"DeviceIndex\":3,\"Speed\":15,\"Clockwise\":true}}]";
+        String testStr = "[{\"VorzeA10CycloneCmd\":{\"Id\":7,\"DeviceIndex\":3,\"Clockwise\":true,\"Speed\":15}}]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
         List<ButtplugMessage> msgs = parser.parseJson(testStr);

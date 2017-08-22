@@ -6,20 +6,15 @@ import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 
 public class KiirooCmd extends ButtplugDeviceMessage {
 
-    @JsonProperty(value="Command", required = true)
+    @JsonProperty(value = "Command", required = true)
     public String deviceCmd;
-    
-    public KiirooCmd(long deviceIndex, String deviceCmd, long id)
-    {
+
+    public KiirooCmd(long deviceIndex, String deviceCmd, long id) {
         super(id, deviceIndex);
         this.deviceCmd = deviceCmd;
     }
 
-    public KiirooCmd(long deviceIndex, String deviceCmd) {
-        super(ButtplugConsts.DefaultMsgId, deviceIndex);
-        this.deviceCmd = deviceCmd;
-    }
-
+    @SuppressWarnings("unused")
     private KiirooCmd() {
         super(ButtplugConsts.DefaultMsgId, -1);
         this.deviceCmd = "";

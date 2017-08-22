@@ -5,11 +5,12 @@ import org.metafetish.buttplug.core.ButtplugMessage;
 
 public class Ok extends ButtplugMessage {
 
-    public Ok() {
-        super(ButtplugConsts.DefaultMsgId);
-    }
-
     public Ok(long id) {
         super(id);
+    }
+
+    @SuppressWarnings("unused")
+    private Ok() {
+        super(ButtplugConsts.DefaultMsgId);
     }
 }

@@ -22,7 +22,7 @@ public class ErrorTest {
                 org.metafetish.buttplug.core.Messages.Error.class);
         Assert.assertEquals(msgs.get(0).id, 7);
         Assert.assertEquals(
-                ((org.metafetish.buttplug.core.Messages.Error) msgs.get(0)).getErrorMessage(),
+                ((Error) msgs.get(0)).errorMessage,
                 "TestError");
         Assert.assertEquals(
                 ((Error) msgs.get(0)).errorCode,

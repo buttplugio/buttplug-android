@@ -14,7 +14,7 @@ public class ButtplugWSClientTest {
     @Test
     public void TestConnect() throws Exception {
         ButtplugWSClient client = new ButtplugWSClient("Java Test");
-        client.Connect(new URI("ws://localhost:12345/buttplug"));
+        client.Connect(new URI("wss://localhost:12345/buttplug"), true);
         client.startScanning();
 
         Thread.sleep(5000);

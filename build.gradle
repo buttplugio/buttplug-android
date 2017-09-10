@@ -4,7 +4,7 @@ allprojects {
     apply plugin: 'maven'
 
     group = 'org.metafetish.buttplug'
-    version = "0.0." + ( "$System.env.TRAVIS_BUILD_NUMBER" ?: "1") + "-SNAPSHOT"
+    version = "0.0." + ( "${System.env.TRAVIS_BUILD_NUMBER?:1}" ) + "-SNAPSHOT"
 
     repositories {
         mavenCentral()

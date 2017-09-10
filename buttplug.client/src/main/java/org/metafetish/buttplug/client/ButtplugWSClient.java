@@ -1,14 +1,6 @@
 package org.metafetish.buttplug.client;
 
-import com.google.common.util.concurrent.SettableFuture;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.WebSocketException;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
+import com.neovisionaries.ws.client.*;
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 import org.metafetish.buttplug.core.ButtplugJsonMessageParser;
@@ -16,8 +8,17 @@ import org.metafetish.buttplug.core.ButtplugMessage;
 import org.metafetish.buttplug.core.Messages.*;
 import org.metafetish.buttplug.core.Messages.Error;
 
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.SettableListenableFuture;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -27,26 +28,23 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
-@WebSocket(maxTextMessageSize = 64 * 1024)
-public class ButtplugWSClient {
+public class ButtplugWSClient extends WebSocketAdapter {
 
     public IDeviceEvent deviceAdded;
 
-    //private IButtplugLog _bpLogger;
-
-    //private IButtplugLogManager _bpLogManager;
     public IDeviceEvent deviceRemoved;
     public IScanningEvent scanningFinished;
     public IErrorEvent erorReceived;
     public ILogEvent logReceived;
+
+    private WebSocket websocket;
     private ButtplugJsonMessageParser _parser;
     private Object sendLock = new Object();
     private String _clientName;
     private int _messageSchemaVersion;
-    private ConcurrentHashMap<Long, SettableFuture<ButtplugMessage>> _waitingMsgs = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long, SettableListenableFuture<ButtplugMessage>> _waitingMsgs = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, ButtplugClientDevice> _devices = new ConcurrentHashMap<>();
-    private WebSocketClient client;
-    private Session session;
+
     private Timer _pingTimer;
     private AtomicLong msgId = new AtomicLong(1);
 
@@ -60,19 +58,16 @@ public class ButtplugWSClient {
     }
 
     public void Connect(URI url) throws Exception {
+        Connect(url, false);
+    }
 
-        if (client != null && session != null && session.isOpen()) {
-            throw new IllegalStateException("WS is already open");
-        }
-
-        client = new WebSocketClient();
+    public void Connect(URI url, boolean trustAll) throws Exception {
 
         _waitingMsgs.clear();
         _devices.clear();
         msgId.set(1);
 
-        client.start();
-        client.connect(this, url, new ClientUpgradeRequest()).get();
+        websocket = getWebSocket(url, trustAll);
 
         ButtplugMessage res = sendMessage(new RequestServerInfo(_clientName, getNextMsgId())).get();
         if (res instanceof ServerInfo) {
@@ -97,56 +92,47 @@ public class ButtplugWSClient {
         }
     }
 
-    @OnWebSocketClose
-    @SuppressWarnings("unused")
+    /*
     public void onClose(int statusCode, String reason) {
         this.session = null;
     }
 
-    @OnWebSocketConnect
-    @SuppressWarnings("unused")
+    //
     public void onConnect(Session session) {
         this.session = session;
     }
-
+*/
     public void Disconnect() {
         if (_pingTimer != null) {
             _pingTimer.cancel();
             _pingTimer = null;
         }
 
-        if (session != null) {
-            try {
-                session.disconnect();
-            } catch (IOException e) {
-                // noop - something when wrong closing the socket, but we're
-                // about to dispose of it anyway.
-            }
+        if (websocket != null) {
+            websocket.disconnect();
+            websocket = null;
         }
-        client = null;
 
         int max = 3;
         while (max-- > 0 && _waitingMsgs.size() != 0) {
             for (long msgId : _waitingMsgs.keySet()) {
-                SettableFuture<ButtplugMessage> val = _waitingMsgs.remove(msgId);
+                SettableListenableFuture<ButtplugMessage> val = _waitingMsgs.remove(msgId);
                 if (val != null) {
                     val.set(new Error("Connection closed!", Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.SystemMsgId));
                 }
             }
         }
-
         msgId.set(1);
     }
 
-    @OnWebSocketMessage
-    @SuppressWarnings("unused")
-    public void onMessage(String buf) {
+    @Override
+    public void onTextMessage(WebSocket socket, String buf) {
         try {
             List<ButtplugMessage> msgs = _parser.parseJson(buf);
 
             for (ButtplugMessage msg : msgs) {
                 if (msg.id > 0) {
-                    SettableFuture<ButtplugMessage> val = _waitingMsgs.remove(msg.id);
+                    SettableListenableFuture<ButtplugMessage> val = _waitingMsgs.remove(msg.id);
                     if (val != null) {
                         val.set(msg);
                         continue;
@@ -196,8 +182,9 @@ public class ButtplugWSClient {
                 throw new Exception(((org.metafetish.buttplug.core.Messages.Error) msg).errorMessage);
             }
         } catch (Throwable e) {
-            if (client != null) {
-                Disconnect();
+            if (websocket != null) {
+                websocket.disconnect();
+                websocket = null;
             }
             throw e;
         }
@@ -246,8 +233,8 @@ public class ButtplugWSClient {
         return sendMessageExpectOk(new RequestLog(aLogLevel, msgId.getAndIncrement()));
     }
 
-    public SettableFuture<ButtplugMessage> sendDeviceMessage(ButtplugClientDevice device, ButtplugDeviceMessage deviceMsg) throws ExecutionException, InterruptedException, IOException {
-        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
+    public ListenableFuture<ButtplugMessage> sendDeviceMessage(ButtplugClientDevice device, ButtplugDeviceMessage deviceMsg) throws ExecutionException, InterruptedException, IOException {
+        SettableListenableFuture<ButtplugMessage> promise = new SettableListenableFuture<ButtplugMessage>();
         ButtplugClientDevice dev = _devices.get(device.index);
         if (dev != null) {
             if (!dev.allowedMessages.contains(deviceMsg.getClass().getSimpleName())) {
@@ -269,22 +256,50 @@ public class ButtplugWSClient {
     }
 
 
-    protected SettableFuture<ButtplugMessage> sendMessage(ButtplugMessage msg) throws ExecutionException, InterruptedException, IOException {
-        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
+    protected ListenableFuture<ButtplugMessage> sendMessage(ButtplugMessage msg) throws ExecutionException, InterruptedException, IOException {
+        SettableListenableFuture<ButtplugMessage> promise = new SettableListenableFuture<ButtplugMessage>();
 
         _waitingMsgs.put(msg.id, promise);
-        if (session == null) {
+        if (websocket == null) {
             promise.set(new org.metafetish.buttplug.core.Messages.Error("Bad WS state!", Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.SystemMsgId));
             return promise;
         }
 
         try {
-            Future<Void> fut = session.getRemote().sendStringByFuture(_parser.formatJson(msg));
-            fut.get();
-        } catch (WebSocketException e) {
+            websocket.sendText(_parser.formatJson(msg));
+            websocket.flush();
+        } catch (IOException e) {
             promise.set(new org.metafetish.buttplug.core.Messages.Error(e.getMessage(), org.metafetish.buttplug.core.Messages.Error.ErrorClass.ERROR_UNKNOWN, msg.id));
         }
 
         return promise;
+    }
+
+    protected WebSocket getWebSocket(URI url, boolean trustAll) throws IOException, WebSocketException, NoSuchAlgorithmException, KeyManagementException {
+        SSLContext context = SSLContext.getDefault();
+        if(trustAll)
+        {
+            context = SSLContext.getInstance("TLS");
+            context.init(null, new TrustManager[] { new X509TrustManager() {
+                @Override
+                public X509Certificate[] getAcceptedIssuers()
+                {
+                    return null;
+                }
+                public void checkClientTrusted(X509Certificate[] certs, String authType)
+                {
+                }
+                public void checkServerTrusted(X509Certificate[] certs, String authType)
+                {
+                }
+            } }, null);
+        }
+        return new WebSocketFactory()
+                .setSSLContext(context)
+                .setConnectionTimeout(2000)
+                .createSocket(url)
+                .addListener(this)
+                .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
+                .connect();
     }
 }

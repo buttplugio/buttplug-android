@@ -5,7 +5,6 @@ import org.metafetish.buttplug.core.Messages.DeviceMessageInfo;
 import org.metafetish.buttplug.core.Messages.DeviceRemoved;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ButtplugClientDevice {
@@ -18,13 +17,13 @@ public class ButtplugClientDevice {
     public ButtplugClientDevice(DeviceMessageInfo aDevInfo) {
         index = aDevInfo.deviceIndex;
         name = aDevInfo.deviceName;
-        allowedMessages = Arrays.asList(aDevInfo.deviceMessages);
+//        allowedMessages = Arrays.asList(aDevInfo.deviceMessages);
     }
 
     public ButtplugClientDevice(DeviceAdded aDevInfo) {
         index = aDevInfo.deviceIndex;
         name = aDevInfo.deviceName;
-        allowedMessages = Arrays.asList(aDevInfo.deviceMessages);
+//        allowedMessages = Arrays.asList(aDevInfo.deviceMessages);
     }
 
     public ButtplugClientDevice(DeviceRemoved aDevInfo) {

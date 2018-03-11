@@ -8,8 +8,11 @@ public abstract class ButtplugDeviceMessage extends ButtplugMessage {
     public long deviceIndex;
 
     public ButtplugDeviceMessage(long id, long deviceIndex) {
-        super(id);
-        this.deviceIndex = deviceIndex;
+        this(id, deviceIndex, 0);
     }
 
+    public ButtplugDeviceMessage(long id, long deviceIndex, long aSchemaVersion) {
+        super(id, aSchemaVersion);
+        this.deviceIndex = deviceIndex;
+    }
 }

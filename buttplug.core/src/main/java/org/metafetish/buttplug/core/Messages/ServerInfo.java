@@ -1,10 +1,11 @@
 package org.metafetish.buttplug.core.Messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugMessage;
 
-public class ServerInfo extends ButtplugMessage {
+public class ServerInfo extends ButtplugMessage implements IButtplugMessageOutgoingOnly {
     @JsonProperty(value = "MajorVersion", required = true)
     public int majorVersion;
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/buttplug-android.iml" filepath="$PROJECT_DIR$/buttplug-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/buttplug.apps.WebsocketServerGUI/buttplug.apps.WebsocketServerGUI.iml" filepath="$PROJECT_DIR$/buttplug.apps.WebsocketServerGUI/buttplug.apps.WebsocketServerGUI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/buttplug.client/buttplug.client.iml" filepath="$PROJECT_DIR$/buttplug.client/buttplug.client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/buttplug.core/buttplug.core.iml" filepath="$PROJECT_DIR$/buttplug.core/buttplug.core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/buttplug.server/buttplug.server.iml" filepath="$PROJECT_DIR$/buttplug.server/buttplug.server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/buttplug.server.managers.AndroidBluetoothManager/buttplug.server.managers.AndroidBluetoothManager.iml" filepath="$PROJECT_DIR$/buttplug.server.managers.AndroidBluetoothManager/buttplug.server.managers.AndroidBluetoothManager.iml" />
+    </modules>
+  </component>
+</project>

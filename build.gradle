@@ -1,96 +1,26 @@
-allprojects {
-    apply plugin: 'java'
-    apply plugin: 'jacoco'
-    apply plugin: 'maven'
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
 
-    group = 'org.metafetish.buttplug'
-    version = "0.0." + ( "${System.env.TRAVIS_BUILD_NUMBER?:1}" ) + "-SNAPSHOT"
+buildscript {
 
     repositories {
-        mavenCentral()
+        google()
+        jcenter()
     }
-
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
-
-    jacocoTestReport {
-        reports {
-            xml.enabled = true
-            html.enabled = true
-        }
-    }
-
-    task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
-        from javadoc.destinationDir
-    }
-
-    artifacts {
-        archives sourcesJar
-        archives javadocJar
-    }
-}
-
-subprojects {
-    configurations {
-        deployerJars
-    }
-
     dependencies {
-        testCompile group: 'junit', name: 'junit', version: '4.12'
-        deployerJars "io.packagecloud.maven.wagon:maven-packagecloud-wagon:0.0.6"
-    }
+        classpath 'com.android.tools.build:gradle:3.0.1'
 
-    uploadArchives {
-        repositories.mavenDeployer {
-            configuration = configurations.deployerJars
-            repository(url: "packagecloud+https://packagecloud.io/blackspherefollower/buttplug4j") {
-                authentication(password: "$System.env.PACKAGECLOUD_TOKEN")
-            }
-            pom.project {
-                name "Buttplug4j"
-                description "Java implementation of the Buttplug WebSocket client"
-                url "https://buttplug.io/"
-                inceptionYear "2017"
-
-                scm {
-                    connection "scm:git:git://github.com/metafetish/buttplug4j.git"
-                    developerConnection "scm:git:ssh@github.com:metafetish/buttplug4j.git"
-                    url "https://github.com/metafetish/buttplug4j"
-                }
-
-                licenses {
-                    license {
-                        name "BSD 3-Clause License"
-                        url "https://github.com/metafetish/buttplug4j/blob/master/LICENSE"
-                    }
-                }
-            }
-        }
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
     }
 }
 
-
-task codeCoverageReport(type: JacocoReport) {
-    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-
-    subprojects.each {
-        sourceSets it.sourceSets.main
-    }
-
-    reports {
-        xml.enabled true
-        xml.destination new File("${buildDir}/reports/jacoco/report.xml")
-        html.enabled false
-        csv.enabled false
+allprojects {
+    repositories {
+        google()
+        jcenter()
     }
 }
 
-codeCoverageReport.dependsOn {
-    subprojects*.test
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }

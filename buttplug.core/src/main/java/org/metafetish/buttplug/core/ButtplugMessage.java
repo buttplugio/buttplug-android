@@ -1,12 +1,34 @@
 package org.metafetish.buttplug.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import org.metafetish.buttplug.core.Messages.*;
+
+import org.metafetish.buttplug.core.Messages.DeviceAdded;
+import org.metafetish.buttplug.core.Messages.DeviceList;
+import org.metafetish.buttplug.core.Messages.DeviceRemoved;
 import org.metafetish.buttplug.core.Messages.Error;
+import org.metafetish.buttplug.core.Messages.FleshlightLaunchFW12Cmd;
+import org.metafetish.buttplug.core.Messages.KiirooCmd;
+import org.metafetish.buttplug.core.Messages.Log;
+import org.metafetish.buttplug.core.Messages.LovenseCmd;
+import org.metafetish.buttplug.core.Messages.Ok;
+import org.metafetish.buttplug.core.Messages.Ping;
+import org.metafetish.buttplug.core.Messages.RequestDeviceList;
+import org.metafetish.buttplug.core.Messages.RequestLog;
+import org.metafetish.buttplug.core.Messages.RequestServerInfo;
+import org.metafetish.buttplug.core.Messages.ScanningFinished;
+import org.metafetish.buttplug.core.Messages.ServerInfo;
+import org.metafetish.buttplug.core.Messages.SingleMotorVibrateCmd;
+import org.metafetish.buttplug.core.Messages.StartScanning;
+import org.metafetish.buttplug.core.Messages.StopAllDevices;
+import org.metafetish.buttplug.core.Messages.StopDeviceCmd;
+import org.metafetish.buttplug.core.Messages.StopScanning;
+import org.metafetish.buttplug.core.Messages.Test;
+import org.metafetish.buttplug.core.Messages.VorzeA10CycloneCmd;
 
 @JsonTypeInfo(include = As.WRAPPER_OBJECT, use = Id.NAME)
 @JsonSubTypes({
@@ -24,7 +46,7 @@ import org.metafetish.buttplug.core.Messages.Error;
         @JsonSubTypes.Type(value = Test.class, name = "Test"),
         @JsonSubTypes.Type(value = DeviceAdded.class, name = "DeviceAdded"),
         @JsonSubTypes.Type(value = DeviceList.class, name = "DeviceList"),
-        @JsonSubTypes.Type(value = DeviceRemoved.class, name = "DeviceRemoved"),
+        @JsonSubTypes.Type(value = DeviceRemoved.class, name = "deviceRemoved"),
         @JsonSubTypes.Type(value = StopAllDevices.class, name = "StopAllDevices"),
         @JsonSubTypes.Type(value = StopDeviceCmd.class, name = "StopDeviceCmd"),
         @JsonSubTypes.Type(value = VorzeA10CycloneCmd.class, name = "VorzeA10CycloneCmd"),
@@ -35,10 +57,21 @@ import org.metafetish.buttplug.core.Messages.Error;
 })
 public abstract class ButtplugMessage {
 
+    @JsonIgnore
+    public final long currentSchemaVersion = 1;
+
     @JsonProperty(value = "Id", required = true)
     public long id;
 
-    public ButtplugMessage(long id) {
+    @JsonProperty(value = "SchemaVersion", required = true)
+    public long schemaVersion;
+
+    public ButtplugMessage(long id, long schemaVersion) {
         this.id = id;
+        this.schemaVersion = schemaVersion;
+    }
+
+    public ButtplugMessage(long id) {
+        this(id, 1);
     }
 }

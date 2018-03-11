@@ -1,15 +1,19 @@
 package org.metafetish.buttplug.core.Messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugMessage;
 
-public class DeviceList extends ButtplugMessage {
+import java.util.ArrayList;
+import java.util.List;
+
+public class DeviceList extends ButtplugMessage implements IButtplugMessageOutgoingOnly {
 
     @JsonProperty(value = "Devices", required = true)
-    public DeviceMessageInfo[] devices;
+    public List<DeviceMessageInfo> devices;
 
-    public DeviceList(DeviceMessageInfo[] devices, long id) {
+    public DeviceList(List<DeviceMessageInfo> devices, long id) {
         super(id);
         this.devices = devices;
     }
@@ -17,6 +21,6 @@ public class DeviceList extends ButtplugMessage {
     @SuppressWarnings("unused")
     private DeviceList() {
         super(ButtplugConsts.DefaultMsgId);
-        this.devices = new DeviceMessageInfo[]{};
+        this.devices = new ArrayList<>();
     }
 }

@@ -21,7 +21,8 @@ public class ButtplugWSClientTest {
         client.requestDeviceList();
         for (ButtplugClientDevice dev : client.getDevices()) {
             if (dev.allowedMessages.contains(SingleMotorVibrateCmd.class.getSimpleName())) {
-                client.sendDeviceMessage(dev, new SingleMotorVibrateCmd(dev.index, 0.5, client.getNextMsgId()));
+                client.sendDeviceMessage(dev, new SingleMotorVibrateCmd(dev.index, 0.5, client
+                        .getNextMsgId()));
             }
         }
 

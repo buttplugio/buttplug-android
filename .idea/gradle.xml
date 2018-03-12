@@ -8,6 +8,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/buttplug.apps.BluetoothDeviceEmulator" />
             <option value="$PROJECT_DIR$/buttplug.apps.WebsocketServerGUI" />
             <option value="$PROJECT_DIR$/buttplug.client" />
             <option value="$PROJECT_DIR$/buttplug.core" />

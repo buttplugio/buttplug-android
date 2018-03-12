@@ -1,4 +1,4 @@
-package org.metafetish.buttplugwebsocketserver;
+package org.metafetish.buttplug.apps.websocketservergui;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/buttplug-android.iml" filepath="$PROJECT_DIR$/buttplug-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/buttplug.apps.BluetoothDeviceEmulator/buttplug.apps.BluetoothDeviceEmulator.iml" filepath="$PROJECT_DIR$/buttplug.apps.BluetoothDeviceEmulator/buttplug.apps.BluetoothDeviceEmulator.iml" />
       <module fileurl="file://$PROJECT_DIR$/buttplug.apps.WebsocketServerGUI/buttplug.apps.WebsocketServerGUI.iml" filepath="$PROJECT_DIR$/buttplug.apps.WebsocketServerGUI/buttplug.apps.WebsocketServerGUI.iml" />
       <module fileurl="file://$PROJECT_DIR$/buttplug.client/buttplug.client.iml" filepath="$PROJECT_DIR$/buttplug.client/buttplug.client.iml" />
       <module fileurl="file://$PROJECT_DIR$/buttplug.core/buttplug.core.iml" filepath="$PROJECT_DIR$/buttplug.core/buttplug.core.iml" />

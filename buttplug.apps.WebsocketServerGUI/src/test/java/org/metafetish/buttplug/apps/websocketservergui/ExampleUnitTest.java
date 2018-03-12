@@ -1,4 +1,4 @@
-package org.metafetish.buttplugwebsocketserver;
+package org.metafetish.buttplug.apps.websocketservergui;
 
 import org.junit.Test;
 

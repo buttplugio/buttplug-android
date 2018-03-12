@@ -1,1 +1,1 @@
-include ':buttplug.core', ':buttplug.server', ':buttplug.client', ':buttplug.apps.WebsocketServerGUI', ':buttplug.server.managers.AndroidBluetoothManager'
+include ':buttplug.core', ':buttplug.server', ':buttplug.client', ':buttplug.apps.WebsocketServerGUI', ':buttplug.server.managers.AndroidBluetoothManager', ':buttplug.apps.BluetoothDeviceEmulator'

@@ -51,8 +51,6 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
         super(aLogManager);
 
         Log.d(TAG, "Loading Android Bluetooth Manager");
-        this.deviceAdded = new ButtplugEventHandler();
-        this.scanningFinished = new ButtplugEventHandler();
         this.activity = activity;
 
         mHandler = new Handler();
@@ -64,18 +62,18 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
         for (IBluetoothDeviceInfo aDeviceFactory : builtinDevices) {
             Log.d(TAG, "Loading Bluetooth Device Factory: " + aDeviceFactory.getClass()
                     .getSimpleName());
-            Log.d(TAG, "earlyservices: " + aDeviceFactory.services);
+            Log.d(TAG, "earlyservices: " + aDeviceFactory.getServices());
 
             Log.d(TAG, "Loading Bluetooth Device Factory: " + aDeviceFactory.getClass()
                     .getSimpleName());
             AndroidBluetoothDeviceFactory deviceFactory = new AndroidBluetoothDeviceFactory(activity, this.bpLogManager, aDeviceFactory);
-            deviceFactory.deviceCreated.addCallback(new IButtplugCallback() {
+            deviceFactory.getDeviceCreated().addCallback(new IButtplugCallback() {
                 @Override
                 public void invoke(ButtplugEvent aEvent) {
                     IButtplugDevice device = aEvent.getDevice();
                     if (device != null) {
                         Log.d(TAG, "Device created (" + device.getIdentifier() + ")");
-                        AndroidBluetoothManager.this.deviceAdded.invoke(new ButtplugEvent(device));
+                        AndroidBluetoothManager.this.getDeviceAdded().invoke(new ButtplugEvent(device));
                         currentlyConnecting.remove(device.getIdentifier());
                     } else {
                         Log.d(TAG, "Failed to create device (" + aEvent.getString() + ")");
@@ -113,6 +111,7 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
             activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
 
+        //TODO: Remove this later
         startScanning();
     }
 
@@ -204,7 +203,7 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
             mScanning = false;
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
             Log.d(TAG, "Stopped BLE Scanning");
-            AndroidBluetoothManager.this.scanningFinished.invoke(new ButtplugEvent());
+            AndroidBluetoothManager.this.getScanningFinished().invoke(new ButtplugEvent());
         } else {
             Log.d(TAG, "BLE not Scanning");
         }

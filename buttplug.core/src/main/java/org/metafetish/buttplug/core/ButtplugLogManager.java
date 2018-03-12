@@ -6,8 +6,12 @@ import android.support.annotation.Nullable;
 import org.metafetish.buttplug.core.Messages.Log;
 
 public class ButtplugLogManager implements IButtplugLogManager {
-    @Nullable
-    public ButtplugEventHandler logMessageReceived = new ButtplugEventHandler();
+    private ButtplugEventHandler logMessageReceived = new ButtplugEventHandler();
+    @NonNull
+    public ButtplugEventHandler getLogMessageReceived() {
+        return this.logMessageReceived;
+    }
+
     private ButtplugLogLevel level;
 
     public ButtplugLogLevel getButtplugLogLevel() {
@@ -38,7 +42,7 @@ public class ButtplugLogManager implements IButtplugLogManager {
     public IButtplugLog getLogger(@NonNull Class aClass) {
         // Just pass the type in instead of traversing the stack to find it.
         IButtplugLog logger = new ButtplugLog(aClass);
-        logger.logMessageReceived.addCallback(logMessageCallback);
+        logger.getLogMessageReceived().addCallback(logMessageCallback);
         return logger;
     }
 }

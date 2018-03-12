@@ -38,7 +38,11 @@ public class AndroidBluetoothDeviceFactory {
     private IButtplugLogManager bpLogManager;
 
     private Map<String, AndroidBluetoothDeviceInterface> bleInterfaces = new HashMap<>();
-    ButtplugEventHandler deviceCreated = new ButtplugEventHandler();
+    private ButtplugEventHandler deviceCreated = new ButtplugEventHandler();
+    @NonNull
+    public ButtplugEventHandler getDeviceCreated() {
+        return this.deviceCreated;
+    }
 
     public AndroidBluetoothDeviceFactory(@NonNull Activity aActivity,
                                          @NonNull IButtplugLogManager aLogManager,
@@ -52,19 +56,19 @@ public class AndroidBluetoothDeviceFactory {
     }
 
     public boolean mayBeDevice(String advertName, List<UUID> advertGUIDs) {
-        if (!deviceInfo.names.isEmpty() && !deviceInfo.names.contains(advertName)) {
+        if (!deviceInfo.getNames().isEmpty() && !deviceInfo.getNames().contains(advertName)) {
             return false;
         }
 
         Log.d(TAG, "Found " + advertName + " for " + deviceInfo.getClass().getSimpleName());
 
-        if (!deviceInfo.names.isEmpty() && advertGUIDs.isEmpty()) {
+        if (!deviceInfo.getNames().isEmpty() && advertGUIDs.isEmpty()) {
             Log.d(TAG, "No advertised services?");
             return true;
         }
 
         //TODO: Print debug info
-        if (advertGUIDs.containsAll(deviceInfo.services)) {
+        if (advertGUIDs.containsAll(deviceInfo.getServices())) {
             return true;
         }
         return false;
@@ -79,7 +83,7 @@ public class AndroidBluetoothDeviceFactory {
         // classes, which is probably not true.
         AndroidBluetoothDeviceInterface bleInterface = new AndroidBluetoothDeviceInterface(this.activity, this.bpLogManager, aDevice, this.deviceInfo);
         bleInterfaces.put(aDevice.getAddress(), bleInterface);
-        bleInterface.deviceConnected.addCallback(new IButtplugCallback() {
+        bleInterface.getDeviceConnected().addCallback(new IButtplugCallback() {
             @Override
             public void invoke(ButtplugEvent aEvent) {
                 String btAddr = aEvent.getString();
@@ -108,29 +112,18 @@ public class AndroidBluetoothDeviceFactory {
                     serviceUuids.add(service.getUuid());
                 }
 
-                Log.d(TAG, "deviceInfo is " + deviceInfo.getClass().getSimpleName());
-                if (!serviceUuids.containsAll(deviceInfo.services)) {
+                if (!serviceUuids.containsAll(deviceInfo.getServices())) {
                     Log.d(TAG, "Cannot find service for device (" + aDevice.getName() + ")");
                     deviceCreated.invoke(new ButtplugEvent(btAddr));
                     return;
                 }
 
-                Log.d(TAG, "services type is " + AndroidBluetoothDeviceFactory.this.deviceInfo.services.getClass().getSimpleName());
-                Log.d(TAG, "services size: " + AndroidBluetoothDeviceFactory.this.deviceInfo.services.size());
-                Log.d(TAG, "names size: " + AndroidBluetoothDeviceFactory.this.deviceInfo.names.size());
-                if (deviceInfo.services.size() == 0) {
-                    Log.d(TAG, "WTF0 (" + aDevice.getName() + ")");
+                if (deviceInfo.getServices().size() == 0) {
                     deviceCreated.invoke(new ButtplugEvent(btAddr));
                 }
-                UUID firstUuid = deviceInfo.services.get(0);
+
+                UUID firstUuid = deviceInfo.getServices().get(0);
                 int serviceUuidIndex = serviceUuids.indexOf(firstUuid);
-                if (serviceUuidIndex == -1) {
-                    Log.d(TAG, "WTF1 (" + aDevice.getName() + ")");
-                    deviceCreated.invoke(new ButtplugEvent(btAddr));
-                } else if (serviceUuidIndex >= services.size()) {
-                    Log.d(TAG, "WTF2 (" + aDevice.getName() + ")");
-                    deviceCreated.invoke(new ButtplugEvent(btAddr));
-                }
                 BluetoothGattService service = services.get(serviceUuidIndex);
 
                 List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
@@ -147,14 +140,14 @@ public class AndroidBluetoothDeviceFactory {
                     characteristicUuids.add(characteristic.getUuid());
                 }
 
-                if (!characteristicUuids.containsAll(deviceInfo.characteristics)) {
+                if (!characteristicUuids.containsAll(deviceInfo.getCharacteristics())) {
                     Log.d(TAG, "Cannot find characteristic for device (" + aDevice.getName() + ")");
                     deviceCreated.invoke(new ButtplugEvent(btAddr));
                     return;
                 }
 
                 Map<UUID, BluetoothGattCharacteristic> gattCharacteristics = new HashMap<>();
-                for (UUID uuid : deviceInfo.characteristics) {
+                for (UUID uuid : deviceInfo.getCharacteristics()) {
                     gattCharacteristics.put(uuid, characteristics.get(characteristicUuids.indexOf
                             (uuid)));
                 }

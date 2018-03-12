@@ -11,13 +11,13 @@ import java.util.UUID;
 
 public interface IBluetoothDeviceInfo {
     @NonNull
-    List<String> names = new ArrayList<>();
+    List<String> getNames();
 
     @NonNull
-    List<UUID> services = new ArrayList<>();
+    List<UUID> getServices();
 
     @NonNull
-    List<UUID> characteristics = new ArrayList<>();
+    List<UUID> getCharacteristics();
 
     @NonNull
     IButtplugDevice CreateDevice(@NonNull IButtplugLogManager aLogManager, @NonNull IBluetoothDeviceInterface aDeviceInterface);

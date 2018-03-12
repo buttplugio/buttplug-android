@@ -1,11 +1,15 @@
 package org.metafetish.buttplug.server;
 
+import android.support.annotation.NonNull;
+
 import org.metafetish.buttplug.core.ButtplugEventHandler;
 
 public interface IDeviceSubtypeManager {
-    ButtplugEventHandler deviceAdded = new ButtplugEventHandler();
+    @NonNull
+    ButtplugEventHandler getDeviceAdded();
 
-    ButtplugEventHandler scanningFinished = new ButtplugEventHandler();
+    @NonNull
+    ButtplugEventHandler getScanningFinished();
 
     void startScanning();
 

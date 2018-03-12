@@ -39,7 +39,7 @@ public class FleshlightLaunch extends ButtplugBluetoothDevice {
     public ListenableFuture<ButtplugMessage> initialize() {
         return iface.writeValue(
                 ButtplugConsts.SystemMsgId,
-                info.characteristics.get(FleshlightLaunchBluetoothInfo.Chrs.Cmd.ordinal()),
+                info.getCharacteristics().get(FleshlightLaunchBluetoothInfo.Chrs.Cmd.ordinal()),
                 new byte[]{0},
                 true
         );
@@ -102,7 +102,7 @@ public class FleshlightLaunch extends ButtplugBluetoothDevice {
             try {
                 return FleshlightLaunch.this.iface.writeValue(
                         cmdMsg.id,
-                        FleshlightLaunch.this.info.characteristics.get(FleshlightLaunchBluetoothInfo.Chrs.Tx.ordinal()),
+                        FleshlightLaunch.this.info.getCharacteristics().get(FleshlightLaunchBluetoothInfo.Chrs.Tx.ordinal()),
                         new byte[]{(byte) cmdMsg.GetPosition(), (byte) cmdMsg.GetSpeed()}
                 ).get();
             } catch (InterruptedException | ExecutionException e) {

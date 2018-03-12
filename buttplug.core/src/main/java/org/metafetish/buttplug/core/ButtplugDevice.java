@@ -44,11 +44,17 @@ public abstract class ButtplugDevice implements IButtplugDevice {
         return !this.isDisconnected;
     }
 
-    @Nullable
-    public ButtplugEventHandler deviceRemoved = new ButtplugEventHandler();
+    private ButtplugEventHandler deviceRemoved = new ButtplugEventHandler();
+    @NonNull
+    public ButtplugEventHandler getDeviceRemoved() {
+        return this.deviceRemoved;
+    }
 
-    @Nullable
-    public ButtplugEventHandler messageEmitted = new ButtplugEventHandler();
+    private ButtplugEventHandler messageEmitted = new ButtplugEventHandler();
+    @NonNull
+    public ButtplugEventHandler getMessageEmitted()  {
+        return this.messageEmitted;
+    }
 
     @NonNull
     protected IButtplugLog bpLogger;

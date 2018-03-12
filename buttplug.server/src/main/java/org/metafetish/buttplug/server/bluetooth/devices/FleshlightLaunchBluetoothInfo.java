@@ -18,11 +18,20 @@ public class FleshlightLaunchBluetoothInfo implements IBluetoothDeviceInfo {
         Cmd
     }
 
-    public List<String> names = new ArrayList<>();
+    private List<String> names = new ArrayList<>();
+    public List<String> getNames() {
+        return this.names;
+    }
 
-    public List<UUID> services = new ArrayList<>();
+    private List<UUID> services = new ArrayList<>();
+    public List<UUID> getServices() {
+        return this.services;
+    }
 
-    public List<UUID> characteristics = new ArrayList<>();
+    private List<UUID> characteristics = new ArrayList<>();
+    public List<UUID> getCharacteristics() {
+        return this.characteristics;
+    }
 
     public FleshlightLaunchBluetoothInfo() {
         names.add("Launch");

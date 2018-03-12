@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import org.metafetish.buttplug.core.ButtplugDevice;
 import org.metafetish.buttplug.core.ButtplugEvent;
+import org.metafetish.buttplug.core.ButtplugEventHandler;
 import org.metafetish.buttplug.core.IButtplugCallback;
 import org.metafetish.buttplug.core.IButtplugLogManager;
 
@@ -23,7 +24,7 @@ public class ButtplugBluetoothDevice extends ButtplugDevice {
         super(aLogManager, aName, aInterface.getAddress());
         this.iface = aInterface;
         this.info = aInfo;
-        this.iface.deviceRemoved.addCallback(this.deviceRemovedCallback);
+        this.iface.getDeviceRemoved().addCallback(this.deviceRemovedCallback);
     }
 
     @Override
@@ -35,7 +36,7 @@ public class ButtplugBluetoothDevice extends ButtplugDevice {
         @Override
         public void invoke(ButtplugEvent aEvent) {
             ButtplugBluetoothDevice.this.invokeDeviceRemoved();
-            ButtplugBluetoothDevice.this.iface.deviceRemoved.removeCallback(ButtplugBluetoothDevice.this.deviceRemovedCallback);
+            ButtplugBluetoothDevice.this.iface.getDeviceRemoved().removeCallback(ButtplugBluetoothDevice.this.deviceRemovedCallback);
         }
     };
 }

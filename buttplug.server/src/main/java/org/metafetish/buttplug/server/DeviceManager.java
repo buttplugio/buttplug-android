@@ -39,8 +39,16 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DeviceManager {
 
     private final Object scanLock;
-    public ButtplugEventHandler deviceMessageReceived = new ButtplugEventHandler();
-    public ButtplugEventHandler scanningFinished = new ButtplugEventHandler();
+    private ButtplugEventHandler deviceMessageReceived = new ButtplugEventHandler();
+    @NonNull
+    public ButtplugEventHandler getDeviceMessageReceived() {
+        return this.deviceMessageReceived;
+    }
+    private ButtplugEventHandler scanningFinished = new ButtplugEventHandler();
+    @NonNull
+    public ButtplugEventHandler getScanningFinished() {
+        return this.scanningFinished;
+    }
     private List<IDeviceSubtypeManager> managers;
     private Map<Long, IButtplugDevice> devices;
     private IButtplugLog bpLogger;
@@ -81,11 +89,8 @@ public class DeviceManager {
                         "device dictionary.");
             }
             for (Map.Entry<Long, IButtplugDevice> x : entries.entrySet()) {
-                if (x.getValue().deviceRemoved != null) {
-                    x.getValue().deviceRemoved.removeCallback(DeviceManager.this
-                            .deviceRemovedCallback);
-                }
-//          x.getValue().messageEmitted.removeCallback(DeviceManager.this.messageEmittedCallback);
+                x.getValue().getDeviceRemoved().removeCallback(DeviceManager.this.deviceRemovedCallback);
+//                x.getValue().getMessageEmitted().removeCallback(DeviceManager.this.messageEmittedCallback);
                 DeviceManager.this.deviceMessageReceived.invoke(new ButtplugEvent(new
                         DeviceRemoved(x.getKey())));
             }
@@ -124,8 +129,8 @@ public class DeviceManager {
 
             DeviceManager.this.devices.put(deviceIndex, aDevice);
             DeviceManager.this.devices.get(deviceIndex).setIndex(deviceIndex);
-            aDevice.deviceRemoved.addCallback(DeviceManager.this.deviceRemovedCallback);
-            aDevice.messageEmitted.addCallback(DeviceManager.this.messageEmittedCallback);
+            aDevice.getDeviceRemoved().addCallback(DeviceManager.this.deviceRemovedCallback);
+            aDevice.getMessageEmitted().addCallback(DeviceManager.this.messageEmittedCallback);
             ButtplugMessage msg = new DeviceAdded(
                     deviceIndex,
                     aDevice.getName(),
@@ -262,7 +267,7 @@ public class DeviceManager {
         Collection<IButtplugDevice> removeDevices = this.devices.values();
         this.devices.clear();
         for (IButtplugDevice removeDevice : removeDevices) {
-            removeDevice.deviceRemoved.removeCallback(this.deviceRemovedCallback);
+            removeDevice.getDeviceRemoved().removeCallback(this.deviceRemovedCallback);
             removeDevice.disconnect();
         }
     }
@@ -284,9 +289,7 @@ public class DeviceManager {
 
     void addDeviceSubtypeManager(IDeviceSubtypeManager aMgr) {
         this.managers.add(aMgr);
-        //noinspection AccessStaticViaInstance,ConstantConditions
-        aMgr.deviceAdded.addCallback(this.deviceAddedCallback);
-        //noinspection AccessStaticViaInstance,ConstantConditions
-        aMgr.scanningFinished.addCallback(this.scanningFinishedCallback);
+        aMgr.getDeviceAdded().addCallback(this.deviceAddedCallback);
+        aMgr.getScanningFinished().addCallback(this.scanningFinishedCallback);
     }
 }

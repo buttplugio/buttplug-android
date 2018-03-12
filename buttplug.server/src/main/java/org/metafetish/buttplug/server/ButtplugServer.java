@@ -35,11 +35,17 @@ public class ButtplugServer {
     @NonNull
     private ButtplugJsonMessageParser parser;
 
-    @Nullable
-    public ButtplugEventHandler messageReceived = new ButtplugEventHandler();
+    private ButtplugEventHandler messageReceived = new ButtplugEventHandler();
+    @NonNull
+    public ButtplugEventHandler getMessageReceived() {
+        return this.messageReceived;
+    }
 
-    @Nullable
-    public ButtplugEventHandler clientConnected = new ButtplugEventHandler();
+    private ButtplugEventHandler clientConnected = new ButtplugEventHandler();
+    @NonNull
+    public ButtplugEventHandler getClientConnected() {
+        return this.clientConnected;
+    }
 
     @NonNull
     protected IButtplugLogManager bpLogManager;
@@ -82,9 +88,9 @@ public class ButtplugServer {
         this.deviceManager = aDeviceManager != null ? aDeviceManager : new DeviceManager(this.bpLogManager);
 
         this.bpLogger.info("Finished setting up ButtplugServer");
-        this.deviceManager.deviceMessageReceived.addCallback(this.deviceMessageReceivedCallback);
-        this.deviceManager.scanningFinished.addCallback(this.scanningFinishedCallback);
-        this.bpLogManager.logMessageReceived.addCallback(this.logMessageReceivedCallback);
+        this.deviceManager.getDeviceMessageReceived().addCallback(this.deviceMessageReceivedCallback);
+        this.deviceManager.getScanningFinished().addCallback(this.scanningFinishedCallback);
+        this.bpLogManager.getLogMessageReceived().addCallback(this.logMessageReceivedCallback);
     }
 
     private IButtplugCallback deviceMessageReceivedCallback = new IButtplugCallback() {
@@ -181,9 +187,9 @@ public class ButtplugServer {
         }
 
         this.deviceManager.stopScanning();
-        this.deviceManager.deviceMessageReceived.removeCallback(this.deviceMessageReceivedCallback);
-        this.deviceManager.scanningFinished.removeCallback(this.scanningFinishedCallback);
-        this.bpLogManager.logMessageReceived.removeCallback(this.logMessageReceivedCallback);
+        this.deviceManager.getDeviceMessageReceived().removeCallback(this.deviceMessageReceivedCallback);
+        this.deviceManager.getScanningFinished().removeCallback(this.scanningFinishedCallback);
+        this.bpLogManager.getLogMessageReceived().removeCallback(this.logMessageReceivedCallback);
         return promise;
     }
 

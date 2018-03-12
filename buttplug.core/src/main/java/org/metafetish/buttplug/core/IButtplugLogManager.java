@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 public interface IButtplugLogManager {
-    @Nullable
-    ButtplugEventHandler logMessageReceived = null;
+    @NonNull
+    ButtplugEventHandler getLogMessageReceived();
 
     @NonNull
     IButtplugLog getLogger(Class aClass);

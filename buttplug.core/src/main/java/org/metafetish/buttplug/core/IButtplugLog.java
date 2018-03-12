@@ -6,8 +6,8 @@ import android.support.annotation.Nullable;
 import org.metafetish.buttplug.core.Messages.Error;
 
 public interface IButtplugLog {
-    @Nullable
-    ButtplugEventHandler logMessageReceived = null;
+    @NonNull
+    ButtplugEventHandler getLogMessageReceived();
 
     void trace(String aMsg);
 
@@ -42,8 +42,8 @@ public interface IButtplugLog {
 
     void logException(Exception aEx, boolean aLocalOnly, String aMsg);
 
-    @Nullable
-    ButtplugEventHandler onLogException = null;
+    @NonNull
+    ButtplugEventHandler getOnLogException();
 
     void logErrorMsg(Error error);
 

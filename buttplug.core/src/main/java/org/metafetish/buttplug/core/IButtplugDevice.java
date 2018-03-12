@@ -17,16 +17,16 @@ public interface IButtplugDevice {
 
     @NonNull
     Long getIndex();
-
     void setIndex(long aIndex);
 
     @NonNull
     Boolean isConnected();
 
-    @Nullable
-    ButtplugEventHandler deviceRemoved = null;
-    @Nullable
-    ButtplugEventHandler messageEmitted = null;
+    @NonNull
+    ButtplugEventHandler getDeviceRemoved();
+
+    @NonNull
+    ButtplugEventHandler getMessageEmitted();
 
     @NonNull
     Iterable<Class> getAllowedMessageTypes();

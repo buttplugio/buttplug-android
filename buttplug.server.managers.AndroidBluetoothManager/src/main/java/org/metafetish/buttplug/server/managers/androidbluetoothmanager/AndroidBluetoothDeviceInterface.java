@@ -48,11 +48,17 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
     @Nullable
     private Boolean isCommunicating;
 
+    private ButtplugEventHandler deviceConnected = new ButtplugEventHandler();
     @NonNull
-    public ButtplugEventHandler deviceConnected = new ButtplugEventHandler();
+    public ButtplugEventHandler getDeviceConnected() {
+        return this.deviceConnected;
+    }
 
+    private ButtplugEventHandler deviceRemoved = new ButtplugEventHandler();
     @NonNull
-    public ButtplugEventHandler deviceRemoved = new ButtplugEventHandler();
+    public ButtplugEventHandler getDeviceRemoved() {
+        return this.deviceRemoved;
+    }
 
     AndroidBluetoothDeviceInterface(@NonNull Activity aActivity,
                                     @NonNull IButtplugLogManager aLogManager,

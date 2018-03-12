@@ -1,5 +1,7 @@
 package org.metafetish.buttplug.server.bluetooth;
 
+import android.support.annotation.NonNull;
+
 import org.metafetish.buttplug.core.ButtplugEventHandler;
 import org.metafetish.buttplug.core.ButtplugMessage;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -17,7 +19,8 @@ public interface IBluetoothDeviceInterface {
 
     String getAddress();
 
-    ButtplugEventHandler deviceRemoved = new ButtplugEventHandler();
+    @NonNull
+    ButtplugEventHandler getDeviceRemoved();
 
     void disconnect();
 }

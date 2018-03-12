@@ -13,7 +13,11 @@ class ButtplugLog implements IButtplugLog {
     @NonNull
     private final String TAG;
 
-    public ButtplugEventHandler logMessageReceived = new ButtplugEventHandler();
+    private ButtplugEventHandler logMessageReceived = new ButtplugEventHandler();
+    @NonNull
+    public ButtplugEventHandler getLogMessageReceived() {
+        return this.logMessageReceived;
+    }
 
     public ButtplugLog(@NonNull Class aClass) {
         TAG = aClass.getSimpleName();
@@ -85,7 +89,11 @@ class ButtplugLog implements IButtplugLog {
         }
     }
 
-    public ButtplugEventHandler onLogException;
+    private ButtplugEventHandler onLogException = new ButtplugEventHandler();
+    @NonNull
+    public ButtplugEventHandler getOnLogException() {
+        return  onLogException;
+    }
 
     public void logException(Exception aEx) {
         this.logException(aEx, true, null);

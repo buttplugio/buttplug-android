@@ -62,10 +62,6 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
         for (IBluetoothDeviceInfo aDeviceFactory : builtinDevices) {
             Log.d(TAG, "Loading Bluetooth Device Factory: " + aDeviceFactory.getClass()
                     .getSimpleName());
-            Log.d(TAG, "earlyservices: " + aDeviceFactory.getServices());
-
-            Log.d(TAG, "Loading Bluetooth Device Factory: " + aDeviceFactory.getClass()
-                    .getSimpleName());
             AndroidBluetoothDeviceFactory deviceFactory = new AndroidBluetoothDeviceFactory(activity, this.bpLogManager, aDeviceFactory);
             deviceFactory.getDeviceCreated().addCallback(new IButtplugCallback() {
                 @Override

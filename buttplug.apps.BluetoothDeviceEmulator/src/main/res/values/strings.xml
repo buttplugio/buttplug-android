@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Buttplug Bluetooth Device Emulator</string>
+    <string name="status_label">Status:</string>
+    <string name="advertising_start">Preparing to advertise</string>
+    <string name="advertising_failure">Failure</string>
+    <string name="advertising_success">Advertising</string>
+    <string name="gatt_connected">Connected</string>
 </resources>

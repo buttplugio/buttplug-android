@@ -31,6 +31,7 @@ import org.metafetish.buttplug.core.IButtplugCallback;
 import org.metafetish.buttplug.core.IButtplugLog;
 import org.metafetish.buttplug.server.IButtplugServerFactory;
 
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 
@@ -325,14 +326,15 @@ public class WebsocketServerControl extends Fragment {
     @SuppressLint("StaticFieldLeak")
     public void startServer() {
         try {
+            Map<String, String> hostPairs = this.ws.getHostPairs(this.loopback);
             this.ws.startServer(this.bpFactory, this.loopback, (int) this.port, this.secure ?
-                    "localhost" : null);
+                    hostPairs : null);
             ((Button) this.activity.findViewById(R.id.server_toggle)).setText(R.string.server_stop);
             this.activity.findViewById(R.id.port).setEnabled(false);
             this.activity.findViewById(R.id.loopback).setEnabled(false);
             this.activity.findViewById(R.id.secure).setEnabled(false);
             ((TextView) this.activity.findViewById(R.id.addresses)).setText(TextUtils.join("\n",
-                    this.ws.getHostnames(this.loopback)));
+                    hostPairs.keySet()));
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -344,5 +346,6 @@ public class WebsocketServerControl extends Fragment {
         ((EditText) this.activity.findViewById(R.id.port)).setEnabled(true);
         ((Switch) this.activity.findViewById(R.id.loopback)).setEnabled(true);
         ((Switch) this.activity.findViewById(R.id.secure)).setEnabled(true);
+        ((TextView) this.activity.findViewById(R.id.addresses)).setText("");
     }
 }

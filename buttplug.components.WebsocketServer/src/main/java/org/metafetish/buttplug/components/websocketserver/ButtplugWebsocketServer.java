@@ -38,10 +38,11 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -124,9 +125,10 @@ public class ButtplugWebsocketServer {
         startServer(factory, true, port, null);
     }
 
-    public void startServer(@NonNull IButtplugServerFactory factory, String secureHostname)
+    public void startServer(@NonNull IButtplugServerFactory factory, Map<String, String>
+            secureHostPairs)
             throws ExecutionException, InterruptedException {
-        startServer(factory, true, 12345, secureHostname);
+        startServer(factory, true, 12345, secureHostPairs);
     }
 
     public void startServer(@NonNull IButtplugServerFactory factory, boolean loopback, int port)
@@ -134,18 +136,20 @@ public class ButtplugWebsocketServer {
         startServer(factory, loopback, port, null);
     }
 
-    public void startServer(@NonNull IButtplugServerFactory factory, boolean loopback, String
-            secureHostname) throws ExecutionException, InterruptedException {
-        startServer(factory, loopback, 12345, secureHostname);
+    public void startServer(@NonNull IButtplugServerFactory factory, boolean loopback,
+                            Map<String, String> secureHostPairs) throws ExecutionException,
+            InterruptedException {
+        startServer(factory, loopback, 12345, secureHostPairs);
     }
 
-    public void startServer(@NonNull IButtplugServerFactory factory, int port, String
-            secureHostname) throws ExecutionException, InterruptedException {
-        startServer(factory, true, port, secureHostname);
+    public void startServer(@NonNull IButtplugServerFactory factory, int port, Map<String,
+            String> secureHostPairs) throws ExecutionException, InterruptedException {
+        startServer(factory, true, port, secureHostPairs);
     }
 
     public void startServer(@NonNull IButtplugServerFactory factory, boolean loopback, int port,
-                            String secureHostname) throws ExecutionException, InterruptedException {
+                            Map<String, String> secureHostPairs) throws ExecutionException,
+            InterruptedException {
         this.serverFactory = factory;
 
         this.bpLogManager = new ButtplugLogManager();
@@ -277,8 +281,8 @@ public class ButtplugWebsocketServer {
                 ButtplugWebsocketServer.this.connected = true;
             }
         };
-        if (secureHostname != null) {
-            KeyStore keyStore = CertUtils.getKeystore(this.context);
+        if (secureHostPairs != null) {
+            KeyStore keyStore = CertUtils.getKeystore(this.context, secureHostPairs);
             if (keyStore != null) {
                 KeyManagerFactory keyManagerFactory = null;
                 TrustManagerFactory trustManagerFactory = null;
@@ -374,17 +378,16 @@ public class ButtplugWebsocketServer {
         }
     }
 
-    public List<String> getHostnames(boolean loopback) throws ExecutionException,
+    public Map<String, String> getHostPairs(boolean loopback) throws ExecutionException,
             InterruptedException {
         return new HostnamesTask().execute(loopback).get();
     }
 
-    public static class HostnamesTask extends AsyncTask<Boolean, Void, List<String>> {
-
+    public static class HostnamesTask extends AsyncTask<Boolean, Void, Map<String, String>> {
         @Override
-        protected List<String> doInBackground(Boolean... booleans) {
+        protected Map<String, String> doInBackground(Boolean... booleans) {
             Boolean loopback = booleans[0];
-            List<String> addresses = new ArrayList<String>();
+            Map<String, String> addresses = new HashMap<>();
             try {
                 for (NetworkInterface networkInterface : Collections.list(NetworkInterface
                         .getNetworkInterfaces())) {
@@ -392,10 +395,13 @@ public class ButtplugWebsocketServer {
                         continue;
                     }
                     Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                    for (InetAddress inetAddresse : Collections.list(networkInterface
+                    for (InetAddress inetAddress : Collections.list(networkInterface
                             .getInetAddresses())) {
-                        if (inetAddresse instanceof Inet4Address) {
-                            addresses.add(inetAddresse.getHostAddress());
+                        if (inetAddress instanceof Inet4Address) {
+                            Log.d(TAG, inetAddress.getHostAddress() + ", " + inetAddress
+                                    .getCanonicalHostName());
+                            addresses.put(inetAddress.getHostAddress(), inetAddress
+                                    .getCanonicalHostName());
                         }
                     }
                 }
@@ -407,7 +413,6 @@ public class ButtplugWebsocketServer {
     }
 
     public static class LoopbackTask extends AsyncTask<Integer, Void, InetSocketAddress> {
-
         @Override
         protected InetSocketAddress doInBackground(Integer... integers) {
             int port = integers[0];
@@ -417,21 +422,6 @@ public class ButtplugWebsocketServer {
                 e.printStackTrace();
             }
             return null;
-        }
-    }
-
-    public static class SocketTask extends AsyncTask<Void, Void, InetSocketAddress> {
-        private String hostname;
-        private int port;
-
-        public SocketTask(String hostname, int port) {
-            this.hostname = hostname;
-            this.port = port;
-        }
-
-        @Override
-        protected InetSocketAddress doInBackground(Void... voids) {
-            return new InetSocketAddress(hostname, port);
         }
     }
 }

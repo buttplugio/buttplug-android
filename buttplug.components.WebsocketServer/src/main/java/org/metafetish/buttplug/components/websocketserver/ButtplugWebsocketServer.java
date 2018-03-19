@@ -178,8 +178,6 @@ public class ButtplugWebsocketServer {
                 }
                 String remoteId = ws.getRemoteSocketAddress().getHostName();
                 ButtplugWebsocketServer.this.connectionAccepted.invoke(new ButtplugEvent(remoteId));
-                Log.d(TAG, "ButtplugWebsocketServer.this.serverFactory == null: " +
-                        ButtplugWebsocketServer.this.serverFactory);
                 ButtplugServer buttplug = ButtplugWebsocketServer.this.serverFactory.getServer();
                 ButtplugWebsocketServer.this.connections.put(remoteId, new Pair<WebSocket,
                         ButtplugServer>(ws, buttplug));

@@ -1,8 +1,10 @@
 package org.metafetish.buttplug.apps.exampleclientgui;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import org.metafetish.buttplug.components.controls.ButtplugTabControl;
 import org.metafetish.buttplug.core.ButtplugEvent;
@@ -31,5 +33,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         getSupportFragmentManager().beginTransaction().add(R.id.main_content, tabs).commit();
+    }
+
+    private boolean backPressed = false;
+
+    @Override
+    public void onBackPressed() {
+        if (this.backPressed) {
+            super.onBackPressed();
+            this.finish();
+        } else {
+            Toast.makeText(this, "Press BACK again to exit", Toast.LENGTH_SHORT).show();
+            this.backPressed = true;
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    MainActivity.this.backPressed = false;
+                }
+            }, 2000);
+        }
     }
 }

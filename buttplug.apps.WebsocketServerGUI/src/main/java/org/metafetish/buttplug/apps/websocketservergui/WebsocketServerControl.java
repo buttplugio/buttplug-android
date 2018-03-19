@@ -26,6 +26,7 @@ import org.metafetish.buttplug.components.controls.ButtplugTabControl;
 import org.metafetish.buttplug.components.websocketserver.ButtplugWebsocketServer;
 import org.metafetish.buttplug.core.ButtplugEvent;
 import org.metafetish.buttplug.core.ButtplugLogManager;
+import org.metafetish.buttplug.core.Events.Connection;
 import org.metafetish.buttplug.core.IButtplugCallback;
 import org.metafetish.buttplug.core.IButtplugLog;
 import org.metafetish.buttplug.server.IButtplugServerFactory;
@@ -57,6 +58,8 @@ public class WebsocketServerControl extends Fragment {
 //    private ConnUrlList _connUrls;
 //    private Timer _toastTimer;
 //    private string _currentExceptionMessage;
+
+    private String remoteId;
 
     private OnFragmentInteractionListener listener;
 
@@ -193,6 +196,13 @@ public class WebsocketServerControl extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.ws.disconnect();
+        this.ws.stopServer();
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (this.listener != null) {
@@ -252,12 +262,15 @@ public class WebsocketServerControl extends Fragment {
                     errorMessage += "\n\nThis usually means that the client/browser tried to " +
                             "connect without SSL. Make sure the client is set use the wss:// URI " +
                             "scheme.";
-                } else {
-                    errorMessage += "\n\nIf your connection is working, you can ignore this " +
-                            "message. Otherwise, this could mean that the client/browser has not " +
-                            "accepted our SSL certificate. Try hitting the test button on the " +
-                            "\"Websocket Server\" tab.";
                 }
+                //TODO: When should this be used?
+//                else {
+//                    errorMessage += "\n\nIf your connection is working, you can ignore this " +
+//                            "message. Otherwise, this could mean that the client/browser has
+// not " +
+//                            "accepted our SSL certificate. Try hitting the test button on the " +
+//                            "\"Websocket Server\" tab.";
+//                }
             }
 
             ((TextView) WebsocketServerControl.this.activity.findViewById(R.id.last_error))
@@ -271,18 +284,41 @@ public class WebsocketServerControl extends Fragment {
     private IButtplugCallback websocketConnectionAccepted = new IButtplugCallback() {
         @Override
         public void invoke(ButtplugEvent event) {
-            String remoteId = event.getString();
-            ((TextView) WebsocketServerControl.this.activity.findViewById(R.id.status)).setText
-                    (getString(R.string.status_connected, remoteId));
-            WebsocketServerControl.this.activity.findViewById(R.id.client_toggle).setEnabled(true);
+            if (event instanceof Connection) {
+                WebsocketServerControl.this.remoteId = ((Connection) event).clientName;
+            } else {
+                WebsocketServerControl.this.remoteId = event.getString();
+            }
+            if (WebsocketServerControl.this.activity != null) {
+                WebsocketServerControl.this.activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((TextView) WebsocketServerControl.this.activity.findViewById(R.id
+                                .status)).setText(getString(R.string.status_connected,
+                                WebsocketServerControl.this.remoteId));
+                        WebsocketServerControl.this.activity.findViewById(R.id.client_toggle)
+                                .setEnabled(true);
+                    }
+                });
+            }
         }
     };
+
     private IButtplugCallback websocketConnectionClosed = new IButtplugCallback() {
         @Override
         public void invoke(ButtplugEvent event) {
-            ((TextView) WebsocketServerControl.this.activity.findViewById(R.id.status)).setText(R
-                    .string.status_not_connected);
-            WebsocketServerControl.this.activity.findViewById(R.id.client_toggle).setEnabled(false);
+            if (WebsocketServerControl.this.activity != null) {
+                WebsocketServerControl.this.activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((TextView) WebsocketServerControl.this.activity.findViewById(R.id
+                                .status)).setText(R
+                                .string.status_not_connected);
+                        WebsocketServerControl.this.activity.findViewById(R.id.client_toggle)
+                                .setEnabled(false);
+                    }
+                });
+            }
         }
     };
 

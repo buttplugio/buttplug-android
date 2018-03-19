@@ -181,8 +181,7 @@ public class DeviceManager {
     }
 
     private static LinkedHashMap<String, MessageAttributes> getAllowedMessageTypesAsDictionary
-            (@NonNull
-                                                                                                       IButtplugDevice device) {
+            (@NonNull IButtplugDevice device) {
         LinkedHashMap<String, MessageAttributes> msgs = new LinkedHashMap<>();
         for (Class msg : device.getAllowedMessageTypes()) {
             msgs.put(msg.getSimpleName(), device.getMessageAttrs(msg));

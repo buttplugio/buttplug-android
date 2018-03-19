@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.metafetish.buttplug.server.bluetooth.devices.FleshlightLaunchBluetoothInfo;
 import org.metafetish.buttplug.server.util.FleshlightHelper;
@@ -171,6 +172,33 @@ public class MainActivity extends AppCompatActivity {
                         this.advertiseCallback
                 );
             }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy()");
+        this.bluetoothLeAdvertiser.stopAdvertising(MainActivity.this.advertiseCallback);
+        this.bluetoothGattServer.close();
+    }
+
+    private boolean backPressed = false;
+
+    @Override
+    public void onBackPressed() {
+        if (this.backPressed) {
+            super.onBackPressed();
+            this.finish();
+        } else {
+            Toast.makeText(this, "Press BACK again to exit", Toast.LENGTH_SHORT).show();
+            this.backPressed = true;
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    MainActivity.this.backPressed = false;
+                }
+            }, 2000);
         }
     }
 

@@ -3,12 +3,14 @@ package org.metafetish.buttplug.apps.websocketservergui;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.metafetish.buttplug.components.controls.ButtplugTabControl;
 import org.metafetish.buttplug.core.ButtplugEvent;
@@ -57,5 +59,24 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return super.dispatchTouchEvent(event);
+    }
+
+    private boolean backPressed = false;
+
+    @Override
+    public void onBackPressed() {
+        if (this.backPressed) {
+            super.onBackPressed();
+            this.finish();
+        } else {
+            Toast.makeText(this, "Press BACK again to exit", Toast.LENGTH_SHORT).show();
+            this.backPressed = true;
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    MainActivity.this.backPressed = false;
+                }
+            }, 2000);
+        }
     }
 }

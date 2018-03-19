@@ -1,7 +1,6 @@
 package org.metafetish.buttplug.core;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import org.metafetish.buttplug.core.Messages.Error;
 
@@ -9,38 +8,38 @@ public interface IButtplugLog {
     @NonNull
     ButtplugEventHandler getLogMessageReceived();
 
-    void trace(String aMsg);
+    void trace(String msg);
 
-    void trace(String aMsg, boolean aLocalOnly);
+    void trace(String msg, boolean localOnly);
 
-    void debug(String aMsg);
+    void debug(String msg);
 
-    void debug(String aMsg, boolean aLocalOnly);
+    void debug(String msg, boolean localOnly);
 
-    void info(String aMsg);
+    void info(String msg);
 
-    void info(String aMsg, boolean aLocalOnly);
+    void info(String msg, boolean localOnly);
 
-    void warn(String aMsg);
+    void warn(String msg);
 
-    void warn(String aMsg, boolean aLocalOnly);
+    void warn(String msg, boolean localOnly);
 
-    void error(String aMsg);
+    void error(String msg);
 
-    void error(String aMsg, boolean aLocalOnly);
+    void error(String msg, boolean localOnly);
 
     // Fatal is kept here for completeness, even if it is not yet used.
-    void fatal(String aMsg);
+    void fatal(String msg);
 
-    void fatal(String aMsg, boolean aLocalOnly);
+    void fatal(String msg, boolean localOnly);
 
-    void logException(Exception aEx);
+    void logException(Exception ex);
 
-    void logException(Exception aEx, boolean aLocalOnly);
+    void logException(Exception ex, boolean localOnly);
 
-    void logException(Exception aEx, String aMsg);
+    void logException(Exception ex, String msg);
 
-    void logException(Exception aEx, boolean aLocalOnly, String aMsg);
+    void logException(Exception ex, boolean localOnly, String msg);
 
     @NonNull
     ButtplugEventHandler getOnLogException();
@@ -48,10 +47,10 @@ public interface IButtplugLog {
     void logErrorMsg(Error error);
 
     @NonNull
-    Error logErrorMsg(long aId, Error.ErrorClass aCode, String aMsg);
+    Error logErrorMsg(long id, Error.ErrorClass code, String msg);
 
     void logWarnMsg(Error warning);
 
     @NonNull
-    Error logWarnMsg(long aId, Error.ErrorClass aCode, String aMsg);
+    Error logWarnMsg(long id, Error.ErrorClass code, String msg);
 }

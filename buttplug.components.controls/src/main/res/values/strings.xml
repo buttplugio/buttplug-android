@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Buttplug Controls</string>
+    <string name="tab_text_1">Application</string>
+    <string name="tab_text_2">Devices</string>
+    <string name="tab_text_3">Log</string>
+    <string name="tab_text_4">About</string>
+    <string name="section_format">This is a placeholder for the %1$s tab.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

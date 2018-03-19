@@ -12,7 +12,8 @@ public class VorzeA10CycloneCmdTest {
 
     @Test
     public void test() throws IOException {
-        String testStr = "[{\"VorzeA10CycloneCmd\":{\"Id\":7,\"DeviceIndex\":3,\"Clockwise\":true,\"Speed\":15}}]";
+        String testStr = "[{\"VorzeA10CycloneCmd\":{\"Id\":7,\"DeviceIndex\":3," +
+                "\"Clockwise\":true,\"Speed\":15}}]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
         List<ButtplugMessage> msgs = parser.parseJson(testStr);
@@ -21,7 +22,7 @@ public class VorzeA10CycloneCmdTest {
         Assert.assertEquals(msgs.get(0).getClass(), VorzeA10CycloneCmd.class);
         Assert.assertEquals(msgs.get(0).id, 7);
         Assert.assertEquals(((VorzeA10CycloneCmd) msgs.get(0)).deviceIndex, 3);
-        Assert.assertEquals(((VorzeA10CycloneCmd) msgs.get(0)).GetSpeed(), 15);
+        Assert.assertEquals(((VorzeA10CycloneCmd) msgs.get(0)).getSpeed(), 15);
         Assert.assertEquals(((VorzeA10CycloneCmd) msgs.get(0)).clockwise, true);
 
         String jsonOut = parser.formatJson(msgs);

@@ -3,8 +3,8 @@ package org.metafetish.buttplug.core.Messages;
 import org.junit.Assert;
 import org.junit.Test;
 import org.metafetish.buttplug.core.ButtplugJsonMessageParser;
+import org.metafetish.buttplug.core.ButtplugLogLevel;
 import org.metafetish.buttplug.core.ButtplugMessage;
-import org.metafetish.buttplug.core.Messages.RequestLog.ButtplugLogLevel;
 
 import java.io.IOException;
 import java.util.List;

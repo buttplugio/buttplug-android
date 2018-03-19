@@ -39,19 +39,20 @@ public class AndroidBluetoothDeviceFactory {
 
     private Map<String, AndroidBluetoothDeviceInterface> bleInterfaces = new HashMap<>();
     private ButtplugEventHandler deviceCreated = new ButtplugEventHandler();
+
     @NonNull
     public ButtplugEventHandler getDeviceCreated() {
         return this.deviceCreated;
     }
 
-    public AndroidBluetoothDeviceFactory(@NonNull Activity aActivity,
-                                         @NonNull IButtplugLogManager aLogManager,
-                                         @NonNull IBluetoothDeviceInfo aInfo) {
-        this.activity = aActivity;
-        this.bpLogManager = aLogManager;
+    public AndroidBluetoothDeviceFactory(@NonNull Activity activity,
+                                         @NonNull IButtplugLogManager logManager,
+                                         @NonNull IBluetoothDeviceInfo info) {
+        this.activity = activity;
+        this.bpLogManager = logManager;
         this.bpLogger = this.bpLogManager.getLogger(this.getClass());
         this.bpLogger.trace("Creating " + this.getClass().getSimpleName());
-        this.deviceInfo = aInfo;
+        this.deviceInfo = info;
     }
 
     public boolean mayBeDevice(String advertName, List<UUID> advertGUIDs) {
@@ -76,16 +77,17 @@ public class AndroidBluetoothDeviceFactory {
     // TODO Have this throw exceptions instead of return null. Once we've made it this far, if we
     // don't find what we're expecting, that's weird.
     // [ItemCanBeNull]
-    void createDeviceAsync(@NonNull BluetoothDevice aDevice) throws ExecutionException,
+    void createDeviceAsync(@NonNull BluetoothDevice device) throws ExecutionException,
             InterruptedException {
         // TODO This assumes we're always planning on having the UUIDs sorted in the Info
         // classes, which is probably not true.
-        AndroidBluetoothDeviceInterface bleInterface = new AndroidBluetoothDeviceInterface(this.activity, this.bpLogManager, aDevice, this.deviceInfo);
-        bleInterfaces.put(aDevice.getAddress(), bleInterface);
+        AndroidBluetoothDeviceInterface bleInterface = new AndroidBluetoothDeviceInterface(this
+                .activity, this.bpLogManager, device, this.deviceInfo);
+        bleInterfaces.put(device.getAddress(), bleInterface);
         bleInterface.getDeviceConnected().addCallback(new IButtplugCallback() {
             @Override
-            public void invoke(ButtplugEvent aEvent) {
-                String btAddr = aEvent.getString();
+            public void invoke(ButtplugEvent event) {
+                String btAddr = event.getString();
                 Log.d(TAG, "Device connected (" + btAddr + ")");
                 if (btAddr == null) {
                     return;
@@ -95,11 +97,11 @@ public class AndroidBluetoothDeviceFactory {
                     return;
                 }
 
-                BluetoothDevice aDevice = bleInterface.getDevice();
-//                String btAddr = aDevice.getAddress();
+                BluetoothDevice bluetoothDevice = bleInterface.getDevice();
+//                String btAddr = bluetoothDevice.getAddress();
                 List<BluetoothGattService> services = bleInterface.getServices();
                 if (services.isEmpty()) {
-                    Log.d(TAG, "No services found for " + aDevice.getName());
+                    Log.d(TAG, "No services found for " + bluetoothDevice.getName());
                     deviceCreated.invoke(new ButtplugEvent(btAddr));
                     return;
                 }
@@ -107,12 +109,13 @@ public class AndroidBluetoothDeviceFactory {
                 List<UUID> serviceUuids = new ArrayList<>();
                 for (BluetoothGattService service : services) {
                     Log.d(TAG, "Found service UUID: " + service.getUuid().toString() + " (" +
-                            aDevice.getName() + ")");
+                            bluetoothDevice.getName() + ")");
                     serviceUuids.add(service.getUuid());
                 }
 
                 if (!serviceUuids.containsAll(deviceInfo.getServices())) {
-                    Log.d(TAG, "Cannot find service for device (" + aDevice.getName() + ")");
+                    Log.d(TAG, "Cannot find service for device (" + bluetoothDevice.getName() +
+                            ")");
                     deviceCreated.invoke(new ButtplugEvent(btAddr));
                     return;
                 }
@@ -127,7 +130,7 @@ public class AndroidBluetoothDeviceFactory {
 
                 List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
                 if (characteristics.isEmpty()) {
-                    Log.d(TAG, "No characteristics found for " + aDevice.getName());
+                    Log.d(TAG, "No characteristics found for " + bluetoothDevice.getName());
                     deviceCreated.invoke(new ButtplugEvent(btAddr));
                     return;
                 }
@@ -135,12 +138,13 @@ public class AndroidBluetoothDeviceFactory {
                 List<UUID> characteristicUuids = new ArrayList<>();
                 for (BluetoothGattCharacteristic characteristic : characteristics) {
                     Log.d(TAG, "Found characteristic UUID: " + characteristic.getUuid().toString
-                            () + " (" + aDevice.getName() + ")");
+                            () + " (" + bluetoothDevice.getName() + ")");
                     characteristicUuids.add(characteristic.getUuid());
                 }
 
                 if (!characteristicUuids.containsAll(deviceInfo.getCharacteristics())) {
-                    Log.d(TAG, "Cannot find characteristic for device (" + aDevice.getName() + ")");
+                    Log.d(TAG, "Cannot find characteristic for device (" + bluetoothDevice
+                            .getName() + ")");
                     deviceCreated.invoke(new ButtplugEvent(btAddr));
                     return;
                 }
@@ -152,7 +156,8 @@ public class AndroidBluetoothDeviceFactory {
                 }
                 bleInterface.setGattCharacteristics(gattCharacteristics);
 
-                IButtplugDevice device = deviceInfo.CreateDevice(AndroidBluetoothDeviceFactory.this.bpLogManager, bleInterface);
+                IButtplugDevice device = deviceInfo.CreateDevice(AndroidBluetoothDeviceFactory
+                        .this.bpLogManager, bleInterface);
                 ButtplugMessage msg = null;
                 try {
                     msg = device.initialize().get();

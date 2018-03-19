@@ -49,25 +49,27 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
     private Boolean isCommunicating;
 
     private ButtplugEventHandler deviceConnected = new ButtplugEventHandler();
+
     @NonNull
     public ButtplugEventHandler getDeviceConnected() {
         return this.deviceConnected;
     }
 
     private ButtplugEventHandler deviceRemoved = new ButtplugEventHandler();
+
     @NonNull
     public ButtplugEventHandler getDeviceRemoved() {
         return this.deviceRemoved;
     }
 
-    AndroidBluetoothDeviceInterface(@NonNull Activity aActivity,
-                                    @NonNull IButtplugLogManager aLogManager,
-                                    @NonNull BluetoothDevice aDevice,
+    AndroidBluetoothDeviceInterface(@NonNull Activity activity,
+                                    @NonNull IButtplugLogManager logManager,
+                                    @NonNull BluetoothDevice device,
                                     @NonNull IBluetoothDeviceInfo deviceInfo) {
-        this.activity = aActivity;
-        this.bpLogger = aLogManager.getLogger(this.getClass());
+        this.activity = activity;
+        this.bpLogger = logManager.getLogger(this.getClass());
 
-        BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+        BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
             @Override
             public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
                 Log.d(TAG, "New State: " + newState);
@@ -88,7 +90,7 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
                 }
             }
         };
-        bleDevice = aDevice.connectGatt(activity, false, mGattCallback);
+        bleDevice = device.connectGatt(activity, false, gattCallback);
     }
 
     BluetoothDevice getDevice() {
@@ -99,42 +101,42 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
         return bleDevice.getServices();
     }
 
-    void setGattCharacteristics(@NonNull Map<UUID, BluetoothGattCharacteristic> aCharacteristics) {
-        gattCharacteristics = aCharacteristics;
+    void setGattCharacteristics(@NonNull Map<UUID, BluetoothGattCharacteristic> characteristics) {
+        gattCharacteristics = characteristics;
     }
 
     public String getAddress() throws NullPointerException {
         return bleDevice.getDevice().getAddress();
     }
 
-    public ListenableFuture<ButtplugMessage> writeValue(long aMsgId, UUID aCharacteristicIndex,
-                                                        byte[] aValue) {
-        return writeValue(aMsgId, aCharacteristicIndex, aValue, false);
+    public ListenableFuture<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex,
+                                                        byte[] value) {
+        return writeValue(msgId, characteristicIndex, value, false);
     }
 
-    public ListenableFuture<ButtplugMessage> writeValue(long aMsgId, UUID aCharacteristicIndex,
-                                                        byte[] aValue, boolean aWriteWithResponse) {
+    public ListenableFuture<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex,
+                                                        byte[] value, boolean writeWithResponse) {
         SettableListenableFuture<ButtplugMessage> promise = new SettableListenableFuture<>();
         if (isCommunicating != null && isCommunicating) {
             Log.d(TAG, "Device transfer in progress, cancelling new transfer.");
         }
 
         BluetoothGattCharacteristic gattCharacteristic = gattCharacteristics.get
-                (aCharacteristicIndex);
+                (characteristicIndex);
         if (gattCharacteristic == null) {
-            promise.set(new Error("Requested characteristic " + aCharacteristicIndex.toString() +
-                    " not found", Error.ErrorClass.ERROR_DEVICE, aMsgId));
+            promise.set(new Error("Requested characteristic " + characteristicIndex.toString() +
+                    " not found", Error.ErrorClass.ERROR_DEVICE, msgId));
             return promise;
         }
         isCommunicating = true;
-        gattCharacteristic.setValue(aValue);
+        gattCharacteristic.setValue(value);
         boolean success = bleDevice.writeCharacteristic(gattCharacteristic);
         if (!success) {
-            promise.set(new Error("Failed to write to characteristic " + aCharacteristicIndex
-                    .toString(), Error.ErrorClass.ERROR_DEVICE, aMsgId));
+            promise.set(new Error("Failed to write to characteristic " + characteristicIndex
+                    .toString(), Error.ErrorClass.ERROR_DEVICE, msgId));
             return promise;
         }
-        promise.set(new Ok(aMsgId));
+        promise.set(new Ok(msgId));
         return promise;
     }
 

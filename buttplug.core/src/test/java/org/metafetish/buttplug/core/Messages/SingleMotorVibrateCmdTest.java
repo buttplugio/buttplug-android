@@ -21,7 +21,7 @@ public class SingleMotorVibrateCmdTest {
         Assert.assertEquals(msgs.get(0).getClass(), SingleMotorVibrateCmd.class);
         Assert.assertEquals(msgs.get(0).id, 7);
         Assert.assertEquals(((SingleMotorVibrateCmd) msgs.get(0)).deviceIndex, 3);
-        Assert.assertEquals(((SingleMotorVibrateCmd) msgs.get(0)).GetSpeed(), 0.6, 0);
+        Assert.assertEquals(((SingleMotorVibrateCmd) msgs.get(0)).getSpeed(), 0.6, 0);
 
         String jsonOut = parser.formatJson(msgs);
         Assert.assertEquals(testStr, jsonOut);

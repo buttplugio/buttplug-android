@@ -1,8 +1,17 @@
 <resources>
     <string name="app_name">Buttplug Websocket Server</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
-    <string name="tab_text_3">Tab 3</string>
-    <string name="action_settings">Settings</string>
-    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="app_short_name">Websocket Server</string>
+    <string name="port">Port</string>
+    <string name="default_port">12345</string>
+    <string name="loopback">Localhost Only</string>
+    <string name="secure">SSL/TLS</string>
+    <string name="server_start">Start</string>
+    <string name="server_stop">Stop</string>
+    <string name="connection_details">Connection Details</string>
+    <string name="addresses">Addresses</string>
+    <string name="status">Status</string>
+    <string name="status_not_connected">(Not Connected)</string>
+    <string name="status_connected">(Connected) %1$s</string>
+    <string name="client_disconnect">Disconnect</string>
+    <string name="last_error">Last Error</string>
 </resources>

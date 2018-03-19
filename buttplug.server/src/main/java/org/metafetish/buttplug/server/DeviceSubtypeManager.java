@@ -15,19 +15,21 @@ public abstract class DeviceSubtypeManager implements IDeviceSubtypeManager {
     protected IButtplugLogManager bpLogManager;
 
     private ButtplugEventHandler deviceAdded = new ButtplugEventHandler();
+
     @NonNull
     public ButtplugEventHandler getDeviceAdded() {
         return this.deviceAdded;
     }
 
     private ButtplugEventHandler scanningFinished = new ButtplugEventHandler();
+
     @NonNull
     public ButtplugEventHandler getScanningFinished() {
         return this.scanningFinished;
     }
 
-    protected DeviceSubtypeManager(@NonNull IButtplugLogManager aLogManager) {
-        this.bpLogManager = aLogManager;
+    protected DeviceSubtypeManager(@NonNull IButtplugLogManager logManager) {
+        this.bpLogManager = logManager;
         this.bpLogger = this.bpLogManager.getLogger(this.getClass());
         this.bpLogger.debug("Setting up Device Manager " + this.getClass().getSimpleName());
     }

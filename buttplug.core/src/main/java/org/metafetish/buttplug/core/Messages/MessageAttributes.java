@@ -2,9 +2,11 @@ package org.metafetish.buttplug.core.Messages;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MessageAttributes {
-    @JsonInclude(Include.NON_NULL)
+    @JsonProperty(value = "FeatureCount")
+    @JsonInclude(Include.NON_DEFAULT)
     public long featureCount;
 
     public MessageAttributes() {

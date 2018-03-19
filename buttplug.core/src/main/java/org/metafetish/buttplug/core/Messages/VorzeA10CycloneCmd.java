@@ -14,25 +14,25 @@ public class VorzeA10CycloneCmd extends ButtplugDeviceMessage {
 
     public VorzeA10CycloneCmd(long deviceIndex, int speed, boolean clockwise, long id) {
         super(id, deviceIndex);
-        SetSpeed(speed);
+        setSpeed(speed);
         this.clockwise = clockwise;
     }
 
     @SuppressWarnings("unused")
     private VorzeA10CycloneCmd() {
         super(ButtplugConsts.DefaultMsgId, -1);
-        SetSpeed(0);
+        setSpeed(0);
         this.clockwise = false;
     }
 
-    public int GetSpeed() {
+    public int getSpeed() {
         if (speed > 99 || speed < 0) {
             return 0;
         }
         return speed;
     }
 
-    public void SetSpeed(int speed) {
+    public void setSpeed(int speed) {
         if (speed > 99) {
             throw new IllegalArgumentException(
                     "VorzeA10CycloneCmd cannot have a speed higher than 99!");

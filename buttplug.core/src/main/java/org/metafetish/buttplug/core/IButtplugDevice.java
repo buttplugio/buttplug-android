@@ -1,7 +1,6 @@
 package org.metafetish.buttplug.core;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import org.metafetish.buttplug.core.Messages.MessageAttributes;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -17,7 +16,8 @@ public interface IButtplugDevice {
 
     @NonNull
     Long getIndex();
-    void setIndex(long aIndex);
+
+    void setIndex(long index);
 
     @NonNull
     Boolean isConnected();
@@ -32,7 +32,7 @@ public interface IButtplugDevice {
     Iterable<Class> getAllowedMessageTypes();
 
     @NonNull
-    ListenableFuture<ButtplugMessage> parseMessage(ButtplugDeviceMessage aMsg) throws
+    ListenableFuture<ButtplugMessage> parseMessage(ButtplugDeviceMessage msg) throws
             InvocationTargetException, IllegalAccessException;
 
     @NonNull
@@ -41,5 +41,5 @@ public interface IButtplugDevice {
     void disconnect();
 
     @NonNull
-    MessageAttributes getMessageAttrs(Class aMsg);
+    MessageAttributes getMessageAttrs(Class msg);
 }

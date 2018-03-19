@@ -11,11 +11,11 @@ import java.util.UUID;
 public interface IBluetoothDeviceInterface {
     String getName();
 
-    ListenableFuture<ButtplugMessage> writeValue(long aMsgId, UUID aCharacteristicIndex, byte[]
-            aValue);
+    ListenableFuture<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex, byte[]
+            value);
 
-    ListenableFuture<ButtplugMessage> writeValue(long aMsgId, UUID aCharacteristicIndex, byte[]
-            aValue, boolean aWriteWithResponse);
+    ListenableFuture<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex, byte[]
+            value, boolean writeWithResponse);
 
     String getAddress();
 

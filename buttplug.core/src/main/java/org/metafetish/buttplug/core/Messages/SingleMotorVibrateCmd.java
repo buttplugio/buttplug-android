@@ -12,23 +12,23 @@ public class SingleMotorVibrateCmd extends ButtplugDeviceMessage {
 
     public SingleMotorVibrateCmd(long deviceIndex, double speed, long id) {
         super(id, deviceIndex);
-        SetSpeed(speed);
+        setSpeed(speed);
     }
 
     @SuppressWarnings("unused")
     private SingleMotorVibrateCmd() {
         super(ButtplugConsts.DefaultMsgId, -1);
-        SetSpeed(0);
+        setSpeed(0);
     }
 
-    public double GetSpeed() {
+    public double getSpeed() {
         if (speed > 1 || speed < 0) {
             return 0;
         }
         return speed;
     }
 
-    public void SetSpeed(double speed) {
+    public void setSpeed(double speed) {
         if (speed > 1) {
             throw new IllegalArgumentException(
                     "SingleMotorVibrateCmd cannot have a speed higher than 1!");

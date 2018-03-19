@@ -8,6 +8,14 @@ import org.metafetish.buttplug.core.ButtplugMessage;
 
 public class Error extends ButtplugMessage implements IButtplugMessageOutgoingOnly {
 
+    public enum ErrorClass {
+        ERROR_UNKNOWN,
+        ERROR_INIT,
+        ERROR_PING,
+        ERROR_MSG,
+        ERROR_DEVICE,
+    }
+
     @JsonProperty(value = "ErrorCode", required = true)
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     public ErrorClass errorCode;
@@ -27,11 +35,4 @@ public class Error extends ButtplugMessage implements IButtplugMessageOutgoingOn
         this.errorCode = ErrorClass.ERROR_UNKNOWN;
     }
 
-    public enum ErrorClass {
-        ERROR_UNKNOWN,
-        ERROR_INIT,
-        ERROR_PING,
-        ERROR_MSG,
-        ERROR_DEVICE,
-    }
 }

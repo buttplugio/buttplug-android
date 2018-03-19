@@ -5,17 +5,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 public class DeviceAdded extends ButtplugDeviceMessage implements IButtplugMessageOutgoingOnly {
     @JsonProperty(value = "DeviceName", required = true)
     public String deviceName;
 
     @JsonProperty(value = "DeviceMessages", required = true)
-    public Map<String, MessageAttributes> deviceMessages;
+    public LinkedHashMap<String, MessageAttributes> deviceMessages;
 
-    public DeviceAdded(long deviceIndex, String deviceName, Map<String, MessageAttributes>
+    public DeviceAdded(long deviceIndex, String deviceName, LinkedHashMap<String, MessageAttributes>
             deviceMessages) {
         super(ButtplugConsts.SystemMsgId, deviceIndex);
 
@@ -27,6 +26,6 @@ public class DeviceAdded extends ButtplugDeviceMessage implements IButtplugMessa
     private DeviceAdded() {
         super(ButtplugConsts.SystemMsgId, 0);
         this.deviceName = "";
-        this.deviceMessages = new HashMap<>();
+        this.deviceMessages = new LinkedHashMap<>();
     }
 }

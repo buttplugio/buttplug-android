@@ -2,7 +2,7 @@ package org.metafetish.buttplug.core.Messages;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.metafetish.buttplug.core.Messages.RequestLog.ButtplugLogLevel;
+import org.metafetish.buttplug.core.ButtplugLogLevel;
 
 import java.io.IOException;
 

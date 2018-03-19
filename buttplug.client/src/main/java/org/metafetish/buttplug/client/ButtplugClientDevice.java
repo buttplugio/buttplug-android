@@ -14,20 +14,20 @@ public class ButtplugClientDevice {
 
     public List<String> allowedMessages;
 
-    public ButtplugClientDevice(DeviceMessageInfo aDevInfo) {
-        index = aDevInfo.deviceIndex;
-        name = aDevInfo.deviceName;
-//        allowedMessages = Arrays.asList(aDevInfo.deviceMessages);
+    public ButtplugClientDevice(DeviceMessageInfo deviceInfo) {
+        index = deviceInfo.deviceIndex;
+        name = deviceInfo.deviceName;
+//        allowedMessages = Arrays.asList(deviceInfo.deviceMessages);
     }
 
-    public ButtplugClientDevice(DeviceAdded aDevInfo) {
-        index = aDevInfo.deviceIndex;
-        name = aDevInfo.deviceName;
-//        allowedMessages = Arrays.asList(aDevInfo.deviceMessages);
+    public ButtplugClientDevice(DeviceAdded deviceInfo) {
+        index = deviceInfo.deviceIndex;
+        name = deviceInfo.deviceName;
+//        allowedMessages = Arrays.asList(deviceInfo.deviceMessages);
     }
 
-    public ButtplugClientDevice(DeviceRemoved aDevInfo) {
-        index = aDevInfo.deviceIndex;
+    public ButtplugClientDevice(DeviceRemoved deviceInfo) {
+        index = deviceInfo.deviceIndex;
         name = "";
         allowedMessages = new ArrayList<>();
     }

@@ -6,21 +6,21 @@ import java.util.List;
 public class ButtplugEventHandler {
     private List<IButtplugCallback> callbacks = new ArrayList<>();
 
-    public void addCallback(IButtplugCallback aCallback) {
-        if (!this.callbacks.contains(aCallback)) {
-            this.callbacks.add(aCallback);
+    public void addCallback(IButtplugCallback callback) {
+        if (!this.callbacks.contains(callback)) {
+            this.callbacks.add(callback);
         }
     }
 
-    public void removeCallback(IButtplugCallback aCallback) {
-        if (this.callbacks.contains(aCallback)) {
-            this.callbacks.remove(aCallback);
+    public void removeCallback(IButtplugCallback callback) {
+        if (this.callbacks.contains(callback)) {
+            this.callbacks.remove(callback);
         }
     }
 
-    public void invoke(ButtplugEvent aEvent) {
+    public void invoke(ButtplugEvent event) {
         for (IButtplugCallback callback : this.callbacks) {
-            callback.invoke(aEvent);
+            callback.invoke(event);
         }
     }
 }

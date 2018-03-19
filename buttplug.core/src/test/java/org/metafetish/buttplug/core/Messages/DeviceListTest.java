@@ -12,24 +12,67 @@ public class DeviceListTest {
 
     @Test
     public void test() throws IOException {
-        String testStr = "[{\"DeviceList\":{\"Id\":5,\"Devices\":[{\"DeviceIndex\":2,\"DeviceName\":\"foo\",\"DeviceMessages\":[\"foo-cmd-1\",\"foo-cmd-2\"]},{\"DeviceIndex\":4,\"DeviceName\":\"bar\",\"DeviceMessages\":[\"bar-cmd-1\",\"bar-cmd-2\"]}]}}]";
+        String testStr = "[" +
+                "{" +
+                "\"DeviceList\":{" +
+                "\"Id\":1," +
+                "\"Devices\":[" +
+                "{" +
+                "\"DeviceIndex\":0," +
+                "\"DeviceName\":\"TestDevice 1\"," +
+                "\"DeviceMessages\":{" +
+                "\"SingleMotorVibrateCmd\":{}," +
+                "\"VibrateCmd\":{\"FeatureCount\":2}," +
+                "\"StopDeviceCmd\":{}" +
+                "}" +
+                "}," +
+                "{" +
+                "\"DeviceIndex\":1," +
+                "\"DeviceName\":\"TestDevice 2\"," +
+                "\"DeviceMessages\":{" +
+                "\"FleshlightLaunchFW12Cmd\":{}," +
+                "\"LinearCmd\":{\"FeatureCount\":1}," +
+                "\"StopDeviceCmd\":{}" +
+                "}" +
+                "}" +
+                "]" +
+                "}" +
+                "}" +
+                "]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
         List<ButtplugMessage> msgs = parser.parseJson(testStr);
 
         Assert.assertEquals(1, msgs.size());
         Assert.assertEquals(DeviceList.class, msgs.get(0).getClass());
-        Assert.assertEquals(5, msgs.get(0).id);
-        Assert.assertEquals(2, ((DeviceList) msgs.get(0)).devices.length);
+        Assert.assertEquals(1, msgs.get(0).id);
+        Assert.assertEquals(2, ((DeviceList) msgs.get(0)).devices.size());
 
-        DeviceMessageInfo[] devs = ((DeviceList) msgs.get(0)).devices;
-        Assert.assertEquals(2, devs[0].deviceIndex);
-        Assert.assertEquals("foo", devs[0].deviceName);
-        Assert.assertArrayEquals(new String[]{"foo-cmd-1", "foo-cmd-2"}, devs[0].deviceMessages);
+        List<DeviceMessageInfo> devs = ((DeviceList) msgs.get(0)).devices;
 
-        Assert.assertEquals(4, devs[1].deviceIndex);
-        Assert.assertEquals("bar", devs[1].deviceName);
-        Assert.assertArrayEquals(new String[]{"bar-cmd-1", "bar-cmd-2"}, devs[1].deviceMessages);
+        Assert.assertEquals(0, devs.get(0).deviceIndex);
+        Assert.assertEquals("TestDevice 1", devs.get(0).deviceName);
+        Assert.assertEquals(3, devs.get(0).deviceMessages.size());
+
+        Assert.assertNotNull(devs.get(0).deviceMessages.get("SingleMotorVibrateCmd"));
+        Assert.assertEquals(0, devs.get(0).deviceMessages.get("SingleMotorVibrateCmd")
+                .featureCount);
+        Assert.assertNotNull(devs.get(0).deviceMessages.get("VibrateCmd"));
+        Assert.assertEquals(2, devs.get(0).deviceMessages.get("VibrateCmd").featureCount);
+        Assert.assertNotNull(devs.get(0).deviceMessages.get("StopDeviceCmd"));
+        Assert.assertEquals(0, devs.get(0).deviceMessages.get("StopDeviceCmd").featureCount);
+
+        Assert.assertEquals(1, devs.get(1).deviceIndex);
+        Assert.assertEquals("TestDevice 2", devs.get(1).deviceName);
+        Assert.assertEquals(3, devs.get(1).deviceMessages.size());
+
+        Assert.assertNotNull(devs.get(1).deviceMessages.get("FleshlightLaunchFW12Cmd"));
+        Assert.assertEquals(0, devs.get(1).deviceMessages.get("FleshlightLaunchFW12Cmd")
+                .featureCount);
+        Assert.assertNotNull(devs.get(1).deviceMessages.get("LinearCmd"));
+        Assert.assertEquals(1, devs.get(1).deviceMessages.get("LinearCmd").featureCount);
+        Assert.assertNotNull(devs.get(1).deviceMessages.get("StopDeviceCmd"));
+        Assert.assertEquals(0, devs.get(1).deviceMessages.get("StopDeviceCmd").featureCount);
 
         String jsonOut = parser.formatJson(msgs);
         Assert.assertEquals(testStr, jsonOut);

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Buttplug Example Client</string>
+    <string name="app_short_name">Example Client</string>
+    <string name="address">Address</string>
+    <string name="default_address">wss://localhost:12345/buttplug</string>
+    <string name="client_connect">Connect</string>
+    <string name="client_disconnect">Disconnect</string>
+</resources>

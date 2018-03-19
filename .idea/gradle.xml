@@ -9,8 +9,11 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/buttplug.apps.BluetoothDeviceEmulator" />
+            <option value="$PROJECT_DIR$/buttplug.apps.ExampleClientGUI" />
             <option value="$PROJECT_DIR$/buttplug.apps.WebsocketServerGUI" />
             <option value="$PROJECT_DIR$/buttplug.client" />
+            <option value="$PROJECT_DIR$/buttplug.components.WebsocketServer" />
+            <option value="$PROJECT_DIR$/buttplug.components.controls" />
             <option value="$PROJECT_DIR$/buttplug.core" />
             <option value="$PROJECT_DIR$/buttplug.server" />
             <option value="$PROJECT_DIR$/buttplug.server.managers.AndroidBluetoothManager" />

@@ -9,7 +9,7 @@ import java.util.List;
 
 public class LinearCmd extends ButtplugDeviceMessage {
     public class VectorSubcommands {
-        private double positionImpl;
+        private double position;
 
         @JsonProperty(required = true)
         public long index;
@@ -17,39 +17,39 @@ public class LinearCmd extends ButtplugDeviceMessage {
         @JsonProperty(required = true)
         public long duration;
 
-        //        @JsonProperty(required = true)
+        //@JsonProperty(required = true)
         public double getPosition() {
-            return this.positionImpl;
+            return this.position;
         }
 
-        public void setPosition(double aPosition) {
-            if (aPosition < 0) {
+        public void setPosition(double position) {
+            if (position < 0) {
                 throw new IllegalArgumentException("LinearCmd Position cannot be less than 0!");
             }
-            if (aPosition > 1) {
+            if (position > 1) {
                 throw new IllegalArgumentException("LinearCmd Position cannot be greater than 1!");
             }
 
-            this.positionImpl = aPosition;
+            this.position = position;
         }
 
-        public VectorSubcommands(long aIndex, long aDuration, double aPosition) {
-            this.index = aIndex;
-            this.duration = aDuration;
-            this.setPosition(aPosition);
+        public VectorSubcommands(long index, long duration, double position) {
+            this.index = index;
+            this.duration = duration;
+            this.setPosition(position);
         }
     }
 
     @JsonProperty(required = true)
     public List<VectorSubcommands> vectors;
 
-    public LinearCmd(long aDeviceIndex, List<VectorSubcommands> aVectors) {
-        this(aDeviceIndex, aVectors, ButtplugConsts.DefaultMsgId);
+    public LinearCmd(long deviceIndex, List<VectorSubcommands> vectors) {
+        this(deviceIndex, vectors, ButtplugConsts.DefaultMsgId);
     }
 
-    public LinearCmd(long aDeviceIndex, List<VectorSubcommands> aVectors, long aId) {
-        super(aId, aDeviceIndex, 1);
-        this.vectors = aVectors;
+    public LinearCmd(long deviceIndex, List<VectorSubcommands> vectors, long id) {
+        super(id, deviceIndex);
+        this.vectors = vectors;
     }
 
 }

@@ -30,6 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,15 +41,19 @@ public class DeviceManager {
 
     private final Object scanLock;
     private ButtplugEventHandler deviceMessageReceived = new ButtplugEventHandler();
+
     @NonNull
     public ButtplugEventHandler getDeviceMessageReceived() {
         return this.deviceMessageReceived;
     }
+
     private ButtplugEventHandler scanningFinished = new ButtplugEventHandler();
+
     @NonNull
     public ButtplugEventHandler getScanningFinished() {
         return this.scanningFinished;
     }
+
     private List<IDeviceSubtypeManager> managers;
     private Map<Long, IButtplugDevice> devices;
     private IButtplugLog bpLogger;
@@ -57,17 +62,17 @@ public class DeviceManager {
     private boolean sentFinished;
     private IButtplugCallback messageEmittedCallback = new IButtplugCallback() {
         @Override
-        public void invoke(ButtplugEvent aEvent) {
+        public void invoke(ButtplugEvent event) {
             if (deviceMessageReceived != null) {
-                deviceMessageReceived.invoke(aEvent);
+                deviceMessageReceived.invoke(event);
             }
         }
     };
     private IButtplugCallback deviceRemovedCallback = new IButtplugCallback() {
         @Override
-        public void invoke(ButtplugEvent aEvent) {
-            IButtplugDevice aDevice = aEvent.getDevice();
-            if (aDevice == null) {
+        public void invoke(ButtplugEvent event) {
+            IButtplugDevice device = event.getDevice();
+            if (device == null) {
                 DeviceManager.this.bpLogger.error("Got DeviceRemoved message from an object that " +
                         "is not a ButtplugDevice.");
                 return;
@@ -77,7 +82,7 @@ public class DeviceManager {
             // translate that for clients.
             Map<Long, IButtplugDevice> entries = new HashMap<>();
             for (Map.Entry<Long, IButtplugDevice> x : DeviceManager.this.devices.entrySet()) {
-                if (x.getValue().getIdentifier().equals(aDevice.getIdentifier())) {
+                if (x.getValue().getIdentifier().equals(device.getIdentifier())) {
                     entries.put(x.getKey(), x.getValue());
                 }
             }
@@ -89,8 +94,10 @@ public class DeviceManager {
                         "device dictionary.");
             }
             for (Map.Entry<Long, IButtplugDevice> x : entries.entrySet()) {
-                x.getValue().getDeviceRemoved().removeCallback(DeviceManager.this.deviceRemovedCallback);
-//                x.getValue().getMessageEmitted().removeCallback(DeviceManager.this.messageEmittedCallback);
+                x.getValue().getDeviceRemoved().removeCallback(DeviceManager.this
+                        .deviceRemovedCallback);
+//                x.getValue().getMessageEmitted().removeCallback(DeviceManager.this
+// .messageEmittedCallback);
                 DeviceManager.this.deviceMessageReceived.invoke(new ButtplugEvent(new
                         DeviceRemoved(x.getKey())));
             }
@@ -98,25 +105,25 @@ public class DeviceManager {
     };
     private IButtplugCallback deviceAddedCallback = new IButtplugCallback() {
         @Override
-        public void invoke(ButtplugEvent aEvent) {
-            IButtplugDevice aDevice = aEvent.getDevice();
+        public void invoke(ButtplugEvent event) {
+            IButtplugDevice device = event.getDevice();
 
             // Devices can be turned off by the time they get to this point, at which point they
             // end up null. Make sure the device isn't null.
-            if (aDevice == null) {
+            if (device == null) {
                 return;
             }
 
             @SuppressLint("UseSparseArrays")
             Map<Long, IButtplugDevice> duplicates = new HashMap<>();
             for (Map.Entry<Long, IButtplugDevice> x : DeviceManager.this.devices.entrySet()) {
-                if (x.getValue().getIdentifier().equals(aDevice.getIdentifier())) {
+                if (x.getValue().getIdentifier().equals(device.getIdentifier())) {
                     duplicates.put(x.getKey(), x.getValue());
                 }
             }
             if (!duplicates.isEmpty() && (duplicates.size() > 1 || duplicates.entrySet().iterator
                     ().next().getValue().isConnected())) {
-                DeviceManager.this.bpLogger.debug("Already have device " + aDevice.getName() + " " +
+                DeviceManager.this.bpLogger.debug("Already have device " + device.getName() + " " +
                         "in Devices list");
                 return;
             }
@@ -125,16 +132,16 @@ public class DeviceManager {
             long deviceIndex = !duplicates.isEmpty() ? duplicates.entrySet().iterator().next()
                     .getKey() : DeviceManager.this.deviceIndexCounter.incrementAndGet();
             DeviceManager.this.bpLogger.info((!duplicates.isEmpty() ? "Readding" : "Adding") + " " +
-                    "Device " + aDevice.getName() + " at index " + deviceIndex);
+                    "Device " + device.getName() + " at index " + deviceIndex);
 
-            DeviceManager.this.devices.put(deviceIndex, aDevice);
+            DeviceManager.this.devices.put(deviceIndex, device);
             DeviceManager.this.devices.get(deviceIndex).setIndex(deviceIndex);
-            aDevice.getDeviceRemoved().addCallback(DeviceManager.this.deviceRemovedCallback);
-            aDevice.getMessageEmitted().addCallback(DeviceManager.this.messageEmittedCallback);
+            device.getDeviceRemoved().addCallback(DeviceManager.this.deviceRemovedCallback);
+            device.getMessageEmitted().addCallback(DeviceManager.this.messageEmittedCallback);
             ButtplugMessage msg = new DeviceAdded(
                     deviceIndex,
-                    aDevice.getName(),
-                    DeviceManager.getAllowedMessageTypesAsDictionary(aDevice)
+                    device.getName(),
+                    DeviceManager.getAllowedMessageTypesAsDictionary(device)
             );
             if (deviceMessageReceived != null) {
                 deviceMessageReceived.invoke(new ButtplugEvent(msg));
@@ -143,7 +150,7 @@ public class DeviceManager {
     };
     private IButtplugCallback scanningFinishedCallback = new IButtplugCallback() {
         @Override
-        public void invoke(ButtplugEvent aEvent) {
+        public void invoke(ButtplugEvent event) {
             synchronized (DeviceManager.this.scanLock) {
                 if (DeviceManager.this.sentFinished) {
                     return;
@@ -162,8 +169,8 @@ public class DeviceManager {
         }
     };
 
-    public DeviceManager(IButtplugLogManager aLogManager) {
-        this.bpLogManager = aLogManager;
+    public DeviceManager(IButtplugLogManager logManager) {
+        this.bpLogManager = logManager;
         this.bpLogger = this.bpLogManager.getLogger(this.getClass());
         this.bpLogger.info("Setting up DeviceManager");
         this.sentFinished = true;
@@ -173,11 +180,12 @@ public class DeviceManager {
         this.managers = new ArrayList<>();
     }
 
-    private static Map<String, MessageAttributes> getAllowedMessageTypesAsDictionary(@NonNull
-                                                                                             IButtplugDevice aDevice) {
-        Map<String, MessageAttributes> msgs = new HashMap<>();
-        for (Class msg : aDevice.getAllowedMessageTypes()) {
-            msgs.put(msg.getSimpleName(), aDevice.getMessageAttrs(msg));
+    private static LinkedHashMap<String, MessageAttributes> getAllowedMessageTypesAsDictionary
+            (@NonNull
+                                                                                                       IButtplugDevice device) {
+        LinkedHashMap<String, MessageAttributes> msgs = new LinkedHashMap<>();
+        for (Class msg : device.getAllowedMessageTypes()) {
+            msgs.put(msg.getSimpleName(), device.getMessageAttrs(msg));
         }
 
         return msgs;
@@ -187,23 +195,23 @@ public class DeviceManager {
         return this.devices;
     }
 
-    protected ListenableFuture<ButtplugMessage> sendMessage(ButtplugMessage aMsg)
+    protected ListenableFuture<ButtplugMessage> sendMessage(ButtplugMessage msg)
             throws ExecutionException, InterruptedException, InvocationTargetException,
             IllegalAccessException {
         SettableListenableFuture<ButtplugMessage> promise = new SettableListenableFuture<>();
 
-        long id = aMsg.id;
-        if (aMsg instanceof StartScanning) {
+        long id = msg.id;
+        if (msg instanceof StartScanning) {
             DeviceManager.this.bpLogger.debug("Got StartScanning Message");
             DeviceManager.this.startScanning();
             promise.set(new Ok(id));
             return promise;
-        } else if (aMsg instanceof StopScanning) {
+        } else if (msg instanceof StopScanning) {
             DeviceManager.this.bpLogger.debug("Got StopScanning Message");
             DeviceManager.this.stopScanning();
             promise.set(new Ok(id));
             return promise;
-        } else if (aMsg instanceof StopAllDevices) {
+        } else if (msg instanceof StopAllDevices) {
             DeviceManager.this.bpLogger.debug("Got StopAllDevices Message");
             boolean isOk = true;
             String errorMsg = "";
@@ -212,7 +220,7 @@ public class DeviceManager {
                     continue;
                 }
                 ButtplugMessage r = device.getValue().parseMessage(new StopDeviceCmd(device
-                        .getKey(), aMsg.id)).get();
+                        .getKey(), msg.id)).get();
                 if (r instanceof Ok) {
                     continue;
                 }
@@ -224,11 +232,11 @@ public class DeviceManager {
                 return promise;
             }
 
-            promise.set(new Error(errorMsg, Error.ErrorClass.ERROR_DEVICE, aMsg.id));
+            promise.set(new Error(errorMsg, Error.ErrorClass.ERROR_DEVICE, msg.id));
             return promise;
-        } else if (aMsg instanceof RequestDeviceList) {
+        } else if (msg instanceof RequestDeviceList) {
             DeviceManager.this.bpLogger.debug("Got RequestDeviceList Message");
-            List<DeviceMessageInfo> msgDevices = new ArrayList<>();
+            ArrayList<DeviceMessageInfo> msgDevices = new ArrayList<>();
             for (Map.Entry<Long, IButtplugDevice> x : DeviceManager.this.devices.entrySet()) {
                 if (x.getValue().isConnected()) {
                     msgDevices.add(new DeviceMessageInfo(
@@ -240,23 +248,24 @@ public class DeviceManager {
             }
             promise.set(new DeviceList(msgDevices, id));
             return promise;
-        } else if (aMsg instanceof ButtplugDeviceMessage) {
-            DeviceManager.this.bpLogger.trace("Sending " + aMsg.getClass().getSimpleName() + " to" +
-                    " device index " + ((ButtplugDeviceMessage) aMsg).deviceIndex);
+        } else if (msg instanceof ButtplugDeviceMessage) {
+            DeviceManager.this.bpLogger.trace("Sending " + msg.getClass().getSimpleName() + " to" +
+                    " device index " + ((ButtplugDeviceMessage) msg).deviceIndex);
             // If it's a device message, it's most likely not ours.
-            ButtplugDeviceMessage msg = (ButtplugDeviceMessage) aMsg;
-            if (this.devices.containsKey(msg.deviceIndex)) {
-                ButtplugMessage result = DeviceManager.this.devices.get(msg.deviceIndex)
-                        .parseMessage(msg).get();
+            ButtplugDeviceMessage deviceMessage = (ButtplugDeviceMessage) msg;
+            if (this.devices.containsKey(deviceMessage.deviceIndex)) {
+                ButtplugMessage result = DeviceManager.this.devices.get(deviceMessage.deviceIndex)
+                        .parseMessage(deviceMessage).get();
                 promise.set(result);
                 return promise;
             }
             promise.set(DeviceManager.this.bpLogger.logErrorMsg(id, Error.ErrorClass
-                    .ERROR_DEVICE, "Dropping message for unknown device index " + msg.deviceIndex));
+                    .ERROR_DEVICE, "Dropping message for unknown device index " + deviceMessage
+                    .deviceIndex));
             return promise;
         }
         promise.set(
-                new Error("Message type " + aMsg.getClass().getSimpleName() + " unhandled by this" +
+                new Error("Message type " + msg.getClass().getSimpleName() + " unhandled by this" +
                         " server.",
                         Error.ErrorClass.ERROR_MSG, id));
         return promise;
@@ -287,9 +296,9 @@ public class DeviceManager {
         }
     }
 
-    void addDeviceSubtypeManager(IDeviceSubtypeManager aMgr) {
-        this.managers.add(aMgr);
-        aMgr.getDeviceAdded().addCallback(this.deviceAddedCallback);
-        aMgr.getScanningFinished().addCallback(this.scanningFinishedCallback);
+    void addDeviceSubtypeManager(IDeviceSubtypeManager mgr) {
+        this.managers.add(mgr);
+        mgr.getDeviceAdded().addCallback(this.deviceAddedCallback);
+        mgr.getScanningFinished().addCallback(this.scanningFinishedCallback);
     }
 }

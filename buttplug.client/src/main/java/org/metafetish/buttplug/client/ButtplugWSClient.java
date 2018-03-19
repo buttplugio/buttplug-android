@@ -57,20 +57,20 @@ public class ButtplugWSClient extends WebSocketAdapter {
     public ILogEvent logReceived;
 
     private WebSocket websocket;
-    private ButtplugJsonMessageParser _parser;
+    private ButtplugJsonMessageParser parser;
     private Object sendLock = new Object();
-    private String _clientName;
-    private int _messageSchemaVersion;
-    private ConcurrentHashMap<Long, SettableListenableFuture<ButtplugMessage>> _waitingMsgs = new
+    private String clientName;
+    private int messageSchemaVersion;
+    private ConcurrentHashMap<Long, SettableListenableFuture<ButtplugMessage>> waitingMsgs = new
             ConcurrentHashMap<>();
-    private ConcurrentHashMap<Long, ButtplugClientDevice> _devices = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long, ButtplugClientDevice> devices = new ConcurrentHashMap<>();
 
-    private Timer _pingTimer;
+    private Timer pingTimer;
     private AtomicLong msgId = new AtomicLong(1);
 
-    public ButtplugWSClient(String aClientName) {
-        _clientName = aClientName;
-        _parser = new ButtplugJsonMessageParser();
+    public ButtplugWSClient(String clientName) {
+        this.clientName = clientName;
+        this.parser = new ButtplugJsonMessageParser();
     }
 
     public long getNextMsgId() {
@@ -83,18 +83,18 @@ public class ButtplugWSClient extends WebSocketAdapter {
 
     public void Connect(URI url, boolean trustAll) throws Exception {
 
-        _waitingMsgs.clear();
-        _devices.clear();
-        msgId.set(1);
+        this.waitingMsgs.clear();
+        this.devices.clear();
+        this.msgId.set(1);
 
-        websocket = getWebSocket(url, trustAll);
+        this.websocket = getWebSocket(url, trustAll);
 
-        ButtplugMessage res = sendMessage(new RequestServerInfo(_clientName, getNextMsgId(), 0))
+        ButtplugMessage res = sendMessage(new RequestServerInfo(this.clientName, getNextMsgId(), 0))
                 .get();
         if (res instanceof ServerInfo) {
             if (((ServerInfo) res).maxPingTime > 0) {
-                _pingTimer = new Timer("pingTimer", true);
-                _pingTimer.scheduleAtFixedRate(new TimerTask() {
+                this.pingTimer = new Timer("pingTimer", true);
+                this.pingTimer.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
                         try {
@@ -124,20 +124,20 @@ public class ButtplugWSClient extends WebSocketAdapter {
     }
 */
     public void Disconnect() {
-        if (_pingTimer != null) {
-            _pingTimer.cancel();
-            _pingTimer = null;
+        if (this.pingTimer != null) {
+            this.pingTimer.cancel();
+            this.pingTimer = null;
         }
 
-        if (websocket != null) {
-            websocket.disconnect();
-            websocket = null;
+        if (this.websocket != null) {
+            this.websocket.disconnect();
+            this.websocket = null;
         }
 
         int max = 3;
-        while (max-- > 0 && _waitingMsgs.size() != 0) {
-            for (long msgId : _waitingMsgs.keySet()) {
-                SettableListenableFuture<ButtplugMessage> val = _waitingMsgs.remove(msgId);
+        while (max-- > 0 && this.waitingMsgs.size() != 0) {
+            for (long msgId : this.waitingMsgs.keySet()) {
+                SettableListenableFuture<ButtplugMessage> val = this.waitingMsgs.remove(msgId);
                 if (val != null) {
                     val.set(new Error("Connection closed!", Error.ErrorClass.ERROR_UNKNOWN,
                             ButtplugConsts.SystemMsgId));
@@ -150,11 +150,11 @@ public class ButtplugWSClient extends WebSocketAdapter {
     @Override
     public void onTextMessage(WebSocket socket, String buf) {
         try {
-            List<ButtplugMessage> msgs = _parser.parseJson(buf);
+            List<ButtplugMessage> msgs = this.parser.parseJson(buf);
 
             for (ButtplugMessage msg : msgs) {
                 if (msg.id > 0) {
-                    SettableListenableFuture<ButtplugMessage> val = _waitingMsgs.remove(msg.id);
+                    SettableListenableFuture<ButtplugMessage> val = this.waitingMsgs.remove(msg.id);
                     if (val != null) {
                         val.set(msg);
                         continue;
@@ -162,34 +162,34 @@ public class ButtplugWSClient extends WebSocketAdapter {
                 }
 
                 if (msg instanceof Log) {
-                    if (logReceived != null) {
-                        logReceived.logReceived((Log) msg);
+                    if (this.logReceived != null) {
+                        this.logReceived.logReceived((Log) msg);
                     }
                 } else if (msg instanceof DeviceAdded) {
                     ButtplugClientDevice device = new ButtplugClientDevice((DeviceAdded) msg);
-                    _devices.put(((DeviceAdded) msg).deviceIndex, device);
-                    if (deviceAdded != null) {
-                        deviceAdded.deviceAdded(device);
+                    this.devices.put(((DeviceAdded) msg).deviceIndex, device);
+                    if (this.deviceAdded != null) {
+                        this.deviceAdded.deviceAdded(device);
                     }
                 } else if (msg instanceof DeviceRemoved) {
-                    if (_devices.remove(((DeviceRemoved) msg).deviceIndex) != null) {
-                        if (deviceRemoved != null) {
-                            deviceRemoved.deviceRemoved(((DeviceRemoved) msg).deviceIndex);
+                    if (this.devices.remove(((DeviceRemoved) msg).deviceIndex) != null) {
+                        if (this.deviceRemoved != null) {
+                            this.deviceRemoved.deviceRemoved(((DeviceRemoved) msg).deviceIndex);
                         }
                     }
                 } else if (msg instanceof ScanningFinished) {
-                    if (scanningFinished != null) {
-                        scanningFinished.scanningFinished();
+                    if (this.scanningFinished != null) {
+                        this.scanningFinished.scanningFinished();
                     }
                 } else if (msg instanceof Error) {
-                    if (erorReceived != null) {
-                        erorReceived.errorReceived((Error) msg);
+                    if (this.erorReceived != null) {
+                        this.erorReceived.errorReceived((Error) msg);
                     }
                 }
             }
         } catch (IOException e) {
-            if (erorReceived != null) {
-                erorReceived.errorReceived(new Error(e.getMessage(),
+            if (this.erorReceived != null) {
+                this.erorReceived.errorReceived(new Error(e.getMessage(),
                         Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.SystemMsgId));
             } else {
                 e.printStackTrace();
@@ -222,11 +222,11 @@ public class ButtplugWSClient extends WebSocketAdapter {
         }
 
         for (DeviceMessageInfo d : ((DeviceList) res).devices) {
-            if (!_devices.containsKey(d.deviceIndex)) {
+            if (!this.devices.containsKey(d.deviceIndex)) {
                 ButtplugClientDevice device = new ButtplugClientDevice(d);
-                if (_devices.put(d.deviceIndex, device) == null) {
-                    if (deviceAdded != null) {
-                        deviceAdded.deviceAdded(device);
+                if (this.devices.put(d.deviceIndex, device) == null) {
+                    if (this.deviceAdded != null) {
+                        this.deviceAdded.deviceAdded(device);
                     }
                 }
             }
@@ -235,7 +235,7 @@ public class ButtplugWSClient extends WebSocketAdapter {
 
     public List<ButtplugClientDevice> getDevices() {
         List<ButtplugClientDevice> devices = new ArrayList<>();
-        devices.addAll(_devices.values());
+        devices.addAll(this.devices.values());
         return devices;
     }
 
@@ -251,9 +251,9 @@ public class ButtplugWSClient extends WebSocketAdapter {
         return sendMessageExpectOk(new StopAllDevices(msgId.incrementAndGet()));
     }
 
-    public boolean requestLog(ButtplugLogLevel aLogLevel) throws ExecutionException,
+    public boolean requestLog(ButtplugLogLevel logLevel) throws ExecutionException,
             InterruptedException, IOException {
-        return sendMessageExpectOk(new RequestLog(aLogLevel, msgId.getAndIncrement()));
+        return sendMessageExpectOk(new RequestLog(logLevel, msgId.getAndIncrement()));
     }
 
     public ListenableFuture<ButtplugMessage> sendDeviceMessage(ButtplugClientDevice device,
@@ -261,7 +261,7 @@ public class ButtplugWSClient extends WebSocketAdapter {
             throws ExecutionException, InterruptedException, IOException {
         SettableListenableFuture<ButtplugMessage> promise = new
                 SettableListenableFuture<ButtplugMessage>();
-        ButtplugClientDevice dev = _devices.get(device.index);
+        ButtplugClientDevice dev = this.devices.get(device.index);
         if (dev != null) {
             if (!dev.allowedMessages.contains(deviceMsg.getClass().getSimpleName())) {
                 promise.set(new Error("Device does not accept message type: " + deviceMsg
@@ -271,7 +271,7 @@ public class ButtplugWSClient extends WebSocketAdapter {
             }
 
             deviceMsg.deviceIndex = device.index;
-            deviceMsg.id = msgId.incrementAndGet();
+            deviceMsg.id = this.msgId.incrementAndGet();
             return sendMessage(deviceMsg);
         } else {
             promise.set(new Error("Device not available.", Error.ErrorClass.ERROR_DEVICE,
@@ -291,16 +291,16 @@ public class ButtplugWSClient extends WebSocketAdapter {
         SettableListenableFuture<ButtplugMessage> promise = new
                 SettableListenableFuture<ButtplugMessage>();
 
-        _waitingMsgs.put(msg.id, promise);
-        if (websocket == null) {
+        this.waitingMsgs.put(msg.id, promise);
+        if (this.websocket == null) {
             promise.set(new Error("Bad WS state!", Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts
                     .SystemMsgId));
             return promise;
         }
 
         try {
-            websocket.sendText(_parser.formatJson(msg));
-            websocket.flush();
+            this.websocket.sendText(this.parser.formatJson(msg));
+            this.websocket.flush();
         } catch (IOException e) {
             promise.set(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, msg.id));
         }

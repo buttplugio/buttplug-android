@@ -2,8 +2,7 @@ package org.metafetish.buttplug.core.Messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 public class DeviceMessageInfo {
 
@@ -14,9 +13,10 @@ public class DeviceMessageInfo {
     public String deviceName;
 
     @JsonProperty(value = "DeviceMessages", required = true)
-    public Map<String, MessageAttributes> deviceMessages;
+    public LinkedHashMap<String, MessageAttributes> deviceMessages;
 
-    public DeviceMessageInfo(long deviceIndex, String deviceName, Map<String, MessageAttributes>
+    public DeviceMessageInfo(long deviceIndex, String deviceName, LinkedHashMap<String,
+            MessageAttributes>
             deviceMessages) {
         this.deviceName = deviceName;
         this.deviceIndex = deviceIndex;
@@ -27,6 +27,6 @@ public class DeviceMessageInfo {
     private DeviceMessageInfo() {
         this.deviceName = "";
         this.deviceIndex = -1;
-        this.deviceMessages = new HashMap<>();
+        this.deviceMessages = new LinkedHashMap<>();
     }
 }

@@ -12,7 +12,9 @@ public class ServerInfoTest {
 
     @Test
     public void test() throws IOException {
-        String testStr = "[{\"ServerInfo\":{\"Id\":1,\"MajorVersion\":0,\"MinorVersion\":1,\"BuildVersion\":1,\"MessageVersion\":1,\"MaxPingTime\":500,\"ServerName\":\"Websocket Server\"}}]";
+        String testStr = "[{\"ServerInfo\":{\"Id\":1,\"MajorVersion\":0,\"MinorVersion\":1," +
+                "\"BuildVersion\":1,\"MessageVersion\":1,\"MaxPingTime\":500," +
+                "\"ServerName\":\"Websocket Server\"}}]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
         List<ButtplugMessage> msgs = parser.parseJson(testStr);

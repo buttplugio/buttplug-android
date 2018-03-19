@@ -14,108 +14,110 @@ class ButtplugLog implements IButtplugLog {
     private final String TAG;
 
     private ButtplugEventHandler logMessageReceived = new ButtplugEventHandler();
+
     @NonNull
     public ButtplugEventHandler getLogMessageReceived() {
         return this.logMessageReceived;
     }
 
-    public ButtplugLog(@NonNull Class aClass) {
-        TAG = aClass.getSimpleName();
+    public ButtplugLog(@NonNull Class classDefinition) {
+        TAG = classDefinition.getSimpleName();
     }
 
-    public void trace(String aMsg) {
-        this.trace(aMsg, false);
+    public void trace(String msg) {
+        this.trace(msg, false);
     }
 
-    public void trace(String aMsg, boolean aLocalOnly) {
-        android.util.Log.v(TAG, aMsg);
-        if (!aLocalOnly) {
-            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.TRACE, aMsg)));
+    public void trace(String msg, boolean localOnly) {
+        android.util.Log.v(TAG, msg);
+        if (!localOnly) {
+            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.TRACE, msg)));
         }
     }
 
-    public void debug(String aMsg) {
-        this.debug(aMsg, false);
+    public void debug(String msg) {
+        this.debug(msg, false);
     }
 
-    public void debug(String aMsg, boolean aLocalOnly) {
-        android.util.Log.d(TAG, aMsg);
-        if (!aLocalOnly) {
-            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.DEBUG, aMsg)));
+    public void debug(String msg, boolean localOnly) {
+        android.util.Log.d(TAG, msg);
+        if (!localOnly) {
+            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.DEBUG, msg)));
         }
     }
 
-    public void info(String aMsg) {
-        this.info(aMsg, false);
+    public void info(String msg) {
+        this.info(msg, false);
     }
 
-    public void info(String aMsg, boolean aLocalOnly) {
-        android.util.Log.i(TAG, aMsg);
-        if (!aLocalOnly) {
-            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.INFO, aMsg)));
+    public void info(String msg, boolean localOnly) {
+        android.util.Log.i(TAG, msg);
+        if (!localOnly) {
+            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.INFO, msg)));
         }
     }
 
-    public void warn(String aMsg) {
-        this.warn(aMsg, false);
+    public void warn(String msg) {
+        this.warn(msg, false);
     }
 
-    public void warn(String aMsg, boolean aLocalOnly) {
-        android.util.Log.w(TAG, aMsg);
-        if (!aLocalOnly) {
-            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.WARN, aMsg)));
+    public void warn(String msg, boolean localOnly) {
+        android.util.Log.w(TAG, msg);
+        if (!localOnly) {
+            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.WARN, msg)));
         }
     }
 
-    public void error(String aMsg) {
-        this.error(aMsg, false);
+    public void error(String msg) {
+        this.error(msg, false);
     }
 
-    public void error(String aMsg, boolean aLocalOnly) {
-        android.util.Log.e(TAG, aMsg);
-        if (!aLocalOnly) {
-            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.ERROR, aMsg)));
+    public void error(String msg, boolean localOnly) {
+        android.util.Log.e(TAG, msg);
+        if (!localOnly) {
+            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.ERROR, msg)));
         }
     }
 
-    public void fatal(String aMsg) {
-        this.fatal(aMsg, false);
+    public void fatal(String msg) {
+        this.fatal(msg, false);
     }
 
-    public void fatal(String aMsg, boolean aLocalOnly) {
-        android.util.Log.wtf(TAG, aMsg);
-        if (!aLocalOnly) {
-            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.FATAL, aMsg)));
+    public void fatal(String msg, boolean localOnly) {
+        android.util.Log.wtf(TAG, msg);
+        if (!localOnly) {
+            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.FATAL, msg)));
         }
     }
 
     private ButtplugEventHandler onLogException = new ButtplugEventHandler();
+
     @NonNull
     public ButtplugEventHandler getOnLogException() {
-        return  onLogException;
+        return onLogException;
     }
 
-    public void logException(Exception aEx) {
-        this.logException(aEx, true, null);
+    public void logException(Exception ex) {
+        this.logException(ex, true, null);
     }
 
-    public void logException(Exception aEx, boolean aLocalOnly) {
-        this.logException(aEx, aLocalOnly, null);
+    public void logException(Exception ex, boolean localOnly) {
+        this.logException(ex, localOnly, null);
     }
 
-    public void logException(Exception aEx, String aMsg) {
-        this.logException(aEx, true, aMsg);
+    public void logException(Exception ex, String msg) {
+        this.logException(ex, true, msg);
     }
 
-    public void logException(Exception aEx, boolean aLocalOnly, String aMsg) {
+    public void logException(Exception ex, boolean localOnly, String msg) {
         String errorMsg;
-        if (aEx != null) {
-            errorMsg = aEx.getClass().getSimpleName() + ": " + (aMsg != null ? aMsg : aEx
-                    .getMessage()) + "\n" + Arrays.toString(aEx.getStackTrace());
+        if (ex != null) {
+            errorMsg = ex.getClass().getSimpleName() + ": " + (msg != null ? msg : ex
+                    .getMessage()) + "\n" + Arrays.toString(ex.getStackTrace());
         } else {
-            errorMsg = "Unknown Exception" + (aMsg != null ? ": " + aMsg : "");
+            errorMsg = "Unknown Exception" + (msg != null ? ": " + msg : "");
         }
-        this.error(errorMsg, aLocalOnly);
+        this.error(errorMsg, localOnly);
         this.onLogException.invoke(new ButtplugEvent(new Error(errorMsg, Error.ErrorClass
                 .ERROR_UNKNOWN, ButtplugConsts.DefaultMsgId)));
     }
@@ -125,9 +127,9 @@ class ButtplugLog implements IButtplugLog {
     }
 
     @NonNull
-    public Error logErrorMsg(long aId, Error.ErrorClass aCode, String aMsg) {
-        this.error(aMsg, false);
-        return new Error(aMsg, aCode, aId);
+    public Error logErrorMsg(long id, Error.ErrorClass code, String msg) {
+        this.error(msg, false);
+        return new Error(msg, code, id);
     }
 
     public void logWarnMsg(Error warning) {
@@ -135,9 +137,9 @@ class ButtplugLog implements IButtplugLog {
     }
 
     @NonNull
-    public Error logWarnMsg(long aId, Error.ErrorClass aCode, String aMsg) {
-        this.warn(aMsg, false);
-        return new Error(aMsg, aCode, aId);
+    public Error logWarnMsg(long id, Error.ErrorClass code, String msg) {
+        this.warn(msg, false);
+        return new Error(msg, code, id);
     }
 
 }

@@ -10,9 +10,36 @@ public class KiirooCmd extends ButtplugDeviceMessage {
     @JsonProperty(value = "Command", required = true)
     public String deviceCmd;
 
-    public KiirooCmd(long deviceIndex, String deviceCmd, long id) {
+    private int position;
+
+    public int getPosition() {
+        if (position > 4 || position < 0) {
+            return 0;
+        }
+        return position;
+    }
+
+    public void setPosition(int position) {
+        if (position > 4) {
+            throw new IllegalArgumentException(
+                    "KiirooRawCmd cannot have a position higher than 4!");
+        }
+
+        if (position < 0) {
+            throw new IllegalArgumentException(
+                    "KiirooRawCmd cannot have a position lower than 0!");
+        }
+
+        this.position = position;
+    }
+
+    public KiirooCmd(long deviceIndex, int position) {
+        this(deviceIndex, position, ButtplugConsts.DefaultMsgId);
+    }
+
+    public KiirooCmd(long deviceIndex, int position, long id) {
         super(id, deviceIndex);
-        this.deviceCmd = deviceCmd;
+        this.setPosition(position);
     }
 
     @SuppressWarnings("unused")

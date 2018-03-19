@@ -12,8 +12,8 @@ import java.util.List;
 public abstract class BluetoothSubtypeManager extends DeviceSubtypeManager {
     protected List<IBluetoothDeviceInfo> builtinDevices;
 
-    protected BluetoothSubtypeManager(@NonNull IButtplugLogManager aLogManager) {
-        super(aLogManager);
+    protected BluetoothSubtypeManager(@NonNull IButtplugLogManager logManager) {
+        super(logManager);
         builtinDevices = new ArrayList<>();
         builtinDevices.add(new FleshlightLaunchBluetoothInfo());
     }

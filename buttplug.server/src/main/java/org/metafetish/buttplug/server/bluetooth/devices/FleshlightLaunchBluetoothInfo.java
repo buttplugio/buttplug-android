@@ -19,16 +19,19 @@ public class FleshlightLaunchBluetoothInfo implements IBluetoothDeviceInfo {
     }
 
     private List<String> names = new ArrayList<>();
+
     public List<String> getNames() {
         return this.names;
     }
 
     private List<UUID> services = new ArrayList<>();
+
     public List<UUID> getServices() {
         return this.services;
     }
 
     private List<UUID> characteristics = new ArrayList<>();
+
     public List<UUID> getCharacteristics() {
         return this.characteristics;
     }
@@ -45,8 +48,8 @@ public class FleshlightLaunchBluetoothInfo implements IBluetoothDeviceInfo {
     }
 
     @NonNull
-    public IButtplugDevice CreateDevice(@NonNull IButtplugLogManager aLogManager, @NonNull IBluetoothDeviceInterface aInterface) {
-        return new FleshlightLaunch(aLogManager, aInterface, this);
+    public IButtplugDevice CreateDevice(@NonNull IButtplugLogManager logManager, @NonNull
+            IBluetoothDeviceInterface iface) {
+        return new FleshlightLaunch(logManager, iface, this);
     }
-
 }

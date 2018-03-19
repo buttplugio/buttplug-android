@@ -1,7 +1,6 @@
 package org.metafetish.buttplug.core;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import org.metafetish.buttplug.core.Messages.Error;
 import org.metafetish.buttplug.core.Messages.MessageAttributes;
@@ -35,8 +34,8 @@ public abstract class ButtplugDevice implements IButtplugDevice {
         return this.index;
     }
 
-    public void setIndex(long aIndex) {
-        this.index = aIndex;
+    public void setIndex(long index) {
+        this.index = index;
     }
 
     @NonNull
@@ -45,14 +44,16 @@ public abstract class ButtplugDevice implements IButtplugDevice {
     }
 
     private ButtplugEventHandler deviceRemoved = new ButtplugEventHandler();
+
     @NonNull
     public ButtplugEventHandler getDeviceRemoved() {
         return this.deviceRemoved;
     }
 
     private ButtplugEventHandler messageEmitted = new ButtplugEventHandler();
+
     @NonNull
-    public ButtplugEventHandler getMessageEmitted()  {
+    public ButtplugEventHandler getMessageEmitted() {
         return this.messageEmitted;
     }
 
@@ -65,26 +66,27 @@ public abstract class ButtplugDevice implements IButtplugDevice {
     private boolean isDisconnected;
 
     public class ButtplugDeviceWrapper {
-        public IButtplugMessageCallback callback;
+        public IButtplugDeviceMessageCallback callback;
         public MessageAttributes attrs;
 
-        public ButtplugDeviceWrapper(IButtplugMessageCallback aCallback) {
-            this(aCallback, new MessageAttributes());
+        public ButtplugDeviceWrapper(IButtplugDeviceMessageCallback callback) {
+            this(callback, new MessageAttributes());
         }
 
-        public ButtplugDeviceWrapper(IButtplugMessageCallback aCallback, MessageAttributes aAttrs) {
-            this.callback = aCallback;
-            this.attrs = aAttrs;
+        public ButtplugDeviceWrapper(IButtplugDeviceMessageCallback callback, MessageAttributes
+                attrs) {
+            this.callback = callback;
+            this.attrs = attrs;
         }
     }
 
-    protected ButtplugDevice(@NonNull IButtplugLogManager aLogManager,
-                             @NonNull String aName,
-                             @NonNull String aIdentifier) {
-        bpLogger = aLogManager.getLogger(this.getClass());
+    protected ButtplugDevice(@NonNull IButtplugLogManager logManager,
+                             @NonNull String name,
+                             @NonNull String identifier) {
+        bpLogger = logManager.getLogger(this.getClass());
         msgFuncs = new HashMap<>();
-        name = aName;
-        identifier = aIdentifier;
+        this.name = name;
+        this.identifier = identifier;
     }
 
     @NonNull
@@ -92,9 +94,9 @@ public abstract class ButtplugDevice implements IButtplugDevice {
         return this.msgFuncs.keySet();
     }
 
-    public MessageAttributes getMessageAttrs(Class aMsg) {
-        if (this.msgFuncs.containsKey(aMsg)) {
-            return this.msgFuncs.get(aMsg).attrs;
+    public MessageAttributes getMessageAttrs(Class msg) {
+        if (this.msgFuncs.containsKey(msg)) {
+            return this.msgFuncs.get(msg).attrs;
         }
         return new MessageAttributes();
     }
@@ -107,23 +109,23 @@ public abstract class ButtplugDevice implements IButtplugDevice {
     }
 
     @NonNull
-    public ListenableFuture<ButtplugMessage> parseMessage(@NonNull ButtplugDeviceMessage aMsg)
+    public ListenableFuture<ButtplugMessage> parseMessage(@NonNull ButtplugDeviceMessage msg)
             throws InvocationTargetException, IllegalAccessException {
         SettableListenableFuture<ButtplugMessage> promise = new SettableListenableFuture<>();
         if (this.isDisconnected) {
             promise.set(
                     new Error(this.name + " has disconnected and can no longer process messages.",
-                            Error.ErrorClass.ERROR_DEVICE, aMsg.id));
+                            Error.ErrorClass.ERROR_DEVICE, msg.id));
             return promise;
         }
-        if (!msgFuncs.containsKey(aMsg.getClass())) {
+        if (!msgFuncs.containsKey(msg.getClass())) {
             promise.set(
-                    new Error(this.name + " cannot handle message of type " + aMsg.getClass()
-                            .getSimpleName(), Error.ErrorClass.ERROR_DEVICE, aMsg.id));
+                    new Error(this.name + " cannot handle message of type " + msg.getClass()
+                            .getSimpleName(), Error.ErrorClass.ERROR_DEVICE, msg.id));
             return promise;
         }
         // We just checked whether the key exists above, so we're ok.
-        promise.set(this.msgFuncs.get(aMsg.getClass()).callback.invoke(aMsg));
+        promise.set(this.msgFuncs.get(msg.getClass()).callback.invoke(msg));
         return promise;
     }
 
@@ -136,9 +138,9 @@ public abstract class ButtplugDevice implements IButtplugDevice {
 
     public abstract void disconnect();
 
-    protected void emitMessage(ButtplugMessage aMsg) {
+    protected void emitMessage(ButtplugMessage msg) {
         if (this.messageEmitted != null) {
-            this.messageEmitted.invoke(new ButtplugEvent(aMsg));
+            this.messageEmitted.invoke(new ButtplugEvent(msg));
         }
     }
 }

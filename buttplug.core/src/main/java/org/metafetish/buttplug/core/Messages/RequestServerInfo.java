@@ -8,12 +8,13 @@ import org.metafetish.buttplug.core.ButtplugMessage;
 public class RequestServerInfo extends ButtplugMessage {
     @JsonProperty(value = "ClientName", required = true)
     public String clientName;
+    @JsonProperty(value = "MessageVersion")
     public long messageVersion;
 
-    public RequestServerInfo(String clientName, long id, long aMessageVersion) {
+    public RequestServerInfo(String clientName, long id, long messageVersion) {
         super(id);
         this.clientName = clientName;
-        this.messageVersion = aMessageVersion;
+        this.messageVersion = messageVersion;
     }
 
     @SuppressWarnings("unused")

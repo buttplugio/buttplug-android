@@ -113,7 +113,7 @@ public class ButtplugTabControl extends Fragment implements IButtplugServerFacto
             // Create the adapter that will return a fragment for each of the three
             // primary sections of the activity.
             this.sectionsPagerAdapter = new SectionsPagerAdapter(activity
-                    .getSupportFragmentManager());
+                    .getSupportFragmentManager(), this.hasDevicePanel ? 4 : 3);
 
             // Set up the ViewPager with the sections adapter.
             this.viewPager = (ViewPager) activity.findViewById(R.id.container);
@@ -263,23 +263,30 @@ public class ButtplugTabControl extends Fragment implements IButtplugServerFacto
 
         public SparseArray<Fragment> instances = new SparseArray<>();
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        private int count;
+
+        public SectionsPagerAdapter(FragmentManager fm, int count) {
             super(fm);
+            this.count = count;
         }
 
         @Override
         public Fragment getItem(int position) {
-            Fragment fragment = this.instances.get(position);
-            if (fragment == null) {
-                return PlaceholderFragment.newInstance(position);
+            if (position == this.count - 1) {
+                return new ButtplugAboutControl();
             } else {
-                return fragment;
+                Fragment fragment = this.instances.get(position);
+                if (fragment == null) {
+                    return PlaceholderFragment.newInstance(position);
+                } else {
+                    return fragment;
+                }
             }
         }
 
         @Override
         public int getCount() {
-            return 4;
+            return this.count;
         }
     }
 }

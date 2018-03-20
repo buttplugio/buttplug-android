@@ -5,7 +5,12 @@
     <string name="tab_text_3">Log</string>
     <string name="tab_text_4">About</string>
     <string name="section_format">This is a placeholder for the %1$s tab.</string>
+    <string name="logo_desc">Buttplug logo</string>
+    <string name="patreon_desc">Patreon link</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="header">Buttplug %1$s</string>>
+    <string name="link">By <a href="https://www.metafetish.com/">Metafetish</a>\n\n<a href="https://buttplug.io/">Software updates</a>\n<a href="https://github.com/mftrips/buttplug-android">Source Code</a>\n<a href="https://github.com/mftrips/buttplug-android/blob/master/LICENSE">License information</a></string>
+    <string name="body">Buttplug and the corresponding applications and libraries are provided open source and free of charge. If you would like to help sponsor further development of this and other adult toy and interface software, please consider donating to our patreon campaign at http://patreon.com/qdot, or by clicking on the Patreon image below. Thanks, and enjoy buttplugging!</string>
+    <string name="legal">Buttplug logo used with permission of Nonpolynomial Labs, LLC.</string>
+
 </resources>

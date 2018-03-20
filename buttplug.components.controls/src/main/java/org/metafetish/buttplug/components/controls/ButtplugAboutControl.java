@@ -48,11 +48,11 @@ public class ButtplugAboutControl extends Fragment {
             TextView headerText = (TextView) ButtplugAboutControl.this.activity.findViewById(R.id
                     .header_text);
             try {
-                headerText.setText(getString(R.string.header, ButtplugAboutControl.this.activity
+                headerText.setText(getString(R.string.header_title, ButtplugAboutControl.this.activity
                         .getPackageManager().getPackageInfo(ButtplugAboutControl.this.activity
                                 .getPackageName(), 0).versionName));
             } catch (PackageManager.NameNotFoundException e) {
-                headerText.setText(getString(R.string.header, ""));
+                headerText.setText(getString(R.string.header_title, ""));
             }
 
             TextView linkText = (TextView) ButtplugAboutControl.this.activity.findViewById(R.id

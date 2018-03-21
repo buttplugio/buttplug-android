@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Buttplug Controls</string>
-    <string name="tab_text_1">Application</string>
-    <string name="tab_text_2">Devices</string>
-    <string name="tab_text_3">Log</string>
-    <string name="tab_text_4">About</string>
+    <string name="application">Application</string>
+    <string name="devices">Devices</string>
+    <string name="log">Log</string>
+    <string name="about">About</string>
     <string name="section_format">This is a placeholder for the %1$s tab.</string>
     <string name="logo_desc">Buttplug logo</string>
     <string name="patreon_desc">Patreon link</string>
@@ -13,4 +13,16 @@
     <string name="body">Buttplug and the corresponding applications and libraries are provided open source and free of charge. If you would like to help sponsor further development of this and other adult toy and interface software, please consider donating to our patreon campaign at http://patreon.com/qdot, or by clicking on the Patreon image below. Thanks, and enjoy buttplugging!</string>
     <string name="legal">The Buttplug name and logo are used with permission of Nonpolynomial Labs, LLC.</string>
 
+    <string name="log_level">Log Level</string>
+    <string-array name="log_levels">
+        <item>Off</item>
+        <item>Fatal</item>
+        <item>Error</item>
+        <item>Warn</item>
+        <item>Info</item>
+        <item>Debug</item>
+        <item>Trace</item>
+    </string-array>
+    <string name="clear_log">Clear Log</string>
+    <string name="save_log">Save to File</string>
 </resources>

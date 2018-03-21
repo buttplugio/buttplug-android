@@ -1,6 +1,7 @@
 package org.metafetish.buttplug.components.controls;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -30,7 +31,6 @@ public class ButtplugAboutControl extends Fragment {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -41,14 +41,13 @@ public class ButtplugAboutControl extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        if (activity != null) {
-            this.activity = activity;
+        if (this.activity != null) {
 
             TextView headerText = (TextView) ButtplugAboutControl.this.activity.findViewById(R.id
                     .header_text);
             try {
-                headerText.setText(getString(R.string.header_title, ButtplugAboutControl.this.activity
+                headerText.setText(getString(R.string.header_title, ButtplugAboutControl.this
+                        .activity
                         .getPackageManager().getPackageInfo(ButtplugAboutControl.this.activity
                                 .getPackageName(), 0).versionName));
             } catch (PackageManager.NameNotFoundException e) {
@@ -72,6 +71,20 @@ public class ButtplugAboutControl extends Fragment {
                 }
             });
         }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof AppCompatActivity) {
+            this.activity = (AppCompatActivity) context;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        this.activity = null;
     }
 
 }

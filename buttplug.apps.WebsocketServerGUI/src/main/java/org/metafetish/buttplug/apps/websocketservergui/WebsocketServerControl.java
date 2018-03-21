@@ -3,7 +3,6 @@ package org.metafetish.buttplug.apps.websocketservergui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -35,18 +34,12 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link WebsocketServerControl.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link WebsocketServerControl#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class WebsocketServerControl extends Fragment {
     private static final String TAG = WebsocketServerControl.class.getSimpleName();
 
     private AppCompatActivity activity;
+    private View view;
+
     private ButtplugWebsocketServer ws;
     private IButtplugServerFactory bpFactory;
     //TODO: Implement ButtplugConfig?
@@ -56,13 +49,17 @@ public class WebsocketServerControl extends Fragment {
     private long port;
     private boolean secure;
     private SharedPreferences sharedPreferences;
+
+    private boolean serverStarted;
+    private boolean clientConnected;
+    private String lastError;
+
+    private Map<String, String> hostPairs;
 //    private ConnUrlList _connUrls;
 //    private Timer _toastTimer;
 //    private string _currentExceptionMessage;
 
     private String remoteId;
-
-    private OnFragmentInteractionListener listener;
 
     public WebsocketServerControl() {
         // Required empty public constructor
@@ -74,19 +71,31 @@ public class WebsocketServerControl extends Fragment {
         this.bpFactory = bpTabControl;
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment WebsocketServerControl.
-     */
-    public static WebsocketServerControl newInstance() {
-        return new WebsocketServerControl();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (this.activity != null) {
+            this.sharedPreferences = this.activity.getPreferences(Context.MODE_PRIVATE);
+            this.bpLogManager = new ButtplugLogManager();
+            this.bpLogger = this.bpLogManager.getLogger(this.getClass());
+            this.ws = new ButtplugWebsocketServer(this.activity);
+
+            //TODO: Why doesn't this work?
+            //this.bpFactory = (ButtplugTabControl) getParentFragment();
+
+//              this._config = new ButtplugConfig("Buttplug");
+//              this._connUrls = new ConnUrlList();
+
+            this.port = this.sharedPreferences.getLong("port", 12345);
+            this.loopback = this.sharedPreferences.getBoolean("loopback", false);
+            this.secure = this.sharedPreferences.getBoolean("secure", false);
+
+            this.ws.getOnException().addCallback(this.websocketException);
+            this.ws.getConnectionAccepted().addCallback(this.websocketConnectionAccepted);
+            this.ws.getConnectionUpdated().addCallback(this.websocketConnectionAccepted);
+            this.ws.getConnectionClosed().addCallback(this.websocketConnectionClosed);
+            this.startServer();
+        }
     }
 
     @Override
@@ -99,24 +108,8 @@ public class WebsocketServerControl extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        if (activity != null) {
-            this.activity = activity;
-            this.sharedPreferences = this.activity.getPreferences(Context.MODE_PRIVATE);
-            this.bpLogManager = new ButtplugLogManager();
-            this.bpLogger = this.bpLogManager.getLogger(this.getClass());
-            this.ws = new ButtplugWebsocketServer(activity);
-
-            //TODO: Why doesn't this work?
-            //this.bpFactory = (ButtplugTabControl) getParentFragment();
-
-//              this._config = new ButtplugConfig("Buttplug");
-//              this._connUrls = new ConnUrlList();
-
-            this.port = this.sharedPreferences.getLong("port", 12345);
-            this.loopback = this.sharedPreferences.getBoolean("loopback", false);
-            this.secure = this.sharedPreferences.getBoolean("secure", false);
-
+        this.view = view;
+        if (this.activity != null) {
             EditText portText = (EditText) this.activity.findViewById(R.id.port);
             portText.setText(String.valueOf(this.port));
             portText.addTextChangedListener(new TextWatcher() {
@@ -170,8 +163,6 @@ public class WebsocketServerControl extends Fragment {
                 public void onClick(View view) {
                     if (((Button) view).getText().toString().equals(getString(R.string
                             .server_start))) {
-                        ((TextView) WebsocketServerControl.this.activity.findViewById(R.id
-                                .last_error)).setText("");
                         WebsocketServerControl.this.startServer();
                     } else if (((Button) view).getText().toString().equals(getString(R.string
                             .server_stop))) {
@@ -189,11 +180,15 @@ public class WebsocketServerControl extends Fragment {
                 }
             });
 
-            this.ws.getOnException().addCallback(this.websocketException);
-            this.ws.getConnectionAccepted().addCallback(this.websocketConnectionAccepted);
-            this.ws.getConnectionUpdated().addCallback(this.websocketConnectionAccepted);
-            this.ws.getConnectionClosed().addCallback(this.websocketConnectionClosed);
-            this.startServer();
+            if (this.serverStarted) {
+                this.onServerStart();
+                if (this.clientConnected) {
+                    this.onClientConnected();
+                }
+            }
+            if (!this.lastError.isEmpty()) {
+                this.onError();
+            }
         }
     }
 
@@ -204,43 +199,28 @@ public class WebsocketServerControl extends Fragment {
         this.ws.stopServer();
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (this.listener != null) {
-            this.listener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            this.listener = (OnFragmentInteractionListener) context;
-        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
+        if (context instanceof AppCompatActivity) {
+            this.activity = (AppCompatActivity) context;
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        this.listener = null;
+        this.activity = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    public boolean isUiReady() {
+        if (this.activity != null && this.view != null && this.bpFactory != null) {
+            ButtplugTabControl tabControl = (ButtplugTabControl) this.bpFactory;
+            if (tabControl.tabLayout.getSelectedTabPosition() == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private IButtplugCallback websocketException = new IButtplugCallback() {
@@ -274,31 +254,35 @@ public class WebsocketServerControl extends Fragment {
 //                }
             }
 
-            ((TextView) WebsocketServerControl.this.activity.findViewById(R.id.last_error))
-                    .setText(errorMessage);
+            if (WebsocketServerControl.this.isUiReady()) {
+                WebsocketServerControl.this.activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        WebsocketServerControl.this.onError();
+                    }
+                });
+            }
 
             WebsocketServerControl.this.bpLogger.logException(exception, true, errorMessage);
             //TODO: Implement isTerminating
             WebsocketServerControl.this.ws.stopServer();
         }
     };
+
     private IButtplugCallback websocketConnectionAccepted = new IButtplugCallback() {
         @Override
         public void invoke(ButtplugEvent event) {
+            WebsocketServerControl.this.clientConnected = true;
             if (event instanceof Connection) {
                 WebsocketServerControl.this.remoteId = ((Connection) event).clientName;
             } else {
                 WebsocketServerControl.this.remoteId = event.getString();
             }
-            if (WebsocketServerControl.this.activity != null) {
+            if (WebsocketServerControl.this.isUiReady()) {
                 WebsocketServerControl.this.activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        ((TextView) WebsocketServerControl.this.activity.findViewById(R.id
-                                .status)).setText(getString(R.string.status_connected,
-                                WebsocketServerControl.this.remoteId));
-                        WebsocketServerControl.this.activity.findViewById(R.id.client_toggle)
-                                .setEnabled(true);
+                        WebsocketServerControl.this.onClientConnected();
                     }
                 });
             }
@@ -308,44 +292,80 @@ public class WebsocketServerControl extends Fragment {
     private IButtplugCallback websocketConnectionClosed = new IButtplugCallback() {
         @Override
         public void invoke(ButtplugEvent event) {
-            if (WebsocketServerControl.this.activity != null) {
+            WebsocketServerControl.this.clientConnected = false;
+            if (WebsocketServerControl.this.isUiReady()) {
                 WebsocketServerControl.this.activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        ((TextView) WebsocketServerControl.this.activity.findViewById(R.id
-                                .status)).setText(R
-                                .string.status_not_connected);
-                        WebsocketServerControl.this.activity.findViewById(R.id.client_toggle)
-                                .setEnabled(false);
+                        WebsocketServerControl.this.onClientDisonnected();
                     }
                 });
             }
         }
     };
 
-    @SuppressLint("StaticFieldLeak")
-    public void startServer() {
+    private void startServer() {
         try {
-            Map<String, String> hostPairs = this.ws.getHostPairs(this.loopback);
+            this.serverStarted = true;
+            this.lastError = "";
+            this.hostPairs = this.ws.getHostPairs(this.loopback);
             this.ws.startServer(this.bpFactory, this.loopback, (int) this.port, this.secure ?
                     hostPairs : null);
+            this.onServerStart();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopServer() {
+        this.serverStarted = false;
+        this.ws.stopServer();
+        this.onServerStop();
+    }
+
+    private void onServerStart() {
+        if (this.isUiReady()) {
             ((Button) this.activity.findViewById(R.id.server_toggle)).setText(R.string.server_stop);
             this.activity.findViewById(R.id.port).setEnabled(false);
             this.activity.findViewById(R.id.loopback).setEnabled(false);
             this.activity.findViewById(R.id.secure).setEnabled(false);
             ((TextView) this.activity.findViewById(R.id.addresses)).setText(TextUtils.join("\n",
                     hostPairs.keySet()));
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
+            ((TextView) this.activity.findViewById(R.id.last_error)).setText("");
         }
     }
 
-    public void stopServer() {
-        this.ws.stopServer();
-        ((Button) this.activity.findViewById(R.id.server_toggle)).setText(R.string.server_start);
-        ((EditText) this.activity.findViewById(R.id.port)).setEnabled(true);
-        ((Switch) this.activity.findViewById(R.id.loopback)).setEnabled(true);
-        ((Switch) this.activity.findViewById(R.id.secure)).setEnabled(true);
-        ((TextView) this.activity.findViewById(R.id.addresses)).setText("");
+    private void onServerStop() {
+        if (this.isUiReady()) {
+            ((Button) this.activity.findViewById(R.id.server_toggle)).setText(R.string
+                    .server_start);
+            this.activity.findViewById(R.id.port).setEnabled(true);
+            this.activity.findViewById(R.id.loopback).setEnabled(true);
+            this.activity.findViewById(R.id.secure).setEnabled(true);
+            ((TextView) this.activity.findViewById(R.id.addresses)).setText("");
+        }
     }
+
+    private void onClientConnected() {
+        if (this.isUiReady()) {
+            ((TextView) this.activity.findViewById(R.id.status)).setText(getString(R.string
+                    .status_connected, this.remoteId));
+            this.activity.findViewById(R.id.client_toggle).setEnabled(true);
+        }
+    }
+
+    private void onClientDisonnected() {
+        if (this.isUiReady()) {
+            ((TextView) this.activity.findViewById(R.id.status)).setText(R.string
+                    .status_not_connected);
+            this.activity.findViewById(R.id.client_toggle).setEnabled(false);
+        }
+    }
+
+    private void onError() {
+        if (this.isUiReady()) {
+            ((TextView) this.activity.findViewById(R.id.last_error)).setText(this.lastError);
+        }
+    }
+
 }

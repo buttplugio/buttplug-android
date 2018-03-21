@@ -62,7 +62,6 @@ public class ButtplugTabControl extends Fragment implements IButtplugServerFacto
     public ButtplugTabControl() {
         // Required empty public constructor
         //TODO: Implement _guiLog
-        //TODO: Implement AboutControl
     }
 
     @Override

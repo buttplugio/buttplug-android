@@ -112,9 +112,6 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
-
-        //TODO: Remove this later
-//        startScanning();
     }
 
     private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {

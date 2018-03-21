@@ -66,11 +66,6 @@ public class ButtplugServer {
     @SuppressWarnings("FieldCanBeLocal")
     private long clientMessageVersion;
 
-    public static String getLicense() {
-        //TODO: Implement getLicense()
-        return "";
-    }
-
     public ButtplugServer(String serverName, long maxPingTime) {
         this(serverName, maxPingTime, null);
     }
@@ -174,10 +169,8 @@ public class ButtplugServer {
             this.clientMessageVersion = ((RequestServerInfo) msg).messageVersion;
 
             //TODO: Implement pingTimer
-            //TODO: clientConnectedListeners event?
-            if (this.clientConnected != null) {
-                this.clientConnected.invoke(new ButtplugEvent(msg));
-            }
+            this.clientConnected.invoke(new ButtplugEvent(msg));
+
             promise.set(new ServerInfo(this.serverName, 1, this.maxPingTime, id));
             return promise;
         } else if (msg instanceof Test) {

@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 
-public class MagicMotion extends ButtplugBluetoothDevice {
+public class Vibratissimo extends ButtplugBluetoothDevice {
     private double vibratorSpeed;
 
-    public MagicMotion(@NonNull IBluetoothDeviceInterface iface,
+    public Vibratissimo(@NonNull IBluetoothDeviceInterface iface,
                   @NonNull IBluetoothDeviceInfo info) {
-        super(String.format("MagicMotion %s", iface.getName()), iface, info);
+        super(String.format("Vibratissimo %s", iface.getName()), iface, info);
         msgFuncs.put(SingleMotorVibrateCmd.class, new ButtplugDeviceWrapper(
                 this.handleSingleMotorVibrateCmd, new MessageAttributes(1)));
         msgFuncs.put(VibrateCmd.class, new ButtplugDeviceWrapper(this.handleVibrateCmd,
@@ -36,9 +36,9 @@ public class MagicMotion extends ButtplugBluetoothDevice {
     private IButtplugDeviceMessageCallback handleStopDeviceCmd = new IButtplugDeviceMessageCallback() {
         @Override
         public ButtplugMessage invoke(ButtplugDeviceMessage msg) {
-            MagicMotion.this.bpLogger.debug(
-                    String.format("Stopping Device %s", MagicMotion.this.getName()));
-            return MagicMotion.this.handleSingleMotorVibrateCmd.invoke(
+            Vibratissimo.this.bpLogger.debug(
+                    String.format("Stopping Device %s", Vibratissimo.this.getName()));
+            return Vibratissimo.this.handleSingleMotorVibrateCmd.invoke(
                     new SingleMotorVibrateCmd(msg.deviceIndex, 0, msg.id));
         }
     };
@@ -47,7 +47,7 @@ public class MagicMotion extends ButtplugBluetoothDevice {
         @Override
         public ButtplugMessage invoke(ButtplugDeviceMessage msg) {
             if (!(msg instanceof SingleMotorVibrateCmd)) {
-                return MagicMotion.this.bpLogger.logErrorMsg(msg.id, Error.ErrorClass.ERROR_DEVICE,
+                return Vibratissimo.this.bpLogger.logErrorMsg(msg.id, Error.ErrorClass.ERROR_DEVICE,
                         "Wrong Handler");
             }
             SingleMotorVibrateCmd cmdMsg = (SingleMotorVibrateCmd) msg;
@@ -56,7 +56,7 @@ public class MagicMotion extends ButtplugBluetoothDevice {
             List<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<>();
             speeds.add(vibrateCmd.new VibrateSubcommand(0, cmdMsg.getSpeed()));
             vibrateCmd.speeds = speeds;
-            return MagicMotion.this.handleVibrateCmd.invoke(vibrateCmd);
+            return Vibratissimo.this.handleVibrateCmd.invoke(vibrateCmd);
         }
     };
 
@@ -64,7 +64,7 @@ public class MagicMotion extends ButtplugBluetoothDevice {
         @Override
         public ButtplugMessage invoke(ButtplugDeviceMessage msg) {
             if (!(msg instanceof VibrateCmd)) {
-                return MagicMotion.this.bpLogger.logErrorMsg(msg.id, Error.ErrorClass.ERROR_DEVICE,
+                return Vibratissimo.this.bpLogger.logErrorMsg(msg.id, Error.ErrorClass.ERROR_DEVICE,
                         "Wrong Handler");
 
             }
@@ -82,25 +82,39 @@ public class MagicMotion extends ButtplugBluetoothDevice {
                             speed.index), Error.ErrorClass.ERROR_DEVICE, cmdMsg.id);
                 }
 
-                if (Math.abs(MagicMotion.this.vibratorSpeed - speed.getSpeed()) < 0.001) {
+                if (Math.abs(Vibratissimo.this.vibratorSpeed - speed.getSpeed()) < 0.001) {
                     return new Ok(cmdMsg.id);
                 }
 
-                MagicMotion.this.vibratorSpeed = speed.getSpeed();
+                Vibratissimo.this.vibratorSpeed = speed.getSpeed();
             }
 
-            byte[] data = new byte[] { 0x0b, (byte) 0xff, 0x04, 0x0a, 0x32, 0x32, 0x00, 0x04, 0x08, 0x00, 0x64, 0x00 };
-            data[9] = (byte) (MagicMotion.this.vibratorSpeed * 0xff);
+            byte[] data = new byte[] { 0x03, (byte) 0xff };
 
             try {
-                return MagicMotion.this.iface.writeValue(
+                Vibratissimo.this.iface.writeValue(
                         cmdMsg.id,
-                        MagicMotion.this.info.getCharacteristics().get(
-                                MagicMotionBluetoothInfo.Chrs.Tx.ordinal()),
+                        Vibratissimo.this.info.getCharacteristics().get(
+                                VibratissimoBluetoothInfo.Chrs.TxMode.ordinal()),
                         data
                 ).get();
             } catch (InterruptedException | ExecutionException e) {
-                return MagicMotion.this.bpLogger.logErrorMsg(msg.id, Error.ErrorClass.ERROR_DEVICE,
+                return Vibratissimo.this.bpLogger.logErrorMsg(msg.id, Error.ErrorClass.ERROR_DEVICE,
+                        "Exception writing value");
+            }
+
+            data[0] = (byte) (Vibratissimo.this.vibratorSpeed * 0xff);
+            data[1] = 0x00;
+
+            try {
+                return Vibratissimo.this.iface.writeValue(
+                        cmdMsg.id,
+                        Vibratissimo.this.info.getCharacteristics().get(
+                                VibratissimoBluetoothInfo.Chrs.TxSpeed.ordinal()),
+                        data
+                ).get();
+            } catch (InterruptedException | ExecutionException e) {
+                return Vibratissimo.this.bpLogger.logErrorMsg(msg.id, Error.ErrorClass.ERROR_DEVICE,
                         "Exception writing value");
             }
         }

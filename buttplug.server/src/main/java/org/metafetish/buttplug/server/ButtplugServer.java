@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class ButtplugServer {
+    private static final int MAX_PING_TIMEOUT = 5000;
+
     @NonNull
     private ButtplugJsonMessageParser parser;
 
@@ -79,7 +81,6 @@ public class ButtplugServer {
         this.maxPingTime = maxPingTime;
         this.pingTimedOut = false;
         if (maxPingTime != 0) {
-            this.pingTimeoutHandler = new Handler();
             this.pingTimeoutCallback = new Runnable() {
                 @Override
                 public void run() {
@@ -96,6 +97,10 @@ public class ButtplugServer {
         this.deviceManager.getDeviceMessageReceived().addCallback(this.deviceMessageReceivedCallback);
         this.deviceManager.getScanningFinished().addCallback(this.scanningFinishedCallback);
         this.bpLogManager.getLogMessageReceived().addCallback(this.logMessageReceivedCallback);
+    }
+
+    public void setHandler(Handler handler) {
+        this.pingTimeoutHandler = handler;
     }
 
     private IButtplugCallback deviceMessageReceivedCallback = new IButtplugCallback() {
@@ -172,8 +177,10 @@ public class ButtplugServer {
             promise.set(new Ok(id));
             return promise;
         } else if (msg instanceof Ping) {
-            this.pingTimeoutHandler.removeCallbacks(this.pingTimeoutCallback);
-            this.pingTimeoutHandler.postDelayed(this.pingTimeoutCallback, this.maxPingTime);
+            if (this.pingTimeoutHandler != null && this.maxPingTime != 0) {
+                this.pingTimeoutHandler.removeCallbacks(this.pingTimeoutCallback);
+                this.pingTimeoutHandler.postDelayed(this.pingTimeoutCallback, MAX_PING_TIMEOUT);
+            }
             promise.set(new Ok(id));
             return promise;
         } else if (msg instanceof RequestServerInfo) {
@@ -181,7 +188,9 @@ public class ButtplugServer {
             this.receivedRequestServerInfo = true;
             this.clientMessageVersion = ((RequestServerInfo) msg).messageVersion;
 
-            this.pingTimeoutHandler.postDelayed(this.pingTimeoutCallback, this.maxPingTime);
+            if (this.pingTimeoutHandler != null && this.maxPingTime != 0) {
+                this.pingTimeoutHandler.postDelayed(this.pingTimeoutCallback, MAX_PING_TIMEOUT);
+            }
             this.clientConnected.invoke(new ButtplugEvent(msg));
 
             promise.set(new ServerInfo(this.serverName, 1, this.maxPingTime, id));

@@ -50,14 +50,10 @@ public class WebsocketServerControl extends Fragment {
 
     private boolean serverStarted;
     private boolean clientConnected;
-    private String lastError;
 
-    private Map<String, String> hostPairs;
-//    private ConnUrlList _connUrls;
-//    private Timer _toastTimer;
-//    private string _currentExceptionMessage;
-
+    private Map<String, String> connUrls;
     private String remoteId;
+    private String currentExceptionMessage;
 
     public WebsocketServerControl() {
         // Required empty public constructor
@@ -90,6 +86,7 @@ public class WebsocketServerControl extends Fragment {
             this.ws.getConnectionAccepted().addCallback(this.websocketConnectionAccepted);
             this.ws.getConnectionUpdated().addCallback(this.websocketConnectionAccepted);
             this.ws.getConnectionClosed().addCallback(this.websocketConnectionClosed);
+            this.bpLogger.getOnLogException().addCallback(this.exceptionLogged);
             this.startServer();
         }
     }
@@ -116,8 +113,7 @@ public class WebsocketServerControl extends Fragment {
                 @Override
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                     WebsocketServerControl.this.port = Long.valueOf(charSequence.toString());
-                    SharedPreferences.Editor editor = WebsocketServerControl.this
-                            .sharedPreferences.edit();
+                    SharedPreferences.Editor editor = WebsocketServerControl.this.sharedPreferences.edit();
                     editor.putLong("port", WebsocketServerControl.this.port);
                     editor.apply();
                 }
@@ -182,10 +178,16 @@ public class WebsocketServerControl extends Fragment {
                     this.onClientConnected();
                 }
             }
-            if (!this.lastError.isEmpty()) {
+            if (!this.currentExceptionMessage.isEmpty()) {
                 this.onError();
             }
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        this.view = null;
     }
 
     @Override
@@ -210,11 +212,8 @@ public class WebsocketServerControl extends Fragment {
     }
 
     public boolean isUiReady() {
-        if (this.activity != null && this.view != null && this.bpFactory != null) {
-            ButtplugTabControl tabControl = (ButtplugTabControl) this.bpFactory;
-            if (tabControl.tabLayout.getSelectedTabPosition() == 0) {
-                return true;
-            }
+        if (this.activity != null && this.view != null) {
+            return true;
         }
         return false;
     }
@@ -247,18 +246,12 @@ public class WebsocketServerControl extends Fragment {
 //                }
             }
 
-            if (WebsocketServerControl.this.isUiReady()) {
-                WebsocketServerControl.this.activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WebsocketServerControl.this.onError();
-                    }
-                });
-            }
+            WebsocketServerControl.this.currentExceptionMessage = errorMessage;
 
             WebsocketServerControl.this.bpLogger.logException(exception, true, errorMessage);
+
             //TODO: Implement isTerminating
-            WebsocketServerControl.this.ws.stopServer();
+            WebsocketServerControl.this.stopServer();
         }
     };
 
@@ -297,13 +290,27 @@ public class WebsocketServerControl extends Fragment {
         }
     };
 
+    private IButtplugCallback exceptionLogged = new IButtplugCallback() {
+        @Override
+        public void invoke(ButtplugEvent event) {
+            if (WebsocketServerControl.this.isUiReady()) {
+                WebsocketServerControl.this.activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        WebsocketServerControl.this.onError();
+                    }
+                });
+            }
+        }
+    };
+
     private void startServer() {
         try {
             this.serverStarted = true;
-            this.lastError = "";
-            this.hostPairs = this.ws.getHostPairs(this.loopback);
+            this.currentExceptionMessage = "";
+            this.connUrls = this.ws.getHostPairs(this.loopback);
             this.ws.startServer(this.bpFactory, this.loopback, (int) this.port, this.secure ?
-                    hostPairs : null);
+                    connUrls : null);
             this.onServerStart();
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
@@ -313,6 +320,7 @@ public class WebsocketServerControl extends Fragment {
     private void stopServer() {
         this.serverStarted = false;
         this.ws.stopServer();
+        this.onClientDisonnected();
         this.onServerStop();
     }
 
@@ -323,7 +331,7 @@ public class WebsocketServerControl extends Fragment {
             this.activity.findViewById(R.id.loopback).setEnabled(false);
             this.activity.findViewById(R.id.secure).setEnabled(false);
             ((TextView) this.activity.findViewById(R.id.addresses)).setText(TextUtils.join("\n",
-                    hostPairs.keySet()));
+                    connUrls.keySet()));
             ((TextView) this.activity.findViewById(R.id.last_error)).setText("");
         }
     }
@@ -357,7 +365,7 @@ public class WebsocketServerControl extends Fragment {
 
     private void onError() {
         if (this.isUiReady()) {
-            ((TextView) this.activity.findViewById(R.id.last_error)).setText(this.lastError);
+            ((TextView) this.activity.findViewById(R.id.last_error)).setText(this.currentExceptionMessage);
         }
     }
 

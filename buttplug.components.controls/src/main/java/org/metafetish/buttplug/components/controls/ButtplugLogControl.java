@@ -109,6 +109,10 @@ public class ButtplugLogControl extends Fragment {
                     String logLevel = (String) adapterView.getItemAtPosition(i);
                     ButtplugLogControl.this.logLevel = ButtplugLogLevel.valueOf(logLevel.toUpperCase());
                     ((LogAdapter) ButtplugLogControl.this.logAdapter).setLogLevel(ButtplugLogControl.this.logLevel);
+                    SharedPreferences.Editor editor = ButtplugLogControl.this.sharedPreferences.edit();
+                    editor.putString("logLevel", ButtplugLogControl.this.logLevel.toString());
+                    editor.apply();
+
                 }
 
                 @Override

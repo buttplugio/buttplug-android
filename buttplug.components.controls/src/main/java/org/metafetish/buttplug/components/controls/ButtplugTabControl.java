@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -144,7 +145,7 @@ public class ButtplugTabControl extends Fragment implements IButtplugServerFacto
 
     private ButtplugServer initializeButtplugServer(String serverName, long maxPingTime) {
         // Set up internal services
-        ButtplugServer bpServer;
+        final ButtplugServer bpServer;
 
         //TODO: Is this the case with Android?
         // Due to the weird inability to close BLE devices, we have to share device managers
@@ -153,12 +154,19 @@ public class ButtplugTabControl extends Fragment implements IButtplugServerFacto
         if (this.deviceManager == null) {
             bpServer = new ButtplugServer(serverName, maxPingTime);
             this.deviceManager = bpServer.getDeviceManager();
+            bpServer.addDeviceSubtypeManager(new AndroidBluetoothManager(getActivity()));
         } else {
             bpServer = new ButtplugServer(serverName, maxPingTime, this.deviceManager);
-            return bpServer;
         }
 
-        bpServer.addDeviceSubtypeManager(new AndroidBluetoothManager(getActivity()));
+        if (maxPingTime != 0) {
+            this.activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    bpServer.setHandler(new Handler());
+                }
+            });
+        }
 
         return bpServer;
     }

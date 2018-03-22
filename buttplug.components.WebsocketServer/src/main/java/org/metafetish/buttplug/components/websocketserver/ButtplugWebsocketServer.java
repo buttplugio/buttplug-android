@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 
 import org.java_websocket.WebSocket;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 import org.java_websocket.server.WebSocketServer;
@@ -337,7 +338,7 @@ public class ButtplugWebsocketServer {
                 WebSocket ws = ButtplugWebsocketServer.this.connections.get(remoteId).first;
                 try {
                     ws.send((new ButtplugJsonMessageParser()).serialize(msg, 0));
-                } catch (IOException e) {
+                } catch (WebsocketNotConnectedException | IOException e) {
                     e.printStackTrace();
                 }
                 if (msg instanceof Error && ((Error) msg).errorCode == Error.ErrorClass

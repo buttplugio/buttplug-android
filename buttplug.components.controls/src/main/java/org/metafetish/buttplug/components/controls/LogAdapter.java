@@ -48,7 +48,7 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
         this.dataSet = new ArrayList<>(dataSet);
         this.logLevel = ButtplugLogLevel.OFF;
         this.filteredDataSet = new ArrayList<>();
-        this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+        this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         this.dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         this.setLogLevel(logLevel);
     }

@@ -4,7 +4,6 @@ import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 import org.metafetish.buttplug.core.ButtplugMessage;
 import org.metafetish.buttplug.core.IButtplugDeviceMessageCallback;
 import org.metafetish.buttplug.core.Messages.Error;
-import org.metafetish.buttplug.core.Messages.KiirooCmd;
 import org.metafetish.buttplug.core.Messages.MessageAttributes;
 import org.metafetish.buttplug.core.Messages.Ok;
 import org.metafetish.buttplug.core.Messages.RotateCmd;
@@ -15,7 +14,6 @@ import org.metafetish.buttplug.server.bluetooth.ButtplugBluetoothDevice;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInfo;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
-import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

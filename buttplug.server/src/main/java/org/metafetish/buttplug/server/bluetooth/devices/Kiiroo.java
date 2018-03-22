@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 import org.metafetish.buttplug.core.ButtplugMessage;
 import org.metafetish.buttplug.core.IButtplugDeviceMessageCallback;
-import org.metafetish.buttplug.core.IButtplugLogManager;
 import org.metafetish.buttplug.core.Messages.Error;
 import org.metafetish.buttplug.core.Messages.KiirooCmd;
 import org.metafetish.buttplug.core.Messages.MessageAttributes;

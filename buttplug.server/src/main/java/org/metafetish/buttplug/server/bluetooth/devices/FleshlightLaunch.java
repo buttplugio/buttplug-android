@@ -7,7 +7,6 @@ import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 import org.metafetish.buttplug.core.ButtplugMessage;
 import org.metafetish.buttplug.core.IButtplugDeviceMessageCallback;
-import org.metafetish.buttplug.core.IButtplugLogManager;
 import org.metafetish.buttplug.core.Messages.Error;
 import org.metafetish.buttplug.core.Messages.FleshlightLaunchFW12Cmd;
 import org.metafetish.buttplug.core.Messages.LinearCmd;

@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 import org.metafetish.buttplug.core.ButtplugMessage;
 import org.metafetish.buttplug.core.IButtplugDeviceMessageCallback;
-import org.metafetish.buttplug.core.IButtplugLogManager;
 import org.metafetish.buttplug.core.Messages.Error;
 import org.metafetish.buttplug.core.Messages.MessageAttributes;
 import org.metafetish.buttplug.core.Messages.Ok;
@@ -46,11 +45,10 @@ public class KiirooGen2Vibe extends ButtplugBluetoothDevice {
 
     private KiirooGen2VibeType devInfo;
 
-    public KiirooGen2Vibe(@NonNull IButtplugLogManager aLogManager,
-                          @NonNull IBluetoothDeviceInterface aInterface,
-                          @NonNull IBluetoothDeviceInfo aInfo) {
-        super(aLogManager, devInfos.get(aInterface.getName()) + " " + aInterface.getName(), aInterface, aInfo);
-        this.devInfo = this.devInfos.get(aInterface.getName());
+    public KiirooGen2Vibe(@NonNull IBluetoothDeviceInterface iface,
+                          @NonNull IBluetoothDeviceInfo info) {
+        super(String.format("%s %s", devInfos.get(iface.getName()), iface.getName()), iface, info);
+        this.devInfo = this.devInfos.get(iface.getName());
         msgFuncs.put(StopDeviceCmd.class, new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
         msgFuncs.put(VibrateCmd.class, new ButtplugDeviceWrapper(this.handleVibrateCmd, new MessageAttributes(devInfo.vibeCount)));
         msgFuncs.put(SingleMotorVibrateCmd.class, new ButtplugDeviceWrapper(this.handleSingleMotorVibrateCmd));
@@ -59,14 +57,15 @@ public class KiirooGen2Vibe extends ButtplugBluetoothDevice {
     private IButtplugDeviceMessageCallback handleStopDeviceCmd = new IButtplugDeviceMessageCallback() {
         @Override
         public ButtplugMessage invoke(ButtplugDeviceMessage msg) {
-            KiirooGen2Vibe.this.bpLogger.debug("Stopping Device " + KiirooGen2Vibe.this.getName());
+            KiirooGen2Vibe.this.bpLogger.debug(
+                    String.format("Stopping Device %s", KiirooGen2Vibe.this.getName()));
 
             VibrateCmd vibrateCmd = new VibrateCmd(msg.deviceIndex, null, msg.id);
-            List<VibrateCmd.VibrateSubcommand> vCmds = new ArrayList<VibrateCmd.VibrateSubcommand>();
+            List<VibrateCmd.VibrateSubcommand> vibrateCommands = new ArrayList<VibrateCmd.VibrateSubcommand>();
             for (int i = 0; i < KiirooGen2Vibe.this.devInfo.vibeCount; i++) {
-                vCmds.add(vibrateCmd.new VibrateSubcommand(i, 0));
+                vibrateCommands.add(vibrateCmd.new VibrateSubcommand(i, 0));
             }
-            vibrateCmd.speeds = vCmds;
+            vibrateCmd.speeds = vibrateCommands;
 
             return KiirooGen2Vibe.this.handleVibrateCmd.invoke(vibrateCmd);
         }
@@ -86,11 +85,11 @@ public class KiirooGen2Vibe extends ButtplugBluetoothDevice {
             }
 
             VibrateCmd vibrateCmd = new VibrateCmd(msg.deviceIndex, null, msg.id);
-            List<VibrateCmd.VibrateSubcommand> vCmds = new ArrayList<VibrateCmd.VibrateSubcommand>();
+            List<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<VibrateCmd.VibrateSubcommand>();
             for (int i = 0; i < KiirooGen2Vibe.this.devInfo.vibeCount; i++) {
-                vCmds.add(vibrateCmd.new VibrateSubcommand(i, cmdMsg.getSpeed()));
+                speeds.add(vibrateCmd.new VibrateSubcommand(i, cmdMsg.getSpeed()));
             }
-            vibrateCmd.speeds = vCmds;
+            vibrateCmd.speeds = speeds;
 
             return KiirooGen2Vibe.this.handleVibrateCmd.invoke(vibrateCmd);
         }
@@ -107,19 +106,18 @@ public class KiirooGen2Vibe extends ButtplugBluetoothDevice {
             VibrateCmd cmdMsg = (VibrateCmd) msg;
 
             if (cmdMsg.speeds.size() < 1 || cmdMsg.speeds.size() > KiirooGen2Vibe.this.devInfo.vibeCount) {
-                return new Error(
-                        "VibrateCmd requires between 1 and " + KiirooGen2Vibe.this.devInfo.vibeCount + " vectors for this device.",
-                        Error.ErrorClass.ERROR_DEVICE,
-                        cmdMsg.id);
+                return new Error(String.format("VibrateCmd requires %s for this device.",
+                        KiirooGen2Vibe.this.devInfo.vibeCount == 1 ? "1 vector" : String.format(
+                                "between 1 and %s vectors",
+                                KiirooGen2Vibe.this.devInfo.vibeCount
+                        )), Error.ErrorClass.ERROR_DEVICE, cmdMsg.id);
             }
 
             boolean changed = false;
             for (VibrateCmd.VibrateSubcommand vi : cmdMsg.speeds) {
                 if (vi.index >= KiirooGen2Vibe.this.devInfo.vibeCount) {
-                    return new Error(
-                            "Index " + vi.index + " is out of bounds for VibrateCmd for this device.",
-                            Error.ErrorClass.ERROR_DEVICE,
-                            cmdMsg.id);
+                    return new Error(String.format("Index %s is out of bounds for VibrateCmd for this device.",
+                            vi.index), Error.ErrorClass.ERROR_DEVICE, cmdMsg.id);
                 }
 
                 if (Math.abs(KiirooGen2Vibe.this.vibratorSpeeds[(int) vi.index] - vi.getSpeed()) < 0.0001) {

@@ -15,7 +15,7 @@ public class SingleMotorVibrateCmdTest {
         String testStr = "[{\"SingleMotorVibrateCmd\":{\"Id\":7,\"DeviceIndex\":3,\"Speed\":0.6}}]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
-        List<ButtplugMessage> msgs = parser.parseJson(testStr);
+        List<ButtplugMessage> msgs = parser.deserialize(testStr);
 
         Assert.assertEquals(msgs.size(), 1);
         Assert.assertEquals(msgs.get(0).getClass(), SingleMotorVibrateCmd.class);
@@ -23,10 +23,10 @@ public class SingleMotorVibrateCmdTest {
         Assert.assertEquals(((SingleMotorVibrateCmd) msgs.get(0)).deviceIndex, 3);
         Assert.assertEquals(((SingleMotorVibrateCmd) msgs.get(0)).getSpeed(), 0.6, 0);
 
-        String jsonOut = parser.formatJson(msgs);
+        String jsonOut = parser.serialize(msgs, 0);
         Assert.assertEquals(testStr, jsonOut);
 
-        jsonOut = parser.formatJson(msgs.get(0));
+        jsonOut = parser.serialize(msgs.get(0), 0);
         Assert.assertEquals(testStr, jsonOut);
     }
 

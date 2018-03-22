@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,18 +25,19 @@ public class ButtplugJsonMessageParser {
         mapper.setDefaultTyping(typer);
     }
 
-    public List<ButtplugMessage> parseJson(String json)
+    public List<ButtplugMessage> deserialize(String json)
             throws IOException {
         return Arrays.asList(mapper.readValue(json, ButtplugMessage[].class));
     }
 
-    public String formatJson(List<ButtplugMessage> msgs)
+    public String serialize(List<ButtplugMessage> msgs, long clientSchemaVersion)
             throws IOException {
+        //TODO: Support downgrading messages
         return mapper.writeValueAsString(msgs);
     }
 
-    public String formatJson(ButtplugMessage msgs)
+    public String serialize(final ButtplugMessage msg, long clientSchemaVersion)
             throws IOException {
-        return mapper.writeValueAsString(new ButtplugMessage[]{msgs});
+        return this.serialize(new ArrayList<ButtplugMessage>(){{ add(msg); }}, clientSchemaVersion);
     }
 }

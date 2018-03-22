@@ -25,10 +25,9 @@ import java.util.concurrent.ExecutionException;
 public class Kiiroo extends ButtplugBluetoothDevice {
     private double vibratorSpeed;
 
-    public Kiiroo(@NonNull IButtplugLogManager logManager,
-                  @NonNull IBluetoothDeviceInterface iface,
+    public Kiiroo(@NonNull IBluetoothDeviceInterface iface,
                   @NonNull IBluetoothDeviceInfo info) {
-        super(logManager, "Kiiroo " + iface.getName(), iface, info);
+        super(String.format("Kiiroo %s", iface.getName()), iface, info);
         // Setup message function array
         msgFuncs.put(KiirooCmd.class, new ButtplugDeviceWrapper(this.handleKiirooRawCmd));
         msgFuncs.put(StopDeviceCmd.class, new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
@@ -50,9 +49,9 @@ public class Kiiroo extends ButtplugBluetoothDevice {
             // I've
 
             // never gotten that to work. So for now, we just return ok.
-            Kiiroo.this.bpLogger.debug("Stopping Device " + Kiiroo.this.getName());
+            Kiiroo.this.bpLogger.debug(String.format("Stopping Device %s", Kiiroo.this.getName()));
 
-            if (Kiiroo.this.iface.getName() == "PEARL" && Kiiroo.this.vibratorSpeed > 0) {
+            if (Kiiroo.this.iface.getName().equals("PEARL") && Kiiroo.this.vibratorSpeed > 0) {
                 return Kiiroo.this.handleKiirooRawCmd.invoke(new KiirooCmd(msg.deviceIndex, 0,
                         msg.id));
             }
@@ -75,9 +74,9 @@ public class Kiiroo extends ButtplugBluetoothDevice {
             try {
                 return Kiiroo.this.iface.writeValue(
                         cmdMsg.id,
-                        Kiiroo.this.info.getCharacteristics().get(KiirooBluetoothInfo.Chrs.Tx
-                                .ordinal()),
-                        (cmdMsg.getPosition() + ",\n").getBytes()
+                        Kiiroo.this.info.getCharacteristics().get(
+                                KiirooBluetoothInfo.Chrs.Tx.ordinal()),
+                        (String.format("%s,\n", cmdMsg.getPosition())).getBytes()
                 ).get();
             } catch (InterruptedException | ExecutionException e) {
                 return Kiiroo.this.bpLogger.logErrorMsg(msg.id, Error.ErrorClass.ERROR_DEVICE,
@@ -125,12 +124,12 @@ public class Kiiroo extends ButtplugBluetoothDevice {
                         .ErrorClass.ERROR_DEVICE, cmdMsg.id);
             }
 
-            VibrateCmd.VibrateSubcommand v = cmdMsg.speeds.get(0);
-            if (v.index != 0) {
-                return new Error("Index " + v.index + " is out of bounds for VibrateCmd for this " +
-                        "device.", Error.ErrorClass.ERROR_DEVICE, cmdMsg.id);
+            VibrateCmd.VibrateSubcommand speed = cmdMsg.speeds.get(0);
+            if (speed.index != 0) {
+                return new Error(String.format("Index %s is out of bounds for VibrateCmd for this device.",
+                        speed.index), Error.ErrorClass.ERROR_DEVICE, cmdMsg.id);
             }
-            Kiiroo.this.vibratorSpeed = v.getSpeed();
+            Kiiroo.this.vibratorSpeed = speed.getSpeed();
 
             return Kiiroo.this.handleKiirooRawCmd.invoke(new KiirooCmd(msg.deviceIndex, (int)
                     (Kiiroo.this.vibratorSpeed * 4), msg.id));

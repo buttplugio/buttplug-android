@@ -7,8 +7,6 @@ import org.metafetish.buttplug.core.Messages.Log;
 
 import java.util.Arrays;
 
-//import android.util.Log;
-
 class ButtplugLog implements IButtplugLog {
     @NonNull
     private final String TAG;
@@ -31,7 +29,7 @@ class ButtplugLog implements IButtplugLog {
     public void trace(String msg, boolean localOnly) {
         android.util.Log.v(TAG, msg);
         if (!localOnly) {
-            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.TRACE, msg)));
+            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.TRACE, msg, TAG)));
         }
     }
 
@@ -42,7 +40,7 @@ class ButtplugLog implements IButtplugLog {
     public void debug(String msg, boolean localOnly) {
         android.util.Log.d(TAG, msg);
         if (!localOnly) {
-            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.DEBUG, msg)));
+            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.DEBUG, msg, TAG)));
         }
     }
 
@@ -53,7 +51,7 @@ class ButtplugLog implements IButtplugLog {
     public void info(String msg, boolean localOnly) {
         android.util.Log.i(TAG, msg);
         if (!localOnly) {
-            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.INFO, msg)));
+            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.INFO, msg, TAG)));
         }
     }
 
@@ -64,7 +62,7 @@ class ButtplugLog implements IButtplugLog {
     public void warn(String msg, boolean localOnly) {
         android.util.Log.w(TAG, msg);
         if (!localOnly) {
-            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.WARN, msg)));
+            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.WARN, msg, TAG)));
         }
     }
 
@@ -75,7 +73,7 @@ class ButtplugLog implements IButtplugLog {
     public void error(String msg, boolean localOnly) {
         android.util.Log.e(TAG, msg);
         if (!localOnly) {
-            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.ERROR, msg)));
+            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.ERROR, msg, TAG)));
         }
     }
 
@@ -86,7 +84,7 @@ class ButtplugLog implements IButtplugLog {
     public void fatal(String msg, boolean localOnly) {
         android.util.Log.wtf(TAG, msg);
         if (!localOnly) {
-            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.FATAL, msg)));
+            logMessageReceived.invoke(new ButtplugEvent(new Log(ButtplugLogLevel.FATAL, msg, TAG)));
         }
     }
 
@@ -112,10 +110,13 @@ class ButtplugLog implements IButtplugLog {
     public void logException(Exception ex, boolean localOnly, String msg) {
         String errorMsg;
         if (ex != null) {
-            errorMsg = ex.getClass().getSimpleName() + ": " + (msg != null ? msg : ex
-                    .getMessage()) + "\n" + Arrays.toString(ex.getStackTrace());
+            errorMsg = String.format("%s: %s\n%s",
+                    ex.getClass().getSimpleName(),
+                    (msg != null ? msg : ex.getMessage()),
+                    Arrays.toString(ex.getStackTrace()));
         } else {
-            errorMsg = "Unknown Exception" + (msg != null ? ": " + msg : "");
+            errorMsg = String.format("Unknown Exception%s",
+                    (msg != null ? String.format(": %s", msg) : ""));
         }
         this.error(errorMsg, localOnly);
         this.onLogException.invoke(new ButtplugEvent(new Error(errorMsg, Error.ErrorClass

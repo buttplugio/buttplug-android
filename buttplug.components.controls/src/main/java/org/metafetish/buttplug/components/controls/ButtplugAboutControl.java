@@ -17,12 +17,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.metafetish.buttplug.core.ButtplugLogManager;
+import org.metafetish.buttplug.core.IButtplugLog;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class ButtplugAboutControl extends Fragment {
-    private static final String TAG = ButtplugAboutControl.class.getSimpleName();
+    private ButtplugLogManager bpLogManager = new ButtplugLogManager();
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
 
     private AppCompatActivity activity;
 
@@ -47,12 +51,13 @@ public class ButtplugAboutControl extends Fragment {
                     .header_text);
             try {
                 headerText.setText(getString(R.string.header_title, ButtplugAboutControl.this
-                        .activity
-                        .getPackageManager().getPackageInfo(ButtplugAboutControl.this.activity
-                                .getPackageName(), 0).versionName));
+                        .activity.getPackageManager().getPackageInfo(ButtplugAboutControl.this
+                                .activity.getPackageName(), 0).versionName));
             } catch (PackageManager.NameNotFoundException e) {
                 headerText.setText(getString(R.string.header_title, ""));
             }
+
+            //TODO: Implement developer tab?
 
             TextView linkText = (TextView) ButtplugAboutControl.this.activity.findViewById(R.id
                     .header_links);

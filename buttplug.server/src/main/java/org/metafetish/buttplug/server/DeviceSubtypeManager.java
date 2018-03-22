@@ -1,18 +1,18 @@
 package org.metafetish.buttplug.server;
 
-//import android.support.annotation.Nullable;
-
 import android.support.annotation.NonNull;
 
 import org.metafetish.buttplug.core.ButtplugEventHandler;
+import org.metafetish.buttplug.core.ButtplugLogManager;
 import org.metafetish.buttplug.core.IButtplugLog;
 import org.metafetish.buttplug.core.IButtplugLogManager;
 
 public abstract class DeviceSubtypeManager implements IDeviceSubtypeManager {
     @NonNull
-    protected IButtplugLog bpLogger;
+    protected IButtplugLogManager bpLogManager = new ButtplugLogManager();
+
     @NonNull
-    protected IButtplugLogManager bpLogManager;
+    protected IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
 
     private ButtplugEventHandler deviceAdded = new ButtplugEventHandler();
 
@@ -28,10 +28,8 @@ public abstract class DeviceSubtypeManager implements IDeviceSubtypeManager {
         return this.scanningFinished;
     }
 
-    protected DeviceSubtypeManager(@NonNull IButtplugLogManager logManager) {
-        this.bpLogManager = logManager;
-        this.bpLogger = this.bpLogManager.getLogger(this.getClass());
-        this.bpLogger.debug("Setting up Device Manager " + this.getClass().getSimpleName());
+    protected DeviceSubtypeManager() {
+        this.bpLogger.debug(String.format("Setting up Device Manager %s", this.getClass().getSimpleName()));
     }
 
     public abstract void startScanning();

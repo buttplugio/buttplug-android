@@ -13,35 +13,35 @@ public class DeviceListTest {
     @Test
     public void test() throws IOException {
         String testStr = "[" +
-                "{" +
-                "\"DeviceList\":{" +
-                "\"Id\":1," +
-                "\"Devices\":[" +
-                "{" +
-                "\"DeviceIndex\":0," +
-                "\"DeviceName\":\"TestDevice 1\"," +
-                "\"DeviceMessages\":{" +
-                "\"SingleMotorVibrateCmd\":{}," +
-                "\"VibrateCmd\":{\"FeatureCount\":2}," +
-                "\"StopDeviceCmd\":{}" +
-                "}" +
-                "}," +
-                "{" +
-                "\"DeviceIndex\":1," +
-                "\"DeviceName\":\"TestDevice 2\"," +
-                "\"DeviceMessages\":{" +
-                "\"FleshlightLaunchFW12Cmd\":{}," +
-                "\"LinearCmd\":{\"FeatureCount\":1}," +
-                "\"StopDeviceCmd\":{}" +
-                "}" +
-                "}" +
-                "]" +
-                "}" +
-                "}" +
+                    "{" +
+                        "\"DeviceList\":{" +
+                            "\"Id\":1," +
+                            "\"Devices\":[" +
+                                "{" +
+                                    "\"DeviceIndex\":0," +
+                                    "\"DeviceName\":\"TestDevice 1\"," +
+                                    "\"DeviceMessages\":{" +
+                                        "\"SingleMotorVibrateCmd\":{}," +
+                                        "\"VibrateCmd\":{\"FeatureCount\":2}," +
+                                        "\"StopDeviceCmd\":{}" +
+                                    "}" +
+                                "}," +
+                                "{" +
+                                    "\"DeviceIndex\":1," +
+                                    "\"DeviceName\":\"TestDevice 2\"," +
+                                    "\"DeviceMessages\":{" +
+                                        "\"FleshlightLaunchFW12Cmd\":{}," +
+                                        "\"LinearCmd\":{\"FeatureCount\":1}," +
+                                        "\"StopDeviceCmd\":{}" +
+                                    "}" +
+                                "}" +
+                            "]" +
+                        "}" +
+                    "}" +
                 "]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
-        List<ButtplugMessage> msgs = parser.parseJson(testStr);
+        List<ButtplugMessage> msgs = parser.deserialize(testStr);
 
         Assert.assertEquals(1, msgs.size());
         Assert.assertEquals(DeviceList.class, msgs.get(0).getClass());
@@ -74,10 +74,10 @@ public class DeviceListTest {
         Assert.assertNotNull(devs.get(1).deviceMessages.get("StopDeviceCmd"));
         Assert.assertEquals(0, devs.get(1).deviceMessages.get("StopDeviceCmd").featureCount);
 
-        String jsonOut = parser.formatJson(msgs);
+        String jsonOut = parser.serialize(msgs, 1);
         Assert.assertEquals(testStr, jsonOut);
 
-        jsonOut = parser.formatJson(msgs.get(0));
+        jsonOut = parser.serialize(msgs.get(0), 1);
         Assert.assertEquals(testStr, jsonOut);
     }
 

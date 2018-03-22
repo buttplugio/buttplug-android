@@ -15,7 +15,7 @@ public class LovenseCmdTest {
         String testStr = "[{\"LovenseCmd\":{\"Id\":7,\"DeviceIndex\":3,\"Command\":\"5;\"}}]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
-        List<ButtplugMessage> msgs = parser.parseJson(testStr);
+        List<ButtplugMessage> msgs = parser.deserialize(testStr);
 
         Assert.assertEquals(msgs.size(), 1);
         Assert.assertEquals(msgs.get(0).getClass(), LovenseCmd.class);
@@ -23,10 +23,10 @@ public class LovenseCmdTest {
         Assert.assertEquals(((LovenseCmd) msgs.get(0)).deviceIndex, 3);
         Assert.assertEquals(((LovenseCmd) msgs.get(0)).deviceCmd, "5;");
 
-        String jsonOut = parser.formatJson(msgs);
+        String jsonOut = parser.serialize(msgs, 0);
         Assert.assertEquals(testStr, jsonOut);
 
-        jsonOut = parser.formatJson(msgs.get(0));
+        jsonOut = parser.serialize(msgs.get(0), 0);
         Assert.assertEquals(testStr, jsonOut);
     }
 

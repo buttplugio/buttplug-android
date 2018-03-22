@@ -152,9 +152,9 @@ public class CertUtils {
                 .createSubjectPublicKeyInfo(subjectKeyPair.getPublic());
 
         // Issuer
-        X500Name issuerName = new X500Name("CN=" + subject);
+        X500Name issuerName = new X500Name(String.format("CN=%s", subject));
         // Subject DN
-        X500Name subjectName = new X500Name("CN=" + subject);
+        X500Name subjectName = new X500Name(String.format("CN=%s", subject));
 
         // Valid For
         Calendar notBefore = Calendar.getInstance();

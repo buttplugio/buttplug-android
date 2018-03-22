@@ -15,17 +15,17 @@ public class RequestServerInfoTest {
         String testStr = "[{\"RequestServerInfo\":{\"Id\":7,\"ClientName\":\"UnitTest\"}}]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
-        List<ButtplugMessage> msgs = parser.parseJson(testStr);
+        List<ButtplugMessage> msgs = parser.deserialize(testStr);
 
         Assert.assertEquals(msgs.size(), 1);
         Assert.assertEquals(msgs.get(0).getClass(), RequestServerInfo.class);
         Assert.assertEquals(msgs.get(0).id, 7);
         Assert.assertEquals(((RequestServerInfo) msgs.get(0)).clientName, "UnitTest");
 
-        String jsonOut = parser.formatJson(msgs);
+        String jsonOut = parser.serialize(msgs, 0);
         Assert.assertEquals(testStr, jsonOut);
 
-        jsonOut = parser.formatJson(msgs.get(0));
+        jsonOut = parser.serialize(msgs.get(0), 0);
         Assert.assertEquals(testStr, jsonOut);
     }
 

@@ -3,7 +3,6 @@ package org.metafetish.buttplug.server.bluetooth;
 import android.support.annotation.NonNull;
 
 import org.metafetish.buttplug.core.IButtplugDevice;
-import org.metafetish.buttplug.core.IButtplugLogManager;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +18,5 @@ public interface IBluetoothDeviceInfo {
     List<UUID> getCharacteristics();
 
     @NonNull
-    IButtplugDevice CreateDevice(@NonNull IButtplugLogManager logManager, @NonNull
-            IBluetoothDeviceInterface deviceInterface);
+    IButtplugDevice CreateDevice(@NonNull IBluetoothDeviceInterface deviceInterface);
 }

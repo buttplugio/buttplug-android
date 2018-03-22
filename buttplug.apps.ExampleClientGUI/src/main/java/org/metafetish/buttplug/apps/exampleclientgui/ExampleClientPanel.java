@@ -11,11 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.metafetish.buttplug.components.controls.ButtplugTabControl;
+import org.metafetish.buttplug.core.ButtplugLogManager;
+import org.metafetish.buttplug.core.IButtplugLog;
 import org.metafetish.buttplug.server.IButtplugServerFactory;
 
 
 public class ExampleClientPanel extends Fragment {
-    private static final String TAG = ExampleClientPanel.class.getSimpleName();
+    private ButtplugLogManager bpLogManager = new ButtplugLogManager();
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
 
     private AppCompatActivity activity;
     private IButtplugServerFactory bpFactory;

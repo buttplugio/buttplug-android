@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,19 +34,18 @@ import java.util.concurrent.ExecutionException;
 
 
 public class WebsocketServerControl extends Fragment {
-    private static final String TAG = WebsocketServerControl.class.getSimpleName();
-
     private AppCompatActivity activity;
     private View view;
 
     private ButtplugWebsocketServer ws;
     private IButtplugServerFactory bpFactory;
     //TODO: Implement ButtplugConfig?
-    private ButtplugLogManager bpLogManager;
-    private IButtplugLog bpLogger;
+    private ButtplugLogManager bpLogManager = new ButtplugLogManager();
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
     private boolean loopback;
     private long port;
     private boolean secure;
+
     private SharedPreferences sharedPreferences;
 
     private boolean serverStarted;
@@ -76,8 +74,6 @@ public class WebsocketServerControl extends Fragment {
         super.onCreate(savedInstanceState);
         if (this.activity != null) {
             this.sharedPreferences = this.activity.getPreferences(Context.MODE_PRIVATE);
-            this.bpLogManager = new ButtplugLogManager();
-            this.bpLogger = this.bpLogManager.getLogger(this.getClass());
             this.ws = new ButtplugWebsocketServer(this.activity);
 
             //TODO: Why doesn't this work?
@@ -175,7 +171,7 @@ public class WebsocketServerControl extends Fragment {
             clientToggle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d(TAG, "Clicked disconnect");
+                    WebsocketServerControl.this.bpLogger.trace("Clicked disconnect");
                     WebsocketServerControl.this.ws.disconnect();
                 }
             });
@@ -230,7 +226,7 @@ public class WebsocketServerControl extends Fragment {
             Exception exception = event.getException();
             String errorMessage = exception.getMessage();
 
-            Log.d(TAG, errorMessage);
+            WebsocketServerControl.this.bpLogger.trace(errorMessage);
             if (WebsocketServerControl.this.secure && errorMessage.contains("Not GET request") &&
                     WebsocketServerControl.this.ws != null) {  // && !ex.IsTerminating)
                 WebsocketServerControl.this.bpLogger.logException(exception, true, errorMessage);
@@ -238,17 +234,14 @@ public class WebsocketServerControl extends Fragment {
             }
 
             if (WebsocketServerControl.this.secure) {
-                if (errorMessage.contains("The handshake failed due to an unexpected packet " +
-                        "format")) {
+                if (errorMessage.contains("The handshake failed due to an unexpected packet format")) {
                     errorMessage += "\n\nThis usually means that the client/browser tried to " +
-                            "connect without SSL. Make sure the client is set use the wss:// URI " +
-                            "scheme.";
+                            "connect without SSL. Make sure the client is set use the wss:// URI scheme.";
                 }
                 //TODO: When should this be used?
 //                else {
 //                    errorMessage += "\n\nIf your connection is working, you can ignore this " +
-//                            "message. Otherwise, this could mean that the client/browser has
-// not " +
+//                            "message. Otherwise, this could mean that the client/browser has not " +
 //                            "accepted our SSL certificate. Try hitting the test button on the " +
 //                            "\"Websocket Server\" tab.";
 //                }

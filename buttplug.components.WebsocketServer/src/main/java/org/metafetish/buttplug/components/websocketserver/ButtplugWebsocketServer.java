@@ -3,7 +3,6 @@ package org.metafetish.buttplug.components.websocketserver;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.util.Pair;
 
 import org.java_websocket.WebSocket;
@@ -51,8 +50,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
 public class ButtplugWebsocketServer {
-    public static final String TAG = ButtplugWebsocketServer.class.getSimpleName();
-
     @NonNull
     private WebSocketServer wsServer;
 
@@ -60,10 +57,10 @@ public class ButtplugWebsocketServer {
     private IButtplugServerFactory serverFactory;
 
     @NonNull
-    private IButtplugLogManager bpLogManager;
+    private IButtplugLogManager bpLogManager = new ButtplugLogManager();
 
     @NonNull
-    private IButtplugLog bpLogger;
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
 
     private ButtplugEventHandler onException = new ButtplugEventHandler();
 
@@ -152,29 +149,26 @@ public class ButtplugWebsocketServer {
             InterruptedException {
         this.serverFactory = factory;
 
-        this.bpLogManager = new ButtplugLogManager();
-        this.bpLogger = bpLogManager.getLogger(this.getClass());
-
         InetSocketAddress address;
         if (loopback) {
             address = new LoopbackTask().execute(port).get();
         } else {
             address = new InetSocketAddress(port);
         }
-        Log.d(TAG, address.toString());
+        this.bpLogger.trace(address.toString());
 
         this.wsServer = new WebSocketServer(address) {
             @Override
             public void onOpen(WebSocket ws, ClientHandshake handshake) {
-                Log.d(TAG, "onOpen()");
+                ButtplugWebsocketServer.this.bpLogger.trace("onOpen()");
                 if (!ButtplugWebsocketServer.this.connections.isEmpty()) {
                     try {
-                        ws.send((new ButtplugJsonMessageParser()).formatJson
+                        ws.send((new ButtplugJsonMessageParser()).serialize
                                 (ButtplugWebsocketServer.this.bpLogger.logErrorMsg(
                                         ButtplugConsts.SystemMsgId, Error.ErrorClass.ERROR_INIT,
                                         "WebSocketServer already in use!"
 
-                                )));
+                                ), 0));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -242,19 +236,19 @@ public class ButtplugWebsocketServer {
                     }
                     String respJson = null;
                     try {
-                        Log.d(TAG, "Preparing to format");
-                        respJson = (new ButtplugJsonMessageParser()).formatJson(respMsgs);
-                        Log.d(TAG, respJson);
+                        ButtplugWebsocketServer.this.bpLogger.trace("Preparing to format");
+                        respJson = buttplug.serialize(respMsgs);
+                        ButtplugWebsocketServer.this.bpLogger.trace(respJson);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     if (respJson == null) {
-                        Log.d(TAG, "null");
+                        ButtplugWebsocketServer.this.bpLogger.trace("null");
                         return;
                     }
 
                     ws.send(respJson);
-                    Log.d(TAG, "Sent");
+                    ButtplugWebsocketServer.this.bpLogger.trace("Sent");
 
 
                     for (ButtplugMessage respMsg : respMsgs) {
@@ -270,14 +264,14 @@ public class ButtplugWebsocketServer {
 
             @Override
             public void onError(WebSocket ws, Exception ex) {
-                Log.d(TAG, "onError()");
-                Log.d(TAG, Log.getStackTraceString(ex));
+                ButtplugWebsocketServer.this.bpLogger.trace("onError()");
+                ButtplugWebsocketServer.this.bpLogger.logException(ex);
                 ButtplugWebsocketServer.this.onException.invoke(new ButtplugEvent(ex));
             }
 
             @Override
             public void onStart() {
-                Log.d(TAG, "onStart()");
+                ButtplugWebsocketServer.this.bpLogger.trace("onStart()");
                 ButtplugWebsocketServer.this.connected = true;
             }
         };
@@ -287,44 +281,44 @@ public class ButtplugWebsocketServer {
                 KeyManagerFactory keyManagerFactory = null;
                 TrustManagerFactory trustManagerFactory = null;
                 try {
-                    Log.d(TAG, "Getting key manager factory (" + KeyManagerFactory
-                            .getDefaultAlgorithm() + ").");
-                    keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory
-                            .getDefaultAlgorithm());
+                    this.bpLogger.trace(String.format("Getting key manager factory (%s).",
+                            KeyManagerFactory.getDefaultAlgorithm()));
+                    keyManagerFactory = KeyManagerFactory.getInstance(
+                            KeyManagerFactory.getDefaultAlgorithm());
                     keyManagerFactory.init(keyStore, null);
-                    Log.d(TAG, "Getting trust manager factory (" + TrustManagerFactory
-                            .getDefaultAlgorithm() + ").");
+                    this.bpLogger.trace(String.format("Getting trust manager factory (%s).",
+                            TrustManagerFactory.getDefaultAlgorithm()));
                     trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory
                             .getDefaultAlgorithm());
                     trustManagerFactory.init(keyStore);
                 } catch (NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException
                         e) {
-                    Log.d(TAG, "Failed to get key manager factory.");
+                    this.bpLogger.trace("Failed to get key manager factory.");
                     e.printStackTrace();
                 }
                 if (keyManagerFactory != null && trustManagerFactory != null) {
                     SSLContext sslContext = null;
                     try {
-                        Log.d(TAG, "Getting ssl context.");
+                        this.bpLogger.trace("Getting ssl context.");
                         sslContext = SSLContext.getInstance("TLS");
                         sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory
                                 .getTrustManagers(), null);
                     } catch (NoSuchAlgorithmException | KeyManagementException e) {
-                        Log.d(TAG, "Failed to get ssl context.");
+                        this.bpLogger.trace("Failed to get ssl context.");
                         e.printStackTrace();
                     }
                     if (sslContext != null) {
-                        Log.d(TAG, "Setting ssl factory.");
+                        this.bpLogger.trace("Setting ssl factory.");
                         this.wsServer.setWebSocketFactory(new DefaultSSLWebSocketServerFactory
                                 (sslContext));
                     } else {
-                        Log.d(TAG, "Ssl context is null.");
+                        this.bpLogger.trace("Ssl context is null.");
                     }
                 } else {
-                    Log.d(TAG, "Key manager factory is null.");
+                    this.bpLogger.trace("Key manager factory is null.");
                 }
             } else {
-                Log.d(TAG, "Failed to read keystore.");
+                this.bpLogger.trace("Failed to read keystore.");
             }
         }
         this.wsServer.start();
@@ -342,7 +336,7 @@ public class ButtplugWebsocketServer {
                 String remoteId = ButtplugWebsocketServer.this.connections.keys().nextElement();
                 WebSocket ws = ButtplugWebsocketServer.this.connections.get(remoteId).first;
                 try {
-                    ws.send((new ButtplugJsonMessageParser()).formatJson(msg));
+                    ws.send((new ButtplugJsonMessageParser()).serialize(msg, 0));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -383,7 +377,7 @@ public class ButtplugWebsocketServer {
         return new HostnamesTask().execute(loopback).get();
     }
 
-    public static class HostnamesTask extends AsyncTask<Boolean, Void, Map<String, String>> {
+    public class HostnamesTask extends AsyncTask<Boolean, Void, Map<String, String>> {
         @Override
         protected Map<String, String> doInBackground(Boolean... booleans) {
             Boolean loopback = booleans[0];
@@ -398,10 +392,12 @@ public class ButtplugWebsocketServer {
                     for (InetAddress inetAddress : Collections.list(networkInterface
                             .getInetAddresses())) {
                         if (inetAddress instanceof Inet4Address) {
-                            Log.d(TAG, inetAddress.getHostAddress() + ", " + inetAddress
-                                    .getCanonicalHostName());
-                            addresses.put(inetAddress.getHostAddress(), inetAddress
-                                    .getCanonicalHostName());
+                            ButtplugWebsocketServer.this.bpLogger.trace(String.format("%s, %s",
+                                    inetAddress.getHostAddress(),
+                                    inetAddress.getCanonicalHostName()));
+                            addresses.put(
+                                    inetAddress.getHostAddress(),
+                                    inetAddress.getCanonicalHostName());
                         }
                     }
                 }

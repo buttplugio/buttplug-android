@@ -10,18 +10,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
-public class KiirooGen2VibeBluetoothInfo implements IBluetoothDeviceInfo {
+public class LovenseRev1BluetoothInfo implements IBluetoothDeviceInfo {
     public enum Chrs {
         Tx,
-        RxTouch,
-        RxAccel
+        Rx
     }
 
     private List<String> names = new ArrayList<String>() {{
-        add("Pearl2");
-        add("Fuse");
-        add("Virtual Blowbot");
+        // Nora
+        add("LVS-A011");
+        add("LVS-C011");
+        // Max
+        add("LVS-B011");
+        // Ambi
+        add("LVS-L009");
     }};
 
     public List<String> getNames() {
@@ -29,7 +31,7 @@ public class KiirooGen2VibeBluetoothInfo implements IBluetoothDeviceInfo {
     }
 
     private List<UUID> services = new ArrayList<UUID>() {{
-        add(UUID.fromString("88f82580-0000-01e6-aace-0002a5d5c51b"));
+        add(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb"));
     }};
 
     public List<UUID> getServices() {
@@ -38,11 +40,9 @@ public class KiirooGen2VibeBluetoothInfo implements IBluetoothDeviceInfo {
 
     private List<UUID> characteristics = new ArrayList<UUID>() {{
         // tx
-        add(UUID.fromString("88f82581-0000-01e6-aace-0002a5d5c51b"));
-        // rx (touch: 3 zone bitmask)
-        add(UUID.fromString("88f82582-0000-01e6-aace-0002a5d5c51b"));
-        // rx (accellorometer?)
-        add(UUID.fromString("88f82584-0000-01e6-aace-0002a5d5c51b"));
+        add(UUID.fromString("0000fff2-0000-1000-8000-00805f9b34fb"));
+        // rx
+        add(UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb"));
     }};
 
     public List<UUID> getCharacteristics() {
@@ -51,6 +51,6 @@ public class KiirooGen2VibeBluetoothInfo implements IBluetoothDeviceInfo {
 
     @NonNull
     public IButtplugDevice CreateDevice(@NonNull IBluetoothDeviceInterface iface) {
-        return new KiirooGen2Vibe(iface, this);
+        return new Lovense(iface, this);
     }
 }

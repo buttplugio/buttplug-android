@@ -9,10 +9,10 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import org.metafetish.buttplug.core.ButtplugEvent;
 import org.metafetish.buttplug.core.ButtplugEventHandler;
+import org.metafetish.buttplug.core.ButtplugLogManager;
 import org.metafetish.buttplug.core.ButtplugMessage;
 import org.metafetish.buttplug.core.IButtplugLog;
 import org.metafetish.buttplug.core.IButtplugLogManager;
@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterface {
-    private static final String TAG = AndroidBluetoothDeviceInterface.class.getSimpleName();
     private Activity activity;
 
     public String getName() {
@@ -40,7 +39,10 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
     private Map<UUID, BluetoothGattCharacteristic> gattCharacteristics = new HashMap<>();
 
     @NonNull
-    private IButtplugLog bpLogger;
+    private IButtplugLogManager bpLogManager = new ButtplugLogManager();
+
+    @NonNull
+    private IButtplugLog bpLogger = bpLogManager.getLogger(this.getClass());
 
     @NonNull
     private BluetoothGatt bleDevice;
@@ -63,17 +65,14 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
     }
 
     AndroidBluetoothDeviceInterface(@NonNull Activity activity,
-                                    @NonNull IButtplugLogManager logManager,
                                     @NonNull BluetoothDevice device,
                                     @NonNull IBluetoothDeviceInfo deviceInfo) {
         this.activity = activity;
-        this.bpLogger = logManager.getLogger(this.getClass());
 
         BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
             @Override
             public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-                Log.d(TAG, "New State: " + newState);
-//                if ()
+                AndroidBluetoothDeviceInterface.this.bpLogger.trace(String.format("New State: %s", newState));
                 if (newState == BluetoothAdapter.STATE_CONNECTED) {
                     gatt.discoverServices();
                 } else if (newState == BluetoothAdapter.STATE_DISCONNECTED) {
@@ -118,22 +117,22 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
                                                         byte[] value, boolean writeWithResponse) {
         SettableListenableFuture<ButtplugMessage> promise = new SettableListenableFuture<>();
         if (isCommunicating != null && isCommunicating) {
-            Log.d(TAG, "Device transfer in progress, cancelling new transfer.");
+            this.bpLogger.trace("Device transfer in progress, cancelling new transfer.");
         }
 
         BluetoothGattCharacteristic gattCharacteristic = gattCharacteristics.get
                 (characteristicIndex);
         if (gattCharacteristic == null) {
-            promise.set(new Error("Requested characteristic " + characteristicIndex.toString() +
-                    " not found", Error.ErrorClass.ERROR_DEVICE, msgId));
+            promise.set(new Error(String.format("Requested characteristic %s not found",
+                    characteristicIndex.toString()), Error.ErrorClass.ERROR_DEVICE, msgId));
             return promise;
         }
         isCommunicating = true;
         gattCharacteristic.setValue(value);
         boolean success = bleDevice.writeCharacteristic(gattCharacteristic);
         if (!success) {
-            promise.set(new Error("Failed to write to characteristic " + characteristicIndex
-                    .toString(), Error.ErrorClass.ERROR_DEVICE, msgId));
+            promise.set(new Error(String.format("Failed to write to characteristic %s",
+                    characteristicIndex.toString()), Error.ErrorClass.ERROR_DEVICE, msgId));
             return promise;
         }
         promise.set(new Ok(msgId));

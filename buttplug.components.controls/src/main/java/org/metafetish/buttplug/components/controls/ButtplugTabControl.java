@@ -1,6 +1,8 @@
 package org.metafetish.buttplug.components.controls;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,6 +23,7 @@ import android.widget.TextView;
 import org.metafetish.buttplug.core.ButtplugEventHandler;
 import org.metafetish.buttplug.core.ButtplugLogManager;
 import org.metafetish.buttplug.core.Events.CreateView;
+import org.metafetish.buttplug.core.IButtplugLog;
 import org.metafetish.buttplug.server.ButtplugServer;
 import org.metafetish.buttplug.server.DeviceManager;
 import org.metafetish.buttplug.server.IButtplugServerFactory;
@@ -28,7 +31,8 @@ import org.metafetish.buttplug.server.managers.androidbluetoothmanager.AndroidBl
 
 
 public class ButtplugTabControl extends Fragment implements IButtplugServerFactory {
-    private static final String TAG = ButtplugTabControl.class.getSimpleName();
+    private ButtplugLogManager bpLogManager = new ButtplugLogManager();
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
 
     private AppCompatActivity activity;
     private String serverName;
@@ -47,9 +51,7 @@ public class ButtplugTabControl extends Fragment implements IButtplugServerFacto
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
      * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     * loaded fragment in memory.
      */
     public SectionsPagerAdapter sectionsPagerAdapter;
 
@@ -61,7 +63,21 @@ public class ButtplugTabControl extends Fragment implements IButtplugServerFacto
 
     public ButtplugTabControl() {
         // Required empty public constructor
-        //TODO: Implement _guiLog
+        //TODO: Implement Sentry?
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (this.activity != null) {
+            try {
+                this.bpLogger.info(String.format("Buttplug %s",
+                        this.activity.getPackageManager().getPackageInfo(
+                                this.activity.getPackageName(), 0).versionName));
+            } catch (PackageManager.NameNotFoundException e) {
+                this.bpLogger.error("No version info available!");
+            }
+        }
     }
 
     @Override
@@ -100,6 +116,7 @@ public class ButtplugTabControl extends Fragment implements IButtplugServerFacto
                     (this.tabLayout));
             this.tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener
                     (this.viewPager));
+            this.viewPager.setOffscreenPageLimit(2);
 
             this.creatingView.invoke(new CreateView(this));
         }
@@ -119,6 +136,12 @@ public class ButtplugTabControl extends Fragment implements IButtplugServerFacto
         this.activity = null;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ButtplugLogManager.lastLogMessagesReceived.clear();
+    }
+
     private ButtplugServer initializeButtplugServer(String serverName, long maxPingTime) {
         // Set up internal services
         ButtplugServer bpServer;
@@ -135,8 +158,7 @@ public class ButtplugTabControl extends Fragment implements IButtplugServerFacto
             return bpServer;
         }
 
-        bpServer.addDeviceSubtypeManager(new AndroidBluetoothManager(getActivity(), new
-                ButtplugLogManager()));
+        bpServer.addDeviceSubtypeManager(new AndroidBluetoothManager(getActivity()));
 
         return bpServer;
     }
@@ -144,6 +166,26 @@ public class ButtplugTabControl extends Fragment implements IButtplugServerFacto
     public void setServerDetails(String serverName, long maxPingTime) {
         this.serverName = serverName;
         this.maxPingTime = maxPingTime;
+
+        String codeName;
+        if (Build.VERSION.SDK_INT <= 20) {
+            codeName = "Kit Kat";
+        } else if(Build.VERSION.SDK_INT <= 22) {
+            codeName = "Lollipop";
+        } else if(Build.VERSION.SDK_INT == 23) {
+            codeName = "Marshmallow";
+        } else if(Build.VERSION.SDK_INT <= 25) {
+            codeName = "Nougat";
+        } else if(Build.VERSION.SDK_INT <= 27) {
+            codeName = "Oreo";
+        } else {
+            codeName = "P";
+        }
+        this.bpLogger.info(String.format("Android %s.%s (%s, SDK %s)",
+                Build.VERSION.RELEASE,
+                Build.VERSION.INCREMENTAL,
+                codeName,
+                Build.VERSION.SDK_INT));
     }
 
     @Override
@@ -191,7 +233,6 @@ public class ButtplugTabControl extends Fragment implements IButtplugServerFacto
             AppCompatActivity activity = (AppCompatActivity) getActivity();
             if (activity != null) {
                 TabLayout tabLayout = (TabLayout) activity.findViewById(R.id.tabs);
-//                    Log.d(TAG, "Tab " + getArguments().getInt(ARG_SECTION_NUMBER));
                 int tabIndex = getArguments().getInt(ARG_SECTION_NUMBER);
                 if (tabIndex >= 0 && tabIndex <= tabLayout.getTabCount() - 1) {
                     String tabText = tabLayout.getTabAt(tabIndex).getText().toString();

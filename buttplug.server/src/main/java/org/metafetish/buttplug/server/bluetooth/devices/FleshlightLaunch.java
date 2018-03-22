@@ -25,10 +25,9 @@ import java.util.concurrent.ExecutionException;
 public class FleshlightLaunch extends ButtplugBluetoothDevice {
     private double lastPosition;
 
-    public FleshlightLaunch(@NonNull IButtplugLogManager logManager,
-                            @NonNull IBluetoothDeviceInterface iface,
+    public FleshlightLaunch(@NonNull IBluetoothDeviceInterface iface,
                             @NonNull IBluetoothDeviceInfo info) {
-        super(logManager, "Fleshlight Launch", iface, info);
+        super("Fleshlight Launch", iface, info);
         // Setup message function array
         msgFuncs.put(FleshlightLaunchFW12Cmd.class, new ButtplugDeviceWrapper(this
                 .handleFleshlightLaunchRawCmd));
@@ -56,8 +55,8 @@ public class FleshlightLaunch extends ButtplugBluetoothDevice {
             // However, since each move it makes is finite (unlike setting vibration on some
             // devices),
             // so we can assume it will be a short move, similar to what we do for the Kiiroo toys.
-            FleshlightLaunch.this.bpLogger.debug("Stopping Device " + FleshlightLaunch.this
-                    .getName());
+            FleshlightLaunch.this.bpLogger.debug(String.format("Stopping Device %s",
+                    FleshlightLaunch.this.getName()));
             return new Ok(msg.id);
         }
     };
@@ -78,15 +77,17 @@ public class FleshlightLaunch extends ButtplugBluetoothDevice {
 
             for (LinearCmd.VectorSubcommands vector : cmdMsg.vectors) {
                 if (vector.index != 0) {
-                    return new Error("Index " + vector.index + " is out of bounds for LinearCmd " +
-                            "for this device.", Error.ErrorClass.ERROR_DEVICE, cmdMsg.id);
+                    return new Error(String.format("Index %s is out of bounds for LinearCmd for this device.",
+                            vector.index),
+                            Error.ErrorClass.ERROR_DEVICE,
+                            cmdMsg.id);
                 }
 
-                return FleshlightLaunch.this.handleFleshlightLaunchRawCmd.invoke(new
-                        FleshlightLaunchFW12Cmd(
+                return FleshlightLaunch.this.handleFleshlightLaunchRawCmd.invoke(new FleshlightLaunchFW12Cmd(
                         cmdMsg.deviceIndex,
-                        (int) FleshlightHelper.getSpeed(Math.abs(FleshlightLaunch.this
-                                .lastPosition - vector.getPosition()), vector.duration) * 99,
+                        (int) FleshlightHelper.getSpeed(Math.abs(
+                                FleshlightLaunch.this.lastPosition - vector.getPosition()),
+                                vector.duration) * 99,
                         (int) vector.getPosition() * 99,
                         cmdMsg.id
                 ));

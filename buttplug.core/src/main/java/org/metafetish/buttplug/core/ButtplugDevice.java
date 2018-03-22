@@ -58,7 +58,10 @@ public abstract class ButtplugDevice implements IButtplugDevice {
     }
 
     @NonNull
-    protected IButtplugLog bpLogger;
+    protected IButtplugLogManager bpLogManager = new ButtplugLogManager();
+
+    @NonNull
+    protected IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
 
     @NonNull
     protected Map<Class, ButtplugDeviceWrapper> msgFuncs;
@@ -80,10 +83,8 @@ public abstract class ButtplugDevice implements IButtplugDevice {
         }
     }
 
-    protected ButtplugDevice(@NonNull IButtplugLogManager logManager,
-                             @NonNull String name,
+    protected ButtplugDevice(@NonNull String name,
                              @NonNull String identifier) {
-        bpLogger = logManager.getLogger(this.getClass());
         msgFuncs = new HashMap<>();
         this.name = name;
         this.identifier = identifier;
@@ -113,15 +114,18 @@ public abstract class ButtplugDevice implements IButtplugDevice {
             throws InvocationTargetException, IllegalAccessException {
         SettableListenableFuture<ButtplugMessage> promise = new SettableListenableFuture<>();
         if (this.isDisconnected) {
-            promise.set(
-                    new Error(this.name + " has disconnected and can no longer process messages.",
-                            Error.ErrorClass.ERROR_DEVICE, msg.id));
+            promise.set(new Error(
+                    String.format("%s has disconnected and can no longer process messages.",
+                            this.name),
+                    Error.ErrorClass.ERROR_DEVICE, msg.id));
             return promise;
         }
         if (!msgFuncs.containsKey(msg.getClass())) {
-            promise.set(
-                    new Error(this.name + " cannot handle message of type " + msg.getClass()
-                            .getSimpleName(), Error.ErrorClass.ERROR_DEVICE, msg.id));
+            promise.set(new Error(
+                    String.format("%s cannot handle message of type %s",
+                        this.name,
+                        msg.getClass().getSimpleName()),
+                    Error.ErrorClass.ERROR_DEVICE, msg.id));
             return promise;
         }
         // We just checked whether the key exists above, so we're ok.

@@ -123,16 +123,18 @@ public class DeviceManager {
             }
             if (!duplicates.isEmpty() && (duplicates.size() > 1 || duplicates.entrySet().iterator
                     ().next().getValue().isConnected())) {
-                DeviceManager.this.bpLogger.debug("Already have device " + device.getName() + " " +
-                        "in Devices list");
+                DeviceManager.this.bpLogger.debug(String.format("Already have device %s in Devices list",
+                        device.getName()));
                 return;
             }
 
             // If we get to 4 billion devices connected, this may be a problem.
             long deviceIndex = !duplicates.isEmpty() ? duplicates.entrySet().iterator().next()
                     .getKey() : DeviceManager.this.deviceIndexCounter.incrementAndGet();
-            DeviceManager.this.bpLogger.info((!duplicates.isEmpty() ? "Readding" : "Adding") + " " +
-                    "Device " + device.getName() + " at index " + deviceIndex);
+            DeviceManager.this.bpLogger.info(String.format("%s Device %s at index %s",
+                    (!duplicates.isEmpty() ? "Readding" : "Adding"),
+                    device.getName(),
+                    deviceIndex));
 
             DeviceManager.this.devices.put(deviceIndex, device);
             DeviceManager.this.devices.get(deviceIndex).setIndex(deviceIndex);
@@ -224,7 +226,7 @@ public class DeviceManager {
                     continue;
                 }
                 isOk = false;
-                errorMsg = errorMsg.concat(((Error) r).errorMessage + "; ");
+                errorMsg = errorMsg.concat(String.format("%s; ", ((Error) r).errorMessage));
             }
             if (isOk) {
                 promise.set(new Ok(id));
@@ -248,8 +250,9 @@ public class DeviceManager {
             promise.set(new DeviceList(msgDevices, id));
             return promise;
         } else if (msg instanceof ButtplugDeviceMessage) {
-            DeviceManager.this.bpLogger.trace("Sending " + msg.getClass().getSimpleName() + " to" +
-                    " device index " + ((ButtplugDeviceMessage) msg).deviceIndex);
+            DeviceManager.this.bpLogger.trace(String.format("Sending %s to device index %s",
+                    msg.getClass().getSimpleName(),
+                    ((ButtplugDeviceMessage) msg).deviceIndex));
             // If it's a device message, it's most likely not ours.
             ButtplugDeviceMessage deviceMessage = (ButtplugDeviceMessage) msg;
             if (this.devices.containsKey(deviceMessage.deviceIndex)) {
@@ -258,14 +261,13 @@ public class DeviceManager {
                 promise.set(result);
                 return promise;
             }
-            promise.set(DeviceManager.this.bpLogger.logErrorMsg(id, Error.ErrorClass
-                    .ERROR_DEVICE, "Dropping message for unknown device index " + deviceMessage
-                    .deviceIndex));
+            promise.set(DeviceManager.this.bpLogger.logErrorMsg(id, Error.ErrorClass.ERROR_DEVICE,
+                    String.format("Dropping message for unknown device index %s", deviceMessage.deviceIndex)));
             return promise;
         }
         promise.set(
-                new Error("Message type " + msg.getClass().getSimpleName() + " unhandled by this" +
-                        " server.",
+                new Error(String.format("Message type %s unhandled by this server.",
+                        msg.getClass().getSimpleName()),
                         Error.ErrorClass.ERROR_MSG, id));
         return promise;
     }

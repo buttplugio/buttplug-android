@@ -16,7 +16,7 @@ public class LogTest {
         String testStr = "[{\"Log\":{\"Id\":7,\"LogLevel\":\"Warn\",\"LogMessage\":\"TestLog\"}}]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
-        List<ButtplugMessage> msgs = parser.parseJson(testStr);
+        List<ButtplugMessage> msgs = parser.deserialize(testStr);
 
         Assert.assertEquals(msgs.size(), 1);
         Assert.assertEquals(msgs.get(0).getClass(), Log.class);
@@ -24,10 +24,10 @@ public class LogTest {
         Assert.assertEquals(((Log) msgs.get(0)).logLevel, ButtplugLogLevel.WARN);
         Assert.assertEquals(((Log) msgs.get(0)).logMessage, "TestLog");
 
-        String jsonOut = parser.formatJson(msgs);
+        String jsonOut = parser.serialize(msgs, 0);
         Assert.assertEquals(testStr, jsonOut);
 
-        jsonOut = parser.formatJson(msgs.get(0));
+        jsonOut = parser.serialize(msgs.get(0), 0);
         Assert.assertEquals(testStr, jsonOut);
     }
 

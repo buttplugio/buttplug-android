@@ -10,7 +10,9 @@ import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 import org.metafetish.buttplug.core.ButtplugJsonMessageParser;
 import org.metafetish.buttplug.core.ButtplugLogLevel;
+import org.metafetish.buttplug.core.ButtplugLogManager;
 import org.metafetish.buttplug.core.ButtplugMessage;
+import org.metafetish.buttplug.core.IButtplugLog;
 import org.metafetish.buttplug.core.Messages.DeviceAdded;
 import org.metafetish.buttplug.core.Messages.DeviceList;
 import org.metafetish.buttplug.core.Messages.DeviceMessageInfo;
@@ -48,6 +50,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 public class ButtplugWSClient extends WebSocketAdapter {
+    private ButtplugLogManager bpLogManager = new ButtplugLogManager();
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
 
     public IDeviceEvent deviceAdded;
 
@@ -109,7 +113,7 @@ public class ButtplugWSClient extends WebSocketAdapter {
         } else if (res instanceof Error) {
             throw new Exception(((Error) res).errorMessage);
         } else {
-            throw new Exception("Unexpected message returned: " + res.getClass().getName());
+            throw new Exception(String.format("Unexpected message returned: %s", res.getClass().getName()));
         }
     }
 
@@ -150,7 +154,7 @@ public class ButtplugWSClient extends WebSocketAdapter {
     @Override
     public void onTextMessage(WebSocket socket, String buf) {
         try {
-            List<ButtplugMessage> msgs = this.parser.parseJson(buf);
+            List<ButtplugMessage> msgs = this.parser.deserialize(buf);
 
             for (ButtplugMessage msg : msgs) {
                 if (msg.id > 0) {
@@ -264,8 +268,9 @@ public class ButtplugWSClient extends WebSocketAdapter {
         ButtplugClientDevice dev = this.devices.get(device.index);
         if (dev != null) {
             if (!dev.allowedMessages.contains(deviceMsg.getClass().getSimpleName())) {
-                promise.set(new Error("Device does not accept message type: " + deviceMsg
-                        .getClass().getSimpleName(), Error.ErrorClass.ERROR_DEVICE,
+                promise.set(new Error(String.format("Device does not accept message type: %s",
+                        deviceMsg.getClass().getSimpleName()),
+                        Error.ErrorClass.ERROR_DEVICE,
                         ButtplugConsts.SystemMsgId));
                 return promise;
             }
@@ -299,7 +304,8 @@ public class ButtplugWSClient extends WebSocketAdapter {
         }
 
         try {
-            this.websocket.sendText(this.parser.formatJson(msg));
+            //TODO: Upgrade client to schema version 1
+            this.websocket.sendText(this.parser.serialize(msg, 0));
             this.websocket.flush();
         } catch (IOException e) {
             promise.set(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, msg.id));

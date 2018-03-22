@@ -1,10 +1,18 @@
 package org.metafetish.buttplug.core;
 
 import android.support.annotation.NonNull;
+import android.support.v4.util.Pair;
 
 import org.metafetish.buttplug.core.Messages.Log;
 
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
 public class ButtplugLogManager implements IButtplugLogManager {
+    public static ButtplugEventHandler globalLogMessageReceived = new ButtplugEventHandler();
+    public static List<Pair<Date, Log>> lastLogMessagesReceived = new LinkedList<>();
+
     private ButtplugEventHandler logMessageReceived = new ButtplugEventHandler();
 
     @NonNull
@@ -32,10 +40,13 @@ public class ButtplugLogManager implements IButtplugLogManager {
             Log msg = (Log) event.getMessage();
             if (msg.logLevel.ordinal() <= ButtplugLogManager.this.getButtplugLogLevel().ordinal
                     ()) {
-                if (logMessageReceived != null) {
-                    logMessageReceived.invoke(new ButtplugEvent(msg));
-                }
+                logMessageReceived.invoke(event);
             }
+            ButtplugLogManager.lastLogMessagesReceived.add(new Pair<Date, Log>(new Date(), msg));
+            if (ButtplugLogManager.lastLogMessagesReceived.size() > 25) {
+                ButtplugLogManager.lastLogMessagesReceived.remove(0);
+            }
+            ButtplugLogManager.globalLogMessageReceived.invoke(event);
         }
     };
 

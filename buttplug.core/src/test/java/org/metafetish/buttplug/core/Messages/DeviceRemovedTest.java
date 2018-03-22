@@ -15,17 +15,17 @@ public class DeviceRemovedTest {
         String testStr = "[{\"DeviceRemoved\":{\"Id\":3,\"DeviceIndex\":2}}]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
-        List<ButtplugMessage> msgs = parser.parseJson(testStr);
+        List<ButtplugMessage> msgs = parser.deserialize(testStr);
 
         Assert.assertEquals(1, msgs.size());
         Assert.assertEquals(DeviceRemoved.class, msgs.get(0).getClass());
         Assert.assertEquals(3, msgs.get(0).id);
         Assert.assertEquals(2, ((DeviceRemoved) msgs.get(0)).deviceIndex);
 
-        String jsonOut = parser.formatJson(msgs);
+        String jsonOut = parser.serialize(msgs, 0);
         Assert.assertEquals(testStr, jsonOut);
 
-        jsonOut = parser.formatJson(msgs.get(0));
+        jsonOut = parser.serialize(msgs.get(0), 0);
         Assert.assertEquals(testStr, jsonOut);
     }
 

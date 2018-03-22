@@ -16,11 +16,10 @@ public class ButtplugBluetoothDevice extends ButtplugDevice {
     protected IBluetoothDeviceInfo info;
 
     protected ButtplugBluetoothDevice(
-            @NonNull IButtplugLogManager logManager,
             @NonNull String name,
             @NonNull IBluetoothDeviceInterface iface,
             @NonNull IBluetoothDeviceInfo info) {
-        super(logManager, name, iface.getAddress());
+        super(name, iface.getAddress());
         this.iface = iface;
         this.info = info;
         this.iface.getDeviceRemoved().addCallback(this.deviceRemovedCallback);

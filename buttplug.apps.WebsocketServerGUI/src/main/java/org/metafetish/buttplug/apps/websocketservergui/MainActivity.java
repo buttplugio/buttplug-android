@@ -14,11 +14,14 @@ import android.widget.Toast;
 
 import org.metafetish.buttplug.components.controls.ButtplugTabControl;
 import org.metafetish.buttplug.core.ButtplugEvent;
+import org.metafetish.buttplug.core.ButtplugLogManager;
 import org.metafetish.buttplug.core.Events.CreateView;
 import org.metafetish.buttplug.core.IButtplugCallback;
+import org.metafetish.buttplug.core.IButtplugLog;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private ButtplugLogManager bpLogManager = new ButtplugLogManager();
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

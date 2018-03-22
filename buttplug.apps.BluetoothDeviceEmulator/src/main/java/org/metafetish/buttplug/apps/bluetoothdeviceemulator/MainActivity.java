@@ -17,19 +17,21 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.metafetish.buttplug.core.ButtplugLogManager;
+import org.metafetish.buttplug.core.IButtplugLog;
 import org.metafetish.buttplug.server.bluetooth.devices.FleshlightLaunchBluetoothInfo;
 import org.metafetish.buttplug.server.util.FleshlightHelper;
 
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String TAG = MainActivity.class.getSimpleName();
+    private ButtplugLogManager bpLogManager = new ButtplugLogManager();
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
 
     private TextView status;
     private ImageView icon;
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 .BLUETOOTH_SERVICE);
 
         if (bluetoothManager != null) {
-            Log.d(TAG, "openGattServer()");
+            this.bpLogger.trace("openGattServer()");
             this.bluetoothGattServer = bluetoothManager.openGattServer(this, new
                     BluetoothGattServerCallback() {
                         @Override
@@ -65,12 +67,12 @@ public class MainActivity extends AppCompatActivity {
                             super.onConnectionStateChange(device, status, newState);
                             if (newState == BluetoothProfile.STATE_CONNECTED) {
                                 MainActivity.this.status.setText(R.string.gatt_connected);
-                                Log.d(TAG, "onConnectionStateChange(): STATE_CONNECTED");
+                                MainActivity.this.bpLogger.trace("onConnectionStateChange(): STATE_CONNECTED");
                                 MainActivity.this.bluetoothLeAdvertiser.stopAdvertising(MainActivity
                                         .this.advertiseCallback);
                             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                                 MainActivity.this.status.setText(R.string.advertising_start);
-                                Log.d(TAG, "onConnectionStateChange(): STATE_DISCONNECTED");
+                                MainActivity.this.bpLogger.trace("onConnectionStateChange(): STATE_DISCONNECTED");
                                 MainActivity.this.bluetoothLeAdvertiser.startAdvertising(
                                         MainActivity.this.advertiseSettings,
                                         MainActivity.this.advertiseData,
@@ -89,8 +91,9 @@ public class MainActivity extends AppCompatActivity {
                             super.onCharacteristicWriteRequest(device, requestId, characteristic,
                                     preparedWrite, responseNeeded, offset, value);
                             if (characteristic == MainActivity.this.tx) {
-                                Log.d(TAG, "onCharacteristicWriteRequest(): " + Arrays.toString
-                                        (value));
+                                MainActivity.this.bpLogger.trace(String.format(
+                                        "onCharacteristicWriteRequest(): %s",
+                                        Arrays.toString(value)));
                                 if (MainActivity.this.lastCommand != null) {
                                     MainActivity.this.lastPosition = MainActivity.this
                                             .lastCommand[0];
@@ -142,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (this.bluetoothLeAdvertiser != null) {
                 this.status.setText(R.string.advertising_start);
-                Log.d(TAG, "startAdvertising()");
+                this.bpLogger.trace("startAdvertising()");
                 this.advertiseCallback = new AdvertiseCallback() {
                     @Override
                     public void onStartFailure(int errorCode) {
@@ -150,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
 
                         if (errorCode == AdvertiseCallback.ADVERTISE_FAILED_ALREADY_STARTED) {
                             MainActivity.this.status.setText(R.string.advertising_success);
-                            Log.d(TAG, "onStartFailure(): Already started");
+                            MainActivity.this.bpLogger.trace("onStartFailure(): Already started");
                         } else {
                             MainActivity.this.status.setText(R.string.advertising_failure);
                             MainActivity.this.bluetoothLeAdvertiser.stopAdvertising(this);
@@ -161,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onStartSuccess(AdvertiseSettings settingsInEffect) {
                         super.onStartSuccess(settingsInEffect);
                         MainActivity.this.status.setText(R.string.advertising_success);
-                        Log.d(TAG, "onStartSuccess()");
+                        MainActivity.this.bpLogger.trace("onStartSuccess()");
                     }
                 };
                 this.bluetoothLeAdvertiser.startAdvertising(
@@ -176,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy()");
+        this.bpLogger.trace("onDestroy()");
         this.bluetoothLeAdvertiser.stopAdvertising(MainActivity.this.advertiseCallback);
         this.bluetoothGattServer.close();
     }

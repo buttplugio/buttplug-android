@@ -15,7 +15,7 @@ public class TestTest {
         String testStr = "[{\"Test\":{\"Id\":7,\"TestString\":\"TestText\"}}]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
-        List<ButtplugMessage> msgs = parser.parseJson(testStr);
+        List<ButtplugMessage> msgs = parser.deserialize(testStr);
 
         Assert.assertEquals(msgs.size(), 1);
         Assert.assertEquals(msgs.get(0).getClass(),
@@ -25,10 +25,10 @@ public class TestTest {
                 ((org.metafetish.buttplug.core.Messages.Test) msgs.get(0)).getTestString(),
                 "TestText");
 
-        String jsonOut = parser.formatJson(msgs);
+        String jsonOut = parser.serialize(msgs, 0);
         Assert.assertEquals(testStr, jsonOut);
 
-        jsonOut = parser.formatJson(msgs.get(0));
+        jsonOut = parser.serialize(msgs.get(0), 0);
         Assert.assertEquals(testStr, jsonOut);
     }
 

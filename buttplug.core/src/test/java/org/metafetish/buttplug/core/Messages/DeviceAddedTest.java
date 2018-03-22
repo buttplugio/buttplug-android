@@ -14,22 +14,22 @@ public class DeviceAddedTest {
     @Test
     public void test() throws IOException {
         String testStr = "[" +
-                "{" +
-                "\"DeviceAdded\":{" +
-                "\"Id\":0," +
-                "\"DeviceIndex\":0," +
-                "\"DeviceName\":\"TestDevice 1\"," +
-                "\"DeviceMessages\":{" +
-                "\"SingleMotorVibrateCmd\":{}," +
-                "\"VibrateCmd\":{\"FeatureCount\":2}," +
-                "\"StopDeviceCmd\":{}" +
-                "}" +
-                "}" +
-                "}" +
+                    "{" +
+                        "\"DeviceAdded\":{" +
+                            "\"Id\":0," +
+                            "\"DeviceIndex\":0," +
+                            "\"DeviceName\":\"TestDevice 1\"," +
+                            "\"DeviceMessages\":{" +
+                                "\"SingleMotorVibrateCmd\":{}," +
+                                "\"VibrateCmd\":{\"FeatureCount\":2}," +
+                                "\"StopDeviceCmd\":{}" +
+                            "}" +
+                        "}" +
+                    "}" +
                 "]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
-        List<ButtplugMessage> msgs = parser.parseJson(testStr);
+        List<ButtplugMessage> msgs = parser.deserialize(testStr);
 
         Assert.assertEquals(1, msgs.size());
         Assert.assertEquals(DeviceAdded.class, msgs.get(0).getClass());
@@ -47,10 +47,10 @@ public class DeviceAddedTest {
         Assert.assertNotNull(deviceMessages.get("StopDeviceCmd"));
         Assert.assertEquals(0, deviceMessages.get("StopDeviceCmd").featureCount);
 
-        String jsonOut = parser.formatJson(msgs);
+        String jsonOut = parser.serialize(msgs, 1);
         Assert.assertEquals(testStr, jsonOut);
 
-        jsonOut = parser.formatJson(msgs.get(0));
+        jsonOut = parser.serialize(msgs.get(0), 1);
         Assert.assertEquals(testStr, jsonOut);
     }
 

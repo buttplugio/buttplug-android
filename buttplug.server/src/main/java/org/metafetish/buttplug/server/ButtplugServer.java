@@ -1,7 +1,9 @@
 package org.metafetish.buttplug.server;
 
+import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugEvent;
 import org.metafetish.buttplug.core.ButtplugEventHandler;
 import org.metafetish.buttplug.core.ButtplugJsonMessageParser;
@@ -27,13 +29,13 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 import java.util.concurrent.ExecutionException;
 
 public class ButtplugServer {
     @NonNull
     private ButtplugJsonMessageParser parser;
 
+    @NonNull
     private ButtplugEventHandler messageReceived = new ButtplugEventHandler();
 
     @NonNull
@@ -41,6 +43,7 @@ public class ButtplugServer {
         return this.messageReceived;
     }
 
+    @NonNull
     private ButtplugEventHandler clientConnected = new ButtplugEventHandler();
 
     @NonNull
@@ -49,21 +52,21 @@ public class ButtplugServer {
     }
 
     @NonNull
-    protected IButtplugLogManager bpLogManager;
+    protected IButtplugLogManager bpLogManager = new ButtplugLogManager();
 
     @NonNull
-    private IButtplugLog bpLogger;
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
 
     @NonNull
     private DeviceManager deviceManager;
 
-    private Timer pingTimer;
+    private Handler pingTimeoutHandler;
+    private Runnable pingTimeoutCallback;
 
     private String serverName;
     private long maxPingTime;
     private boolean pingTimedOut;
     private boolean receivedRequestServerInfo;
-    @SuppressWarnings("FieldCanBeLocal")
     private long clientMessageVersion;
 
     public ButtplugServer(String serverName, long maxPingTime) {
@@ -75,18 +78,22 @@ public class ButtplugServer {
         this.serverName = serverName;
         this.maxPingTime = maxPingTime;
         this.pingTimedOut = false;
-        //TODO: Implement pingTimer
+        if (maxPingTime != 0) {
+            this.pingTimeoutHandler = new Handler();
+            this.pingTimeoutCallback = new Runnable() {
+                @Override
+                public void run() {
+                    ButtplugServer.this.handlePingTimeout();
+                }
+            };
+        }
 
-        this.bpLogManager = new ButtplugLogManager();
-        this.bpLogger = this.bpLogManager.getLogger(this.getClass());
         this.bpLogger.debug("Setting up ButtplugServer");
         this.parser = new ButtplugJsonMessageParser();
-        this.deviceManager = deviceManager != null ? deviceManager : new DeviceManager(this
-                .bpLogManager);
+        this.deviceManager = deviceManager != null ? deviceManager : new DeviceManager(this.bpLogManager);
 
         this.bpLogger.info("Finished setting up ButtplugServer");
-        this.deviceManager.getDeviceMessageReceived().addCallback(this
-                .deviceMessageReceivedCallback);
+        this.deviceManager.getDeviceMessageReceived().addCallback(this.deviceMessageReceivedCallback);
         this.deviceManager.getScanningFinished().addCallback(this.scanningFinishedCallback);
         this.bpLogManager.getLogMessageReceived().addCallback(this.logMessageReceivedCallback);
     }
@@ -94,57 +101,62 @@ public class ButtplugServer {
     private IButtplugCallback deviceMessageReceivedCallback = new IButtplugCallback() {
         @Override
         public void invoke(ButtplugEvent event) {
-            if (ButtplugServer.this.messageReceived != null) {
-                ButtplugServer.this.messageReceived.invoke(event);
-            }
+            ButtplugServer.this.messageReceived.invoke(event);
         }
     };
 
     private IButtplugCallback logMessageReceivedCallback = new IButtplugCallback() {
         @Override
         public void invoke(ButtplugEvent event) {
-            if (ButtplugServer.this.messageReceived != null) {
-                ButtplugServer.this.messageReceived.invoke(event);
-            }
+            ButtplugServer.this.messageReceived.invoke(event);
         }
     };
 
     private IButtplugCallback scanningFinishedCallback = new IButtplugCallback() {
         @Override
         public void invoke(ButtplugEvent event) {
-            if (ButtplugServer.this.messageReceived != null) {
-                ButtplugServer.this.messageReceived.invoke(new ButtplugEvent(new ScanningFinished
-                        ()));
-            }
+            ButtplugServer.this.messageReceived.invoke(new ButtplugEvent(new ScanningFinished()));
         }
     };
 
-    //TODO: Implement pingTimer
+    private void handlePingTimeout()
+    {
+        this.messageReceived.invoke(new ButtplugEvent(new Error("Ping timed out.",
+                Error.ErrorClass.ERROR_PING, ButtplugConsts.SystemMsgId)));
+        try {
+            this.sendMessage(new StopAllDevices()).get();
+        } catch (InterruptedException | ExecutionException | IllegalAccessException | InvocationTargetException e) {
+            this.bpLogger.error("Failed to issue StopAllDevices.");
+            this.bpLogger.logException(e);
+        }
+        this.pingTimedOut = true;
+    }
 
     protected ListenableFuture<ButtplugMessage> sendMessage(ButtplugMessage msg) throws
             ExecutionException, InterruptedException, InvocationTargetException,
             IllegalAccessException {
         SettableListenableFuture<ButtplugMessage> promise = new SettableListenableFuture<>();
 
-        this.bpLogger.trace("Got Message " + msg.id + " of type " + msg.getClass()
-                .getSimpleName() + " to send");
+        this.bpLogger.trace(String.format("Got Message %s of type %s to send",
+                msg.id,
+                msg.getClass().getSimpleName()));
         long id = msg.id;
         if (id == 0) {
-            promise.set(this.bpLogger.logWarnMsg(id, Error.ErrorClass.ERROR_MSG, "Message Id 0 is" +
-                    " reserved for outgoing system messages. Please use " + "another Id."));
+            promise.set(this.bpLogger.logWarnMsg(id, Error.ErrorClass.ERROR_MSG,"Message Id 0" +
+                    " is reserved for outgoing system messages. Please use another Id."));
             return promise;
         }
 
         if (msg instanceof IButtplugMessageOutgoingOnly) {
-            promise.set(this.bpLogger.logWarnMsg(id, Error.ErrorClass.ERROR_MSG, "Message of type" +
-                    " " + msg.getClass().getSimpleName() + " cannot be sent to server"));
+            promise.set(this.bpLogger.logWarnMsg(id, Error.ErrorClass.ERROR_MSG, String.format(
+                    "Message of type %s cannot be sent to server",
+                    msg.getClass().getSimpleName())));
             return promise;
         }
 
 
         if (this.pingTimedOut) {
-            promise.set(this.bpLogger.logWarnMsg(id, Error.ErrorClass.ERROR_PING, "Ping timed out" +
-                    "."));
+            promise.set(this.bpLogger.logWarnMsg(id, Error.ErrorClass.ERROR_PING, "Ping timed out."));
             return promise;
         }
 
@@ -160,7 +172,8 @@ public class ButtplugServer {
             promise.set(new Ok(id));
             return promise;
         } else if (msg instanceof Ping) {
-            //TODO: Implement pingTimer
+            this.pingTimeoutHandler.removeCallbacks(this.pingTimeoutCallback);
+            this.pingTimeoutHandler.postDelayed(this.pingTimeoutCallback, this.maxPingTime);
             promise.set(new Ok(id));
             return promise;
         } else if (msg instanceof RequestServerInfo) {
@@ -168,7 +181,7 @@ public class ButtplugServer {
             this.receivedRequestServerInfo = true;
             this.clientMessageVersion = ((RequestServerInfo) msg).messageVersion;
 
-            //TODO: Implement pingTimer
+            this.pingTimeoutHandler.postDelayed(this.pingTimeoutCallback, this.maxPingTime);
             this.clientConnected.invoke(new ButtplugEvent(msg));
 
             promise.set(new ServerInfo(this.serverName, 1, this.maxPingTime, id));
@@ -202,7 +215,7 @@ public class ButtplugServer {
             ExecutionException, InterruptedException, IOException, InvocationTargetException,
             IllegalAccessException {
         SettableListenableFuture<List<ButtplugMessage>> promise = new SettableListenableFuture<>();
-        List<ButtplugMessage> msgs = this.parser.parseJson(jsonMsgs);
+        List<ButtplugMessage> msgs = this.parser.deserialize(jsonMsgs);
         List<ButtplugMessage> res = new ArrayList<>();
         for (ButtplugMessage msg : msgs) {
             if (msg instanceof Error) {
@@ -216,15 +229,15 @@ public class ButtplugServer {
     }
 
     public String serialize(ButtplugMessage msg) throws IOException {
-        return this.parser.formatJson(msg);
+        return this.parser.serialize(msg, this.clientMessageVersion);
     }
 
     public String serialize(List<ButtplugMessage> msgs) throws IOException {
-        return this.parser.formatJson(msgs);
+        return this.parser.serialize(msgs, this.clientMessageVersion);
     }
 
     public List<ButtplugMessage> deserialize(String msg) throws IOException {
-        return this.parser.parseJson(msg);
+        return this.parser.deserialize(msg);
     }
 
     public void addDeviceSubtypeManager(IDeviceSubtypeManager mgr) {

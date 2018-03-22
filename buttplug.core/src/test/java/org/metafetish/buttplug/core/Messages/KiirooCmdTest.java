@@ -15,7 +15,7 @@ public class KiirooCmdTest {
         String testStr = "[{\"KiirooCmd\":{\"Id\":7,\"DeviceIndex\":3,\"Command\":\"4;\"}}]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
-        List<ButtplugMessage> msgs = parser.parseJson(testStr);
+        List<ButtplugMessage> msgs = parser.deserialize(testStr);
 
         Assert.assertEquals(msgs.size(), 1);
         Assert.assertEquals(msgs.get(0).getClass(), KiirooCmd.class);
@@ -23,10 +23,10 @@ public class KiirooCmdTest {
         Assert.assertEquals(((KiirooCmd) msgs.get(0)).deviceIndex, 3);
         Assert.assertEquals(((KiirooCmd) msgs.get(0)).deviceCmd, "4;");
 
-        String jsonOut = parser.formatJson(msgs);
+        String jsonOut = parser.serialize(msgs, 0);
         Assert.assertEquals(testStr, jsonOut);
 
-        jsonOut = parser.formatJson(msgs.get(0));
+        jsonOut = parser.serialize(msgs.get(0), 0);
         Assert.assertEquals(testStr, jsonOut);
     }
 

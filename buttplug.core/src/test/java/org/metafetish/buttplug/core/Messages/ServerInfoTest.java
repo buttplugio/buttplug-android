@@ -17,7 +17,7 @@ public class ServerInfoTest {
                 "\"ServerName\":\"Websocket Server\"}}]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
-        List<ButtplugMessage> msgs = parser.parseJson(testStr);
+        List<ButtplugMessage> msgs = parser.deserialize(testStr);
 
         Assert.assertEquals(msgs.size(), 1);
         Assert.assertEquals(msgs.get(0).getClass(), ServerInfo.class);
@@ -29,10 +29,10 @@ public class ServerInfoTest {
         Assert.assertEquals(((ServerInfo) msgs.get(0)).maxPingTime, 500);
         Assert.assertEquals(((ServerInfo) msgs.get(0)).serverName, "Websocket Server");
 
-        String jsonOut = parser.formatJson(msgs);
+        String jsonOut = parser.serialize(msgs, 0);
         Assert.assertEquals(testStr, jsonOut);
 
-        jsonOut = parser.formatJson(msgs.get(0));
+        jsonOut = parser.serialize(msgs.get(0), 0);
         Assert.assertEquals(testStr, jsonOut);
     }
 }

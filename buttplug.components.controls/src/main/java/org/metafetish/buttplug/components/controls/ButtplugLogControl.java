@@ -3,12 +3,15 @@ package org.metafetish.buttplug.components.controls;
 
 import android.Manifest;
 import android.app.DownloadManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -26,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.metafetish.buttplug.core.ButtplugEvent;
@@ -68,7 +72,7 @@ public class ButtplugLogControl extends Fragment {
             this.sharedPreferences = this.activity.getPreferences(Context.MODE_PRIVATE);
             this.logLevel = ButtplugLogLevel.valueOf(this.sharedPreferences.getString("logLevel", this.logLevel.toString()).toUpperCase());
         }
-        this.logAdapter = new LogAdapter(new Handler(), ButtplugLogManager.lastLogMessagesReceived, this.logLevel);
+        this.logAdapter = new LogAdapter(new Handler(), ButtplugLogManager.lastLogMessagesReceived, this.logLevel, this.copyLogMessage);
         ButtplugLogManager.globalLogMessageReceived.addCallback(new IButtplugCallback() {
             @Override
             public void invoke(ButtplugEvent event) {
@@ -168,6 +172,30 @@ public class ButtplugLogControl extends Fragment {
             }
         }
     }
+
+    public View.OnLongClickListener copyLogMessage = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View view) {
+            if (ButtplugLogControl.this.activity != null) {
+                ClipboardManager clipboardManager = (ClipboardManager) ButtplugLogControl.this.activity.
+                        getSystemService(Context.CLIPBOARD_SERVICE);
+                if (clipboardManager != null) {
+                    ClipData clip = ClipData.newPlainText("Buttplug Log Message",
+                            ((TextView) view).getText());
+                    clipboardManager.setPrimaryClip(clip);
+                    Toast.makeText(ButtplugLogControl.this.activity, "Copied log message",
+                            Toast.LENGTH_SHORT).show();
+                    Vibrator vibrator = (Vibrator) ButtplugLogControl.this.activity.
+                            getSystemService(Context.VIBRATOR_SERVICE);
+                    if (vibrator != null) {
+                        vibrator.vibrate(50);
+                    }
+
+                }
+            }
+            return false;
+        }
+    };
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

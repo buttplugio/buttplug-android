@@ -4,12 +4,10 @@ import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.metafetish.buttplug.core.ButtplugLogLevel;
@@ -19,7 +17,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -29,6 +26,7 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
     private ButtplugLogLevel logLevel;
     private List<Pair<Date, Log>> filteredDataSet;
     private DateFormat dateFormat;
+    private View.OnLongClickListener onLongClickListener;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView lineMessage;
@@ -38,18 +36,19 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
         }
     }
 
-    public LogAdapter(Handler handler, ButtplugLogLevel logLevel) {
-        this(handler, new ArrayList<Pair<Date, Log>>(), logLevel);
+    public LogAdapter(Handler handler, ButtplugLogLevel logLevel, View.OnLongClickListener onLongClickListener) {
+        this(handler, new ArrayList<Pair<Date, Log>>(), logLevel, onLongClickListener);
     }
 
     @SuppressLint("SimpleDateFormat")
-    public LogAdapter(Handler handler, List<Pair<Date, Log>> dataSet, ButtplugLogLevel logLevel) {
+    public LogAdapter(Handler handler, List<Pair<Date, Log>> dataSet, ButtplugLogLevel logLevel, View.OnLongClickListener onLongClickListener) {
         this.handler = handler;
         this.dataSet = new ArrayList<>(dataSet);
         this.logLevel = ButtplugLogLevel.OFF;
         this.filteredDataSet = new ArrayList<>();
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         this.dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        this.onLongClickListener = onLongClickListener;
         this.setLogLevel(logLevel);
     }
 
@@ -142,6 +141,7 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
         String logMessage = this.getLogMessage(dataItem);
         if (logMessage != null) {
             holder.lineMessage.setText(logMessage);
+            holder.lineMessage.setOnLongClickListener(this.onLongClickListener);
         }
     }
 

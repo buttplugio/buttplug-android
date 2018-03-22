@@ -11,15 +11,28 @@ import java.util.List;
 import java.util.UUID;
 
 
-public class KiirooBluetoothInfo implements IBluetoothDeviceInfo {
+public class WeVibeBluetoothInfo implements IBluetoothDeviceInfo {
     public enum Chrs {
-        Rx,
         Tx,
+        Rx
     }
 
     private List<String> names = new ArrayList<String>() {{
-        add("ONYX");
-        add("PEARL");
+        add("Cougar");
+        add("4 Plus");
+        add("4plus");
+        add("Bloom");
+        add("classic");
+        add("Ditto");
+        add("Gala");
+        add("Jive");
+        add("Nova");
+        add("NOVAV2");
+        add("Pivot");
+        add("Rave");
+        add("Sync");
+        add("Verge");
+        add("Wish");
     }};
 
     public List<String> getNames() {
@@ -27,7 +40,7 @@ public class KiirooBluetoothInfo implements IBluetoothDeviceInfo {
     }
 
     private List<UUID> services = new ArrayList<UUID>() {{
-        add(UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455"));
+        add(UUID.fromString("f000bb03-0451-4000-b000-000000000000"));
     }};
 
     public List<UUID> getServices() {
@@ -35,10 +48,10 @@ public class KiirooBluetoothInfo implements IBluetoothDeviceInfo {
     }
 
     private List<UUID> characteristics = new ArrayList<UUID>() {{
-        // rx
-        add(UUID.fromString("49535343-1e4d-4bd9-ba61-23c647249616"));
         // tx
-        add(UUID.fromString("49535343-8841-43f4-a8d4-ecbe34729bb3"));
+        add(UUID.fromString("f000c000-0451-4000-b000-000000000000"));
+        // rx
+        add(UUID.fromString("f000b000-0451-4000-b000-000000000000"));
     }};
 
     public List<UUID> getCharacteristics() {
@@ -47,6 +60,6 @@ public class KiirooBluetoothInfo implements IBluetoothDeviceInfo {
 
     @NonNull
     public IButtplugDevice CreateDevice(@NonNull IBluetoothDeviceInterface iface) {
-        return new Kiiroo(iface, this);
+        return new WeVibe(iface, this);
     }
 }

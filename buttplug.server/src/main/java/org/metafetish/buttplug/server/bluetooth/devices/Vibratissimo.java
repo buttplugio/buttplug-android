@@ -89,7 +89,7 @@ public class Vibratissimo extends ButtplugBluetoothDevice {
                 Vibratissimo.this.vibratorSpeed = speed.getSpeed();
             }
 
-            byte[] data = new byte[] { 0x03, (byte) 0xff };
+            byte[] data = new byte[] {0x03, (byte) 0xff};
 
             try {
                 Vibratissimo.this.iface.writeValue(

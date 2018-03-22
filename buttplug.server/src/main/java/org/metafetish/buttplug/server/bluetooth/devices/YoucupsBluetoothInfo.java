@@ -11,23 +11,23 @@ import java.util.List;
 import java.util.UUID;
 
 
-public class KiirooBluetoothInfo implements IBluetoothDeviceInfo {
+public class YoucupsBluetoothInfo implements IBluetoothDeviceInfo {
     public enum Chrs {
-        Rx,
-        Tx,
+        Tx
     }
 
     private List<String> names = new ArrayList<String>() {{
-        add("ONYX");
-        add("PEARL");
+        // Warrior II
+        add("Youcups");
     }};
 
     public List<String> getNames() {
         return this.names;
     }
 
+
     private List<UUID> services = new ArrayList<UUID>() {{
-        add(UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455"));
+        add(UUID.fromString("0000fee9-0000-1000-8000-00805f9b34fb"));
     }};
 
     public List<UUID> getServices() {
@@ -35,10 +35,8 @@ public class KiirooBluetoothInfo implements IBluetoothDeviceInfo {
     }
 
     private List<UUID> characteristics = new ArrayList<UUID>() {{
-        // rx
-        add(UUID.fromString("49535343-1e4d-4bd9-ba61-23c647249616"));
         // tx
-        add(UUID.fromString("49535343-8841-43f4-a8d4-ecbe34729bb3"));
+        add(UUID.fromString("d44bc439-abfd-45a2-b575-925416129600"));
     }};
 
     public List<UUID> getCharacteristics() {
@@ -47,6 +45,6 @@ public class KiirooBluetoothInfo implements IBluetoothDeviceInfo {
 
     @NonNull
     public IButtplugDevice CreateDevice(@NonNull IBluetoothDeviceInterface iface) {
-        return new Kiiroo(iface, this);
+        return new Youcups(iface, this);
     }
 }

@@ -20,6 +20,7 @@ import org.metafetish.buttplug.core.Messages.LovenseCmd;
 import org.metafetish.buttplug.core.Messages.MessageAttributes;
 import org.metafetish.buttplug.core.Messages.Ok;
 import org.metafetish.buttplug.core.Messages.Ping;
+import org.metafetish.buttplug.core.Messages.RawCmd;
 import org.metafetish.buttplug.core.Messages.RequestDeviceList;
 import org.metafetish.buttplug.core.Messages.RequestLog;
 import org.metafetish.buttplug.core.Messages.RequestServerInfo;
@@ -64,7 +65,8 @@ import org.metafetish.buttplug.core.Messages.VorzeA10CycloneCmd;
         @JsonSubTypes.Type(value = RotateCmd.class, name = "RotateCmd"),
         @JsonSubTypes.Type(value = LinearCmd.class, name = "LinearCmd"),
         @JsonSubTypes.Type(value = StopDeviceCmd.class, name = "StopDeviceCmd"),
-        @JsonSubTypes.Type(value = StopAllDevices.class, name = "StopAllDevices")
+        @JsonSubTypes.Type(value = StopAllDevices.class, name = "StopAllDevices"),
+        @JsonSubTypes.Type(value = RawCmd.class, name = "RawCmd")
 })
 public abstract class ButtplugMessage {
 

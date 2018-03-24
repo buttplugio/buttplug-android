@@ -1,13 +1,17 @@
 package org.metafetish.buttplug.core.Messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugMessage;
 
+@JsonPropertyOrder({"Id", "ClientName", "MessageVersion"})
 public class RequestServerInfo extends ButtplugMessage {
+
     @JsonProperty(value = "ClientName", required = true)
     public String clientName;
+
     @JsonProperty(value = "MessageVersion")
     public long messageVersion;
 

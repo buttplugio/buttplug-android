@@ -1,17 +1,19 @@
 package org.metafetish.buttplug.core.Messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 
+@JsonPropertyOrder({"Id", "DeviceIndex", "Position", "Speed"})
 public class FleshlightLaunchFW12Cmd extends ButtplugDeviceMessage {
-
-    @JsonProperty(value = "Speed", required = true)
-    private int speed;
 
     @JsonProperty(value = "Position", required = true)
     private int position;
+
+    @JsonProperty(value = "Speed", required = true)
+    private int speed;
 
     public FleshlightLaunchFW12Cmd(long deviceIndex, int speed, int position, long id) {
         super(id, deviceIndex);

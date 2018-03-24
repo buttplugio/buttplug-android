@@ -6,20 +6,22 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 
+import java.util.ArrayList;
+
 @JsonPropertyOrder({"Id", "DeviceIndex", "Command"})
-public class LovenseCmd extends ButtplugDeviceMessage {
+public class RawCmd extends ButtplugDeviceMessage {
 
     @JsonProperty(value = "Command", required = true)
-    public String deviceCmd;
+    public ArrayList<Byte> command;
 
-    public LovenseCmd(long deviceIndex, String deviceCmd, long id) {
+    public RawCmd(long deviceIndex, ArrayList<Byte> command, long id) {
         super(id, deviceIndex);
-        this.deviceCmd = deviceCmd;
+        this.command = command;
     }
 
     @SuppressWarnings("unused")
-    private LovenseCmd() {
+    private RawCmd() {
         super(ButtplugConsts.DefaultMsgId, -1);
-        this.deviceCmd = "";
+        this.command = null;
     }
 }

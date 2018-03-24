@@ -67,7 +67,7 @@ public class Lovense extends ButtplugBluetoothDevice {
             Lovense.this.bpLogger.debug(String.format("Stopping Device %s", Lovense.this.getName()));
             if (Lovense.friendlyNames.get(iface.getName()).equals("Nora")) {
                 RotateCmd rotateCmd = new RotateCmd(msg.deviceIndex, null, msg.id);
-                List<RotateCmd.RotateSubcommand> rotations = new ArrayList<>();
+                ArrayList<RotateCmd.RotateSubcommand> rotations = new ArrayList<>();
                 rotations.add(rotateCmd.new RotateSubcommand(0, 0, Lovense.this.clockwise));
                 rotateCmd.rotations = rotations;
                 return Lovense.this.handleRotateCmd.invoke(rotateCmd);
@@ -86,7 +86,7 @@ public class Lovense extends ButtplugBluetoothDevice {
             SingleMotorVibrateCmd cmdMsg = (SingleMotorVibrateCmd) msg;
 
             VibrateCmd vibrateCmd = new VibrateCmd(cmdMsg.deviceIndex, null, cmdMsg.id);
-            List<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<>();
+            ArrayList<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<>();
             for (int i = 0; i < Lovense.this.vibratorCount; ++i) {
                 speeds.add(vibrateCmd.new VibrateSubcommand(i, cmdMsg.getSpeed()));
             }

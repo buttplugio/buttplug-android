@@ -101,7 +101,7 @@ public class Kiiroo extends ButtplugBluetoothDevice {
             Kiiroo.this.vibratorSpeed = cmdMsg.getSpeed();
 
             VibrateCmd vibrateCmd = new VibrateCmd(cmdMsg.deviceIndex, null, cmdMsg.id);
-            List<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<>();
+            ArrayList<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<>();
             speeds.add(vibrateCmd.new VibrateSubcommand(0, cmdMsg.getSpeed()));
             vibrateCmd.speeds = speeds;
             return Kiiroo.this.handleVibrateCmd.invoke(vibrateCmd);

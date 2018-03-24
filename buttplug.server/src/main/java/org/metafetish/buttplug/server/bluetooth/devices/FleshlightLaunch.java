@@ -74,7 +74,7 @@ public class FleshlightLaunch extends ButtplugBluetoothDevice {
                         .ERROR_DEVICE, cmdMsg.id);
             }
 
-            for (LinearCmd.VectorSubcommands vector : cmdMsg.vectors) {
+            for (LinearCmd.VectorSubcommand vector : cmdMsg.vectors) {
                 if (vector.index != 0) {
                     return new Error(String.format("Index %s is out of bounds for LinearCmd for this device.",
                             vector.index),

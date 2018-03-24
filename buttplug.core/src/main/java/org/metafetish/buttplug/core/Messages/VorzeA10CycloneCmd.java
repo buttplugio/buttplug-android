@@ -1,16 +1,19 @@
 package org.metafetish.buttplug.core.Messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 
+@JsonPropertyOrder({"Id", "DeviceIndex", "Speed", "Clockwise"})
 public class VorzeA10CycloneCmd extends ButtplugDeviceMessage {
+
+    @JsonProperty(value = "Speed", required = true)
+    private int speed;
 
     @JsonProperty(value = "Clockwise", required = true)
     public boolean clockwise;
-    @JsonProperty(value = "Speed", required = true)
-    private int speed;
 
     public VorzeA10CycloneCmd(long deviceIndex, int speed, boolean clockwise, long id) {
         super(id, deviceIndex);

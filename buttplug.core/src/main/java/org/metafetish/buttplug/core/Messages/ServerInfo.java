@@ -1,11 +1,18 @@
 package org.metafetish.buttplug.core.Messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugMessage;
 
+@JsonPropertyOrder({"Id", "ServerName", "MajorVersion", "MinorVersion", "BuildVersion", "MessageVersion", "MaxPingTime"})
 public class ServerInfo extends ButtplugMessage implements IButtplugMessageOutgoingOnly {
+
+    @JsonProperty(value = "ServerName", required = true)
+    public String serverName;
+
+    //TODO: Be more consistent with use of long or int to replace uint
     @JsonProperty(value = "MajorVersion", required = true)
     public int majorVersion;
 
@@ -20,9 +27,6 @@ public class ServerInfo extends ButtplugMessage implements IButtplugMessageOutgo
 
     @JsonProperty(value = "MaxPingTime", required = true)
     public long maxPingTime;
-
-    @JsonProperty(value = "ServerName", required = true)
-    public String serverName;
 
     public ServerInfo(String serverName, int messageVersion, long maxPingTime, long id) {
         super(id);

@@ -53,7 +53,7 @@ public class MagicMotion extends ButtplugBluetoothDevice {
             SingleMotorVibrateCmd cmdMsg = (SingleMotorVibrateCmd) msg;
 
             VibrateCmd vibrateCmd = new VibrateCmd(cmdMsg.deviceIndex, null, cmdMsg.id);
-            List<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<>();
+            ArrayList<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<>();
             speeds.add(vibrateCmd.new VibrateSubcommand(0, cmdMsg.getSpeed()));
             vibrateCmd.speeds = speeds;
             return MagicMotion.this.handleVibrateCmd.invoke(vibrateCmd);

@@ -1,15 +1,19 @@
 package org.metafetish.buttplug.core.Messages;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 
+@JsonPropertyOrder({"Id", "DeviceIndex", "Command"})
 public class KiirooCmd extends ButtplugDeviceMessage {
 
     @JsonProperty(value = "Command", required = true)
     public String deviceCmd;
 
+    @JsonIgnore
     private int position;
 
     public int getPosition() {

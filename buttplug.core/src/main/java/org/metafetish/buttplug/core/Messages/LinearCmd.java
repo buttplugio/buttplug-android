@@ -1,23 +1,31 @@
 package org.metafetish.buttplug.core.Messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@JsonPropertyOrder({"Id", "DeviceIndex", "Vectors"})
 public class LinearCmd extends ButtplugDeviceMessage {
-    public class VectorSubcommands {
+
+    @JsonPropertyOrder({"Index", "Duration", "Position"})
+    public class VectorSubcommand {
+
         private double position;
 
-        @JsonProperty(required = true)
+        @JsonProperty(value = "Index", required = true)
         public long index;
 
-        @JsonProperty(required = true)
+        @JsonProperty(value = "Duration", required = true)
         public long duration;
 
-        //@JsonProperty(required = true)
+        //TODO: Be more consistent with use of public properties or getter/setters
+        @JsonProperty(value = "Position", required = true)
         public double getPosition() {
             return this.position;
         }
@@ -33,21 +41,35 @@ public class LinearCmd extends ButtplugDeviceMessage {
             this.position = position;
         }
 
-        public VectorSubcommands(long index, long duration, double position) {
+        @SuppressWarnings("unused")
+        public VectorSubcommand() {
+            this.index = -1;
+            this.duration = 0;
+            this.setPosition(0.0);
+        }
+
+        public VectorSubcommand(long index, long duration, double position) {
             this.index = index;
             this.duration = duration;
             this.setPosition(position);
         }
     }
 
-    @JsonProperty(required = true)
-    public List<VectorSubcommands> vectors;
+    @JsonProperty(value = "Vectors", required = true)
+    @JsonDeserialize(contentUsing = VectorSubcommandDeserializer.class)
+    public ArrayList<VectorSubcommand> vectors;
 
-    public LinearCmd(long deviceIndex, List<VectorSubcommands> vectors) {
+    @SuppressWarnings("unused")
+    private LinearCmd() {
+        super(ButtplugConsts.DefaultMsgId, -1);
+        this.vectors = new ArrayList<>();
+    }
+
+    public LinearCmd(long deviceIndex, ArrayList<VectorSubcommand> vectors) {
         this(deviceIndex, vectors, ButtplugConsts.DefaultMsgId);
     }
 
-    public LinearCmd(long deviceIndex, List<VectorSubcommands> vectors, long id) {
+    public LinearCmd(long deviceIndex, ArrayList<VectorSubcommand> vectors, long id) {
         super(id, deviceIndex);
         this.vectors = vectors;
     }

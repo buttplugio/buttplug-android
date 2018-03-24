@@ -63,7 +63,7 @@ public class WeVibe extends ButtplugBluetoothDevice {
             SingleMotorVibrateCmd cmdMsg = (SingleMotorVibrateCmd) msg;
 
             VibrateCmd vibrateCmd = new VibrateCmd(cmdMsg.deviceIndex, null, cmdMsg.id);
-            List<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<>();
+            ArrayList<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<>();
             for (int i = 0; i < WeVibe.this.vibratorCount; ++i) {
                 speeds.add(vibrateCmd.new VibrateSubcommand(i, cmdMsg.getSpeed()));
             }

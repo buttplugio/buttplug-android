@@ -1,11 +1,13 @@
 package org.metafetish.buttplug.core.Messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugLogLevel;
 import org.metafetish.buttplug.core.ButtplugMessage;
 
+@JsonPropertyOrder({"Id", "LogLevel"})
 public class RequestLog extends ButtplugMessage {
 
     @JsonProperty(value = "LogLevel", required = true)

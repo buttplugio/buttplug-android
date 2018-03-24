@@ -1,5 +1,8 @@
 package org.metafetish.buttplug.core.Messages;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.metafetish.buttplug.core.ButtplugJsonMessageParser;
@@ -13,19 +16,19 @@ public class DeviceAddedTest {
 
     @Test
     public void test() throws IOException {
-        String testStr = "[" +
-                    "{" +
-                        "\"DeviceAdded\":{" +
-                            "\"Id\":0," +
-                            "\"DeviceIndex\":0," +
-                            "\"DeviceName\":\"TestDevice 1\"," +
-                            "\"DeviceMessages\":{" +
-                                "\"SingleMotorVibrateCmd\":{}," +
-                                "\"VibrateCmd\":{\"FeatureCount\":2}," +
-                                "\"StopDeviceCmd\":{}" +
-                            "}" +
-                        "}" +
-                    "}" +
+        String testStr = "[\n" +
+                "  {\n" +
+                "    \"DeviceAdded\": {\n" +
+                "      \"Id\": 0,\n" +
+                "      \"DeviceName\": \"TestDevice 1\",\n" +
+                "      \"DeviceIndex\": 0,\n" +
+                "      \"DeviceMessages\": {\n" +
+                "        \"SingleMotorVibrateCmd\": {},\n" +
+                "        \"VibrateCmd\": { \"FeatureCount\": 2 },\n" +
+                "        \"StopDeviceCmd\": {}\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
                 "]";
 
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
@@ -47,11 +50,15 @@ public class DeviceAddedTest {
         Assert.assertNotNull(deviceMessages.get("StopDeviceCmd"));
         Assert.assertEquals(0, deviceMessages.get("StopDeviceCmd").featureCount);
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readValue(testStr, JsonNode.class);
+        String uglyStr = jsonNode.toString();
+
         String jsonOut = parser.serialize(msgs, 1);
-        Assert.assertEquals(testStr, jsonOut);
+        Assert.assertEquals(uglyStr, jsonOut);
 
         jsonOut = parser.serialize(msgs.get(0), 1);
-        Assert.assertEquals(testStr, jsonOut);
+        Assert.assertEquals(uglyStr, jsonOut);
     }
 
 }

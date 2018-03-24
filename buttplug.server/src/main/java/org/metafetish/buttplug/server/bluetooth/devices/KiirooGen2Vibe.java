@@ -61,7 +61,7 @@ public class KiirooGen2Vibe extends ButtplugBluetoothDevice {
                     String.format("Stopping Device %s", KiirooGen2Vibe.this.getName()));
 
             VibrateCmd vibrateCmd = new VibrateCmd(msg.deviceIndex, null, msg.id);
-            List<VibrateCmd.VibrateSubcommand> vibrateCommands = new ArrayList<VibrateCmd.VibrateSubcommand>();
+            ArrayList<VibrateCmd.VibrateSubcommand> vibrateCommands = new ArrayList<VibrateCmd.VibrateSubcommand>();
             for (int i = 0; i < KiirooGen2Vibe.this.devInfo.vibeCount; i++) {
                 vibrateCommands.add(vibrateCmd.new VibrateSubcommand(i, 0));
             }
@@ -85,7 +85,7 @@ public class KiirooGen2Vibe extends ButtplugBluetoothDevice {
             }
 
             VibrateCmd vibrateCmd = new VibrateCmd(msg.deviceIndex, null, msg.id);
-            List<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<VibrateCmd.VibrateSubcommand>();
+            ArrayList<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<VibrateCmd.VibrateSubcommand>();
             for (int i = 0; i < KiirooGen2Vibe.this.devInfo.vibeCount; i++) {
                 speeds.add(vibrateCmd.new VibrateSubcommand(i, cmdMsg.getSpeed()));
             }

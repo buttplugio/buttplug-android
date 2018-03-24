@@ -1,13 +1,16 @@
 package org.metafetish.buttplug.core.Messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 
 import java.util.LinkedHashMap;
 
+@JsonPropertyOrder({"Id", "DeviceName", "DeviceIndex", "DeviceMessages"})
 public class DeviceAdded extends ButtplugDeviceMessage implements IButtplugMessageOutgoingOnly {
+
     @JsonProperty(value = "DeviceName", required = true)
     public String deviceName;
 

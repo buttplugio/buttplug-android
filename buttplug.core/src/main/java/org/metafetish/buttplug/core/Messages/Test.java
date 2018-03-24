@@ -1,10 +1,12 @@
 package org.metafetish.buttplug.core.Messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugMessage;
 
+@JsonPropertyOrder({"Id", "TestString"})
 public class Test extends ButtplugMessage {
 
     @JsonProperty(value = "TestString", required = true)

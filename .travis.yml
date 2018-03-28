@@ -27,7 +27,7 @@ before_deploy:
 - find /home/travis/build/mftrips/buttplug-android/ -name lint-results.html -exec tail -vn +1 {} \;
 - TAG_NAME=$(./gradlew -q printVersionName)-SNAPSHOT
 - |-
-  if git ls-remote origin refs/tags/$TAG_NAME ; then
+  if git ls-remote --exit-code origin refs/tags/$TAG_NAME ; then
     TAG_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/mftrips/buttplug-android/releases/tags/$TAG_NAME | jq -r .id)
     curl -s -H "Authorization: token $GITHUB_TOKEN" -X DELETE https://api.github.com/repos/mftrips/buttplug-android/releases/$TAG_ID
     git push --delete https://mftrips:$GITHUB_TOKEN@github.com/mftrips/buttplug-android $TAG_NAME

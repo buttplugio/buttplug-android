@@ -20,8 +20,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() throws Exception {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
-
-        assertEquals("org.metafetish.buttplug.apps.buttplug.apps.websocketserver", appContext
-                .getPackageName());
+        assertEquals("org.metafetish.buttplug.apps.websocketservergui", appContext.getPackageName());
     }
 }

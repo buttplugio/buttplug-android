@@ -5,4 +5,5 @@
     <string name="advertising_failure">Failure</string>
     <string name="advertising_success">Advertising</string>
     <string name="gatt_connected">Connected</string>
+    <string name="icon_desc">Buttplug logo</string>
 </resources>

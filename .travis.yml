@@ -1,0 +1,48 @@
+if: tag IS blank
+language: android
+addons:
+  apt:
+    packages:
+    - jq
+env:
+  global:
+  - EMULATOR_API=android-22
+  - secure: rv2SJ40CPL/timt7HbZtyB/yNHnegZrwoazQozT/AwJ8d1Z7MqMeVhwGHr/Sf1jHqQwsxmrB4uY5O4jT7afL80yjhOsw0bOO7fR+huTnhIBOoEmWY1kgEkamgsZoGZSlOCd5bYORI1Dbw31CCNK7yP8G4ZpNFYFcTo+60iUnKax3TuG2U+YexxBwosAwiev13zxEYcjRqJXxu7ifj4d2VxY+BzHKtBv0EE+suRE31ZzlUjthgMQvOx3xYQ5UDGkkKWq8lHrbnWzMZYHhrQP5+3/AuRbfoTgFBciHMzNU7p3D05TYg57RwVtWArsWV6EdzXtLIw9z/c01E+LN27Ue2Og9ichl2frrOl1F2tV9PxP7HgHggfGSZ38LBtXkKSk+1f+QXzbcbb8R4wYwnBoGjc0xFsAmrfvZzXJJsQYfC+TWEKKDcArEA/jAf3opTOw3AxtblWm/ZYDQJVHs431SwxeSkfddcB5LVVkuZquMh6Zx+pB0wrb7ht4F0gTbbevEG+kt4QnETO7NtuOw7+4J+68iSK/xwInQHr1ngzE0Cl2ELub+Ke17G/sZY2N+erX6bf1EpdXMCxQtEwB/uze419wGRKRq5humXSm8madUeBqo57D4G9xsHAkamnzpwR8XRdxox7p6jICmqjuI3qnERmMYosWGxgfLlT88cNODyrA=
+android:
+  components:
+  - build-tools-27.0.3
+  - $EMULATOR_API
+  - android-27
+  - sys-img-armeabi-v7a-$EMULATOR_API
+  - extra-android-support
+  - extra-android-m2repository
+before_script:
+- echo no | android create avd --force -n test -t $EMULATOR_API --abi armeabi-v7a
+- emulator -avd test -no-audio -no-window &
+- android-wait-for-emulator
+- adb shell input keyevent 82 &
+after_failure:
+- find /home/travis/build/mftrips/buttplug-android/ -name lint-results.html -exec tail -vn +1 {} \;
+before_deploy:
+- find /home/travis/build/mftrips/buttplug-android/ -name lint-results.html -exec tail -vn +1 {} \;
+- TAG_NAME=$(./gradlew -q printVersionName)-SNAPSHOT
+- |-
+  if git ls-remote origin refs/tags/$TAG_NAME ; then
+    TAG_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/mftrips/buttplug-android/releases/tags/$TAG_NAME | jq -r .id)
+    curl -s -H "Authorization: token $GITHUB_TOKEN" -X DELETE https://api.github.com/repos/mftrips/buttplug-android/releases/$TAG_ID
+    git push --delete https://mftrips:$GITHUB_TOKEN@github.com/mftrips/buttplug-android $TAG_NAME
+  fi
+deploy:
+  provider: releases
+  api_key:
+    secure: IHOHgJXeok2uHND8wnyf2pi93rII9xJyFkqkvfbWKoivwrKLKGyKJPolmi9XvRU1zLgvuy7YN23iT1G6tzCnW9ksmY2CkY0gxRm/Vopnv5lu3ThkAr9ewjSXwmw8IyuSXFUfAvNV0wDE/DoTggyzk88Hz9c0Pu47AAKXgd+6g9RU3K6UUKF8CeAztNcui9eClE7Nq7q8L6h4+zFtGAoF6I6/ngbvxOVDsgpmqT19LXalHpUL16y+GwGJcL73QPyLTk7hw7tFpY2fMm+2ehdaC0ysVEsy72sWutRTGmLzUeq++AIbtK8ENvtidwoqNkPxdXchQQyQUD/UXaD+VzPuM9uFihhVVcvM79p5I2VVj8BIkfjjuWm1V78M4T7d01qbYgQG316+SFmLdgC2TiIedhllBUSN2vuIkfaojQC8tCEsxGTv6xpcizKAZultEamLvUmSMa7bPf6SJMahSea69TFGeDwpN2Wh+imGhD9bZpC5EWsfJzif8SljfbEBPvojqhMz2q/xyBqgo7j8JphITjfALtCott2xdzR1i3/NFEI7ibLWSK4z24kX2rJT4uXeYQ1qDg/2oYdRLhsWOm9f4J+zMWbRJ7xdXSUxdzninJ4998UUsh3BGX1taqqYrR8H0Srz8+x8bGfnfT31VHWm/mVA+Vtua/zeC1DQlUU7Itc=
+  tag_name: $TAG_NAME
+  name: buttplug-android $TAG_NAME
+  file:
+  - buttplug.apps.WebsocketServerGUI/build/outputs/apk/debug/buttplug.apps.WebsocketServerGUI-0.1-SNAPSHOT-debug.apk
+  - buttplug.apps.BluetoothDeviceEmulator/build/outputs/apk/debug/buttplug.apps.BluetoothDeviceEmulator-0.1-SNAPSHOT-debug.apk
+  prerelease: true
+  skip_cleanup: true
+  on:
+    repo: mftrips/buttplug-android
+    branch: master

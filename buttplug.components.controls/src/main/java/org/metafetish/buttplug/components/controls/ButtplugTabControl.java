@@ -31,14 +31,17 @@ import org.metafetish.buttplug.server.IButtplugServerFactory;
 import org.metafetish.buttplug.server.managers.androidbluetoothmanager.AndroidBluetoothManager;
 
 
-public class ButtplugTabControl extends Fragment implements IButtplugServerFactory {
+public class ButtplugTabControl extends Fragment implements IButtplugTabControl, IButtplugServerFactory {
     private ButtplugLogManager bpLogManager = new ButtplugLogManager();
     private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
 
     private AppCompatActivity activity;
     private String serverName;
     private long maxPingTime;
-    public boolean hasDevicePanel = false;
+    private boolean hasDevicePanel = false;
+    public void enableDeviceTab() {
+        this.hasDevicePanel = true;
+    }
     public DeviceManager deviceManager;
     private ButtplugEventHandler creatingView = new ButtplugEventHandler();
 
@@ -54,13 +57,25 @@ public class ButtplugTabControl extends Fragment implements IButtplugServerFacto
      * {@link FragmentPagerAdapter} derivative, which will keep every
      * loaded fragment in memory.
      */
-    public SectionsPagerAdapter sectionsPagerAdapter;
+    private SectionsPagerAdapter sectionsPagerAdapter;
+    public SectionsPagerAdapter getSectionsPagerAdapter() {
+        return this.sectionsPagerAdapter;
+    }
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager viewPager;
-    public TabLayout tabLayout;
+    private TabLayout tabLayout;
+
+    public void setApplicationTab(Fragment fragment, String text) {
+        this.sectionsPagerAdapter.instances.put(0, fragment);
+
+        TabLayout.Tab applicationTab = this.tabLayout.getTabAt(0);
+        if (applicationTab != null) {
+            applicationTab.setText(text);
+        }
+    }
 
     public ButtplugTabControl() {
         // Required empty public constructor

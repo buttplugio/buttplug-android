@@ -1,5 +1,6 @@
 package org.metafetish.buttplug.client;
 
+import com.google.common.util.concurrent.SettableFuture;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
@@ -29,8 +30,6 @@ import org.metafetish.buttplug.core.Messages.ServerInfo;
 import org.metafetish.buttplug.core.Messages.StartScanning;
 import org.metafetish.buttplug.core.Messages.StopAllDevices;
 import org.metafetish.buttplug.core.Messages.StopScanning;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.SettableListenableFuture;
 
 import java.io.IOException;
 import java.net.URI;
@@ -43,6 +42,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.net.ssl.SSLContext;
@@ -65,8 +65,7 @@ public class ButtplugWSClient extends WebSocketAdapter {
     private Object sendLock = new Object();
     private String clientName;
     private int messageSchemaVersion;
-    private ConcurrentHashMap<Long, SettableListenableFuture<ButtplugMessage>> waitingMsgs = new
-            ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long, Future<ButtplugMessage>> waitingMsgs = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, ButtplugClientDevice> devices = new ConcurrentHashMap<>();
 
     private Timer pingTimer;
@@ -93,8 +92,7 @@ public class ButtplugWSClient extends WebSocketAdapter {
 
         this.websocket = getWebSocket(url, trustAll);
 
-        ButtplugMessage res = sendMessage(new RequestServerInfo(this.clientName, getNextMsgId(), 0))
-                .get();
+        ButtplugMessage res = sendMessage(new RequestServerInfo(this.clientName, getNextMsgId(), 0)).get();
         if (res instanceof ServerInfo) {
             if (((ServerInfo) res).maxPingTime > 0) {
                 this.pingTimer = new Timer("pingTimer", true);
@@ -141,7 +139,7 @@ public class ButtplugWSClient extends WebSocketAdapter {
         int max = 3;
         while (max-- > 0 && this.waitingMsgs.size() != 0) {
             for (long msgId : this.waitingMsgs.keySet()) {
-                SettableListenableFuture<ButtplugMessage> val = this.waitingMsgs.remove(msgId);
+                SettableFuture<ButtplugMessage> val = (SettableFuture<ButtplugMessage>) this.waitingMsgs.remove(msgId);
                 if (val != null) {
                     val.set(new Error("Connection closed!", Error.ErrorClass.ERROR_UNKNOWN,
                             ButtplugConsts.SystemMsgId));
@@ -158,7 +156,7 @@ public class ButtplugWSClient extends WebSocketAdapter {
 
             for (ButtplugMessage msg : msgs) {
                 if (msg.id > 0) {
-                    SettableListenableFuture<ButtplugMessage> val = this.waitingMsgs.remove(msg.id);
+                    SettableFuture<ButtplugMessage> val = (SettableFuture<ButtplugMessage>) this.waitingMsgs.remove(msg.id);
                     if (val != null) {
                         val.set(msg);
                         continue;
@@ -260,11 +258,10 @@ public class ButtplugWSClient extends WebSocketAdapter {
         return sendMessageExpectOk(new RequestLog(logLevel, msgId.getAndIncrement()));
     }
 
-    public ListenableFuture<ButtplugMessage> sendDeviceMessage(ButtplugClientDevice device,
+    public Future<ButtplugMessage> sendDeviceMessage(ButtplugClientDevice device,
                                                                ButtplugDeviceMessage deviceMsg)
             throws ExecutionException, InterruptedException, IOException {
-        SettableListenableFuture<ButtplugMessage> promise = new
-                SettableListenableFuture<ButtplugMessage>();
+        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
         ButtplugClientDevice dev = this.devices.get(device.index);
         if (dev != null) {
             if (!dev.allowedMessages.contains(deviceMsg.getClass().getSimpleName())) {
@@ -291,15 +288,14 @@ public class ButtplugWSClient extends WebSocketAdapter {
     }
 
 
-    protected ListenableFuture<ButtplugMessage> sendMessage(ButtplugMessage msg) throws
+    protected Future<ButtplugMessage> sendMessage(ButtplugMessage msg) throws
             ExecutionException, InterruptedException, IOException {
-        SettableListenableFuture<ButtplugMessage> promise = new
-                SettableListenableFuture<ButtplugMessage>();
+        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
 
         this.waitingMsgs.put(msg.id, promise);
         if (this.websocket == null) {
-            promise.set(new Error("Bad WS state!", Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts
-                    .SystemMsgId));
+            promise.set(new Error("Bad WS state!", Error.ErrorClass.ERROR_UNKNOWN,
+                    ButtplugConsts.SystemMsgId));
             return promise;
         }
 

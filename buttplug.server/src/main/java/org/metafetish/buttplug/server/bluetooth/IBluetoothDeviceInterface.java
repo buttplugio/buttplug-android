@@ -4,17 +4,17 @@ import android.support.annotation.NonNull;
 
 import org.metafetish.buttplug.core.ButtplugEventHandler;
 import org.metafetish.buttplug.core.ButtplugMessage;
-import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.UUID;
+import java.util.concurrent.Future;
 
 public interface IBluetoothDeviceInterface {
     String getName();
 
-    ListenableFuture<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex, byte[]
+    Future<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex, byte[]
             value);
 
-    ListenableFuture<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex, byte[]
+    Future<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex, byte[]
             value, boolean writeWithResponse);
 
     String getAddress();

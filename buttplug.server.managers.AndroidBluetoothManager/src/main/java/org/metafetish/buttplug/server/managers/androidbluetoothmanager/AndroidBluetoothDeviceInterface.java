@@ -1,14 +1,16 @@
 package org.metafetish.buttplug.server.managers.androidbluetoothmanager;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.google.common.util.concurrent.SettableFuture;
 
 import org.metafetish.buttplug.core.ButtplugEvent;
 import org.metafetish.buttplug.core.ButtplugEventHandler;
@@ -18,18 +20,15 @@ import org.metafetish.buttplug.core.IButtplugLog;
 import org.metafetish.buttplug.core.IButtplugLogManager;
 import org.metafetish.buttplug.core.Messages.Error;
 import org.metafetish.buttplug.core.Messages.Ok;
-import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInfo;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.SettableListenableFuture;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Future;
 
 public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterface {
-    private Activity activity;
 
     public String getName() {
         return bleDevice.getDevice().getName();
@@ -53,7 +52,7 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
     private ButtplugEventHandler deviceConnected = new ButtplugEventHandler();
 
     @NonNull
-    public ButtplugEventHandler getDeviceConnected() {
+    ButtplugEventHandler getDeviceConnected() {
         return this.deviceConnected;
     }
 
@@ -64,10 +63,8 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
         return this.deviceRemoved;
     }
 
-    AndroidBluetoothDeviceInterface(@NonNull Activity activity,
-                                    @NonNull BluetoothDevice device,
-                                    @NonNull IBluetoothDeviceInfo deviceInfo) {
-        this.activity = activity;
+    AndroidBluetoothDeviceInterface(@NonNull Context context,
+                                    @NonNull BluetoothDevice device) {
 
         BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
             @Override
@@ -89,7 +86,7 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
                 }
             }
         };
-        bleDevice = device.connectGatt(activity, false, gattCallback);
+        bleDevice = device.connectGatt(context, false, gattCallback);
     }
 
     BluetoothDevice getDevice() {
@@ -108,14 +105,14 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
         return bleDevice.getDevice().getAddress();
     }
 
-    public ListenableFuture<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex,
-                                                        byte[] value) {
+    public Future<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex,
+                                              byte[] value) {
         return writeValue(msgId, characteristicIndex, value, false);
     }
 
-    public ListenableFuture<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex,
+    public Future<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex,
                                                         byte[] value, boolean writeWithResponse) {
-        SettableListenableFuture<ButtplugMessage> promise = new SettableListenableFuture<>();
+        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
         if (isCommunicating != null && isCommunicating) {
             this.bpLogger.trace("Device transfer in progress, cancelling new transfer.");
         }

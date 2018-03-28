@@ -173,6 +173,7 @@ public class ButtplugLogControl extends Fragment {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public View.OnLongClickListener copyLogMessage = new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View view) {

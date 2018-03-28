@@ -36,9 +36,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void invoke(ButtplugEvent event) {
                 ButtplugTabControl tabControl = (ButtplugTabControl) ((CreateView) event).fragment;
-                tabControl.sectionsPagerAdapter.instances.put(0, new WebsocketServerControl
-                        (tabControl));
-                tabControl.tabLayout.getTabAt(0).setText(R.string.app_short_name);
+                tabControl.setApplicationTab(new WebsocketServerControl(tabControl),
+                        MainActivity.this.getString(R.string.app_short_name));
             }
         });
         getSupportFragmentManager().beginTransaction().add(R.id.main_content, tabs).commit();

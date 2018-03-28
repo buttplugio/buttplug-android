@@ -13,6 +13,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -25,14 +26,23 @@ android {
         }
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    implementation 'com.android.support:multidex:1.0.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    compile project(path: ':buttplug.server')
+    implementation 'com.google.code.findbugs:jsr305:2.0.1'
+    implementation 'com.google.guava:guava:24.1-android'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.0'
+    implementation project(':buttplug.core')
+    implementation project(':buttplug.server')
 }

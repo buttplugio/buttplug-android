@@ -1,48 +1,26 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:aapt="http://schemas.android.com/aapt"
-        android:width="108dp"
-        android:height="108dp"
-        android:viewportWidth="467.71652"
-        android:viewportHeight="467.71655">
-    <group android:translateX="-292.32285"
-            android:translateY="-138.18898">
-        <path
-            android:pathData="m463.8,483.4c0.1,0.1 0.2,0.2 0.3,0.2 172.5,172.5 171.8,171.9 -0.3,-0.2z"
-            android:strokeLineCap="butt"
-            android:fillType="evenOdd"
-            android:strokeColor="#00000000"
-            android:fillAlpha="1"
-            android:strokeWidth="8"
-            android:strokeLineJoin="miter"
-            android:strokeAlpha="1">
-            <aapt:attr name="android:fillColor">
-    <gradient 
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="467.71652"
+    android:viewportHeight="467.71655">
 
-            android:startY="112892.29716928712"
-            android:startX="75200.83631"
-            android:endY="135017.66196928712"
-            android:endX="175375.93957999998"
-            android:type="linear">
-                </gradient></aapt:attr></path>
+    <group
+        android:translateX="-292.32285"
+        android:translateY="-138.18898">
+
         <path
             android:pathData="m537.1,262.8c2.3,2.2 4.4,5.6 5.5,10.2 1.7,6.7 6.8,31.4 11.6,55.2 2.4,11.9 4.8,23.5 6.5,32.3 1.8,8.7 2.9,14.3 3.1,15.6 0.5,2.2 6,20.2 -4.9,33.6 -8.2,10.2 -9.3,13.6 -9.8,20.8l-0,0.1 -0,0.1c0,-0.1 -0.1,1.2 -0,2.7 0,1.5 0.1,3.3 0.2,5.2 0.2,3.8 0.5,8 0.7,10.2l0,0.1 0,0.1c0.2,3 2,4.3 4.4,5.9l0,0 0,0c1.7,1.2 8.7,5 13.3,7.4l0.1,0 0.1,0.1c3.8,2.2 9.9,5.9 14.7,9.2 2.4,1.6 4.4,3.1 5.9,4.5 0.7,0.7 1.5,0.9 2.1,3.1 0.3,1.1 -0.2,3.6 -1.5,4.6 -1.3,1 -2.3,0.9 -3,0.9l-59.4,0 -0.5,0 -59.4,0c-0.7,0 -1.6,0.1 -3,-0.9l90,90 47,47 43,43 47,47 43,43 47,47 90,90 3.5,1.4 59.4,0 0.5,0 59.4,0c0.7,0 1.6,0.1 3,-0.9 1.3,-1 1.8,-3.5 1.5,-4.6 -0.6,-2.2 -1.4,-2.4 -2.1,-3.1 -1.5,-1.4 -3.5,-2.8 -5.9,-4.5 -4.8,-3.3 -11,-7 -14.7,-9.2l-0.1,-0.1 -0.1,-0c-4.6,-2.4 -11.7,-6.3 -13.3,-7.4l-0,-0 -0,-0c-2.4,-1.6 -4.2,-2.8 -4.4,-5.9l-0,-0.1 -0,-0.1c-0.2,-2.2 -0.5,-6.4 -0.7,-10.2 -0.1,-1.9 -0.2,-3.7 -0.2,-5.2 -0,-1.5 0,-2.8 0,-2.7l0,-0.1 0,-0.1c0.5,-7.2 1.6,-10.6 9.8,-20.8 10.9,-13.4 5.4,-31.4 4.9,-33.6 -0.2,-1.3 -1.3,-6.9 -3.1,-15.6 -1.8,-8.8 -4.1,-20.4 -6.5,-32.3 -4.2,-20.4 -8.4,-40.9 -12.9,-61.2l-90,-90 -51.4,-51.4 -38.6,-38.6 -51.4,-51.4 -38.6,-38.6 -51.4,-51.4 -90,-90c-0.1,-0.1 -0.2,-0.2 -0.2,-0.2z"
-            android:strokeLineCap="butt"
             android:fillAlpha="0.1254902"
-            android:fillType="evenOdd"
-            android:strokeColor="#00000000"
             android:fillColor="#000000"
-            android:strokeWidth="8"
-            android:strokeLineJoin="miter"
-            android:strokeAlpha="1"/>
+            tools:ignore="VectorPath" />
+
         <path
             android:pathData="m525.5,258.8c-3.3,-0.1 -5.4,1 -7.8,2.8 -2.9,2.1 -5.5,5.8 -6.9,11.3 -1.7,6.7 -6.8,31.4 -11.6,55.2 -2.4,11.9 -4.8,23.5 -6.5,32.3 -1.8,8.7 -2.9,14.3 -3.1,15.6 -0.5,2.2 -6,20.2 4.9,33.6 8.2,10.2 9.3,13.6 9.8,20.8l0,0.1 0,0.1c-0,-0.1 0.1,1.2 0,2.7 -0,1.5 -0.1,3.3 -0.2,5.2 -0.2,3.8 -0.5,8 -0.7,10.2l-0,0.1 -0,0.1c-0.2,3 -2,4.3 -4.4,5.9l-0,0 -0,0c-1.7,1.2 -8.7,5 -13.3,7.4l-0.1,0 -0.1,0.1c-3.8,2.2 -9.9,5.9 -14.7,9.2 -2.4,1.6 -4.4,3.1 -5.9,4.5 -0.7,0.7 -1.5,0.9 -2.1,3.1 -0.3,1.1 0.2,3.6 1.5,4.6 1.3,1 2.3,0.9 3,0.9l59.4,0 0.5,0 59.4,0c0.7,0 1.6,0.1 3,-0.9 1.3,-1 1.8,-3.5 1.5,-4.6 -0.6,-2.2 -1.4,-2.4 -2.1,-3.1 -1.5,-1.4 -3.5,-2.8 -5.9,-4.5 -4.8,-3.3 -11,-7 -14.7,-9.2L568,462.3l-0.1,-0c-4.6,-2.4 -11.7,-6.3 -13.3,-7.4l-0,-0 -0,-0c-2.4,-1.6 -4.2,-2.8 -4.4,-5.9l-0,-0.1 -0,-0.1c-0.2,-2.2 -0.5,-6.4 -0.7,-10.2 -0.1,-1.9 -0.2,-3.7 -0.2,-5.2 -0,-1.5 0,-2.8 0,-2.7l0,-0.1 0,-0.1c0.5,-7.2 1.6,-10.6 9.8,-20.8 10.9,-13.4 5.4,-31.4 4.9,-33.6 -0.2,-1.3 -1.3,-6.9 -3.1,-15.6 -1.8,-8.8 -4.1,-20.4 -6.5,-32.3 -4.8,-23.8 -9.9,-48.5 -11.6,-55.2 -1.5,-6.2 -4.7,-10.1 -8,-12.1 -3.3,-2 -6.5,-2 -7.9,-2l0.1,0 -0,-0 -0,0c-0.5,-0 -0.9,-0 -1.2,-0z"
-            android:strokeLineCap="butt"
             android:fillAlpha="1"
-            android:fillType="evenOdd"
-            android:strokeColor="#00000000"
             android:fillColor="#ffffff"
-            android:strokeWidth="8"
-            android:strokeLineJoin="miter"
-            android:strokeAlpha="1"/>
+            tools:ignore="VectorPath" />
+
     </group>
 </vector>

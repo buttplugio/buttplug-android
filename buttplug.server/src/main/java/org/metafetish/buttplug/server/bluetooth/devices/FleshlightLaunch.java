@@ -17,9 +17,9 @@ import org.metafetish.buttplug.server.bluetooth.ButtplugBluetoothDevice;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInfo;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 import org.metafetish.buttplug.server.util.FleshlightHelper;
-import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class FleshlightLaunch extends ButtplugBluetoothDevice {
     private double lastPosition;
@@ -35,7 +35,7 @@ public class FleshlightLaunch extends ButtplugBluetoothDevice {
         msgFuncs.put(StopDeviceCmd.class, new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
     }
 
-    public ListenableFuture<ButtplugMessage> initialize() {
+    public Future<ButtplugMessage> initialize() {
         return iface.writeValue(
                 ButtplugConsts.SystemMsgId,
                 info.getCharacteristics().get(FleshlightLaunchBluetoothInfo.Chrs.Cmd.ordinal()),

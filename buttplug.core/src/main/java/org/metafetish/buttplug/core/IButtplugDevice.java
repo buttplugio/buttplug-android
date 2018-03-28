@@ -3,9 +3,9 @@ package org.metafetish.buttplug.core;
 import android.support.annotation.NonNull;
 
 import org.metafetish.buttplug.core.Messages.MessageAttributes;
-import org.springframework.util.concurrent.ListenableFuture;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.Future;
 
 public interface IButtplugDevice {
     @NonNull
@@ -32,11 +32,11 @@ public interface IButtplugDevice {
     Iterable<Class> getAllowedMessageTypes();
 
     @NonNull
-    ListenableFuture<ButtplugMessage> parseMessage(ButtplugDeviceMessage msg) throws
+    Future<ButtplugMessage> parseMessage(ButtplugDeviceMessage msg) throws
             InvocationTargetException, IllegalAccessException;
 
     @NonNull
-    ListenableFuture<ButtplugMessage> initialize();
+    Future<ButtplugMessage> initialize();
 
     void disconnect();
 

@@ -3,6 +3,8 @@ package org.metafetish.buttplug.server;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import com.google.common.util.concurrent.SettableFuture;
+
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugEvent;
 import org.metafetish.buttplug.core.ButtplugEventHandler;
@@ -22,14 +24,13 @@ import org.metafetish.buttplug.core.Messages.ScanningFinished;
 import org.metafetish.buttplug.core.Messages.ServerInfo;
 import org.metafetish.buttplug.core.Messages.StopAllDevices;
 import org.metafetish.buttplug.core.Messages.Test;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.SettableListenableFuture;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class ButtplugServer {
     private static final int MAX_PING_TIMEOUT = 5000;
@@ -137,10 +138,10 @@ public class ButtplugServer {
         this.pingTimedOut = true;
     }
 
-    protected ListenableFuture<ButtplugMessage> sendMessage(ButtplugMessage msg) throws
+    protected Future<ButtplugMessage> sendMessage(ButtplugMessage msg) throws
             ExecutionException, InterruptedException, InvocationTargetException,
             IllegalAccessException {
-        SettableListenableFuture<ButtplugMessage> promise = new SettableListenableFuture<>();
+        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
 
         this.bpLogger.trace(String.format("Got Message %s of type %s to send",
                 msg.id,
@@ -203,9 +204,9 @@ public class ButtplugServer {
         return promise;
     }
 
-    public ListenableFuture<Void> shutdown() throws ExecutionException, InterruptedException,
+    public Future<Void> shutdown() throws ExecutionException, InterruptedException,
             InvocationTargetException, IllegalAccessException {
-        SettableListenableFuture<Void> promise = new SettableListenableFuture<>();
+        SettableFuture<Void> promise = SettableFuture.create();
         ButtplugMessage msg = this.deviceManager.sendMessage(new StopAllDevices()).get();
         if (msg instanceof Error) {
             this.bpLogger.error("An error occured while stopping devices on shutdown.");
@@ -213,17 +214,16 @@ public class ButtplugServer {
         }
 
         this.deviceManager.stopScanning();
-        this.deviceManager.getDeviceMessageReceived().removeCallback(this
-                .deviceMessageReceivedCallback);
+        this.deviceManager.getDeviceMessageReceived().removeCallback(this.deviceMessageReceivedCallback);
         this.deviceManager.getScanningFinished().removeCallback(this.scanningFinishedCallback);
         this.bpLogManager.getLogMessageReceived().removeCallback(this.logMessageReceivedCallback);
         return promise;
     }
 
-    public ListenableFuture<List<ButtplugMessage>> sendMessage(String jsonMsgs) throws
+    public Future<List<ButtplugMessage>> sendMessage(String jsonMsgs) throws
             ExecutionException, InterruptedException, IOException, InvocationTargetException,
             IllegalAccessException {
-        SettableListenableFuture<List<ButtplugMessage>> promise = new SettableListenableFuture<>();
+        SettableFuture<List<ButtplugMessage>> promise = SettableFuture.create();
         List<ButtplugMessage> msgs = this.parser.deserialize(jsonMsgs);
         List<ButtplugMessage> res = new ArrayList<>();
         for (ButtplugMessage msg : msgs) {

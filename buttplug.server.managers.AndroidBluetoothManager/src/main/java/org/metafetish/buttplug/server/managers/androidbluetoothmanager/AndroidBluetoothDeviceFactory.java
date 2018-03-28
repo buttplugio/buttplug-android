@@ -1,9 +1,9 @@
 package org.metafetish.buttplug.server.managers.androidbluetoothmanager;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import org.metafetish.buttplug.core.ButtplugEvent;
@@ -24,8 +24,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-public class AndroidBluetoothDeviceFactory {
-    private Activity activity;
+class AndroidBluetoothDeviceFactory {
+    private Context context;
 
     @NonNull
     private IButtplugLogManager bpLogManager = new ButtplugLogManager();
@@ -34,24 +34,24 @@ public class AndroidBluetoothDeviceFactory {
     private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
 
     @NonNull
-    public IBluetoothDeviceInfo deviceInfo;
+    private IBluetoothDeviceInfo deviceInfo;
 
     private Map<String, AndroidBluetoothDeviceInterface> bleInterfaces = new HashMap<>();
     private ButtplugEventHandler deviceCreated = new ButtplugEventHandler();
 
     @NonNull
-    public ButtplugEventHandler getDeviceCreated() {
+    ButtplugEventHandler getDeviceCreated() {
         return this.deviceCreated;
     }
 
-    public AndroidBluetoothDeviceFactory(@NonNull Activity activity,
+    AndroidBluetoothDeviceFactory(@NonNull Context context,
                                          @NonNull IBluetoothDeviceInfo info) {
-        this.activity = activity;
+        this.context = context;
         this.bpLogger.trace(String.format("Creating %s", this.getClass().getSimpleName()));
         this.deviceInfo = info;
     }
 
-    public boolean mayBeDevice(String advertName, List<UUID> advertGUIDs) {
+    boolean mayBeDevice(String advertName, List<UUID> advertGUIDs) {
         if (!deviceInfo.getNames().isEmpty() && !deviceInfo.getNames().contains(advertName)) {
             return false;
         }
@@ -64,10 +64,7 @@ public class AndroidBluetoothDeviceFactory {
         }
 
         //TODO: Print debug info
-        if (advertGUIDs.containsAll(deviceInfo.getServices())) {
-            return true;
-        }
-        return false;
+        return advertGUIDs.containsAll(deviceInfo.getServices());
     }
 
     // TODO Have this throw exceptions instead of return null.
@@ -77,8 +74,8 @@ public class AndroidBluetoothDeviceFactory {
             InterruptedException {
         // TODO This assumes we're always planning on having the UUIDs sorted in the Info classes
         // which is probably not true.
-        AndroidBluetoothDeviceInterface bleInterface = new AndroidBluetoothDeviceInterface(this
-                .activity, device, this.deviceInfo);
+        AndroidBluetoothDeviceInterface bleInterface = new AndroidBluetoothDeviceInterface(
+                this.context, device);
         bleInterfaces.put(device.getAddress(), bleInterface);
         bleInterface.getDeviceConnected().addCallback(new IButtplugCallback() {
             @Override

@@ -1,7 +1,6 @@
 package org.metafetish.buttplug.server.managers.androidbluetoothmanager;
 
 import android.Manifest;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -13,11 +12,11 @@ import android.os.ParcelUuid;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 
 import org.metafetish.buttplug.core.ButtplugEvent;
 import org.metafetish.buttplug.core.IButtplugCallback;
 import org.metafetish.buttplug.core.IButtplugDevice;
-import org.metafetish.buttplug.core.IButtplugLogManager;
 import org.metafetish.buttplug.server.bluetooth.BluetoothSubtypeManager;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInfo;
 
@@ -31,23 +30,20 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
     private static final int REQUEST_ENABLE_BT = 1;
     private static final long SCAN_PERIOD = 5000;
 
-    private Activity activity;
     private Handler handler;
     private boolean scanning;
 
-    private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
-    private List<BluetoothDevice> bluetoothDevices;
 
     @NonNull
     private List<AndroidBluetoothDeviceFactory> deviceFactories = new ArrayList<>();
-    @NonNull
-    public List<String> currentlyConnecting;
 
-    public AndroidBluetoothManager(Activity activity) {
+    @NonNull
+    private List<String> currentlyConnecting;
+
+    public AndroidBluetoothManager(Context context) {
         this.bpLogger.trace("Loading Android Bluetooth Manager");
-        this.activity = activity;
-        this.activity.runOnUiThread(new Runnable() {
+        ((AppCompatActivity) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 AndroidBluetoothManager.this.handler = new Handler();
@@ -61,7 +57,7 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
             this.bpLogger.trace(String.format("Loading Bluetooth Device Factory: %s",
                     deviceFactory.getClass().getSimpleName()));
             AndroidBluetoothDeviceFactory androidDeviceFactory = new AndroidBluetoothDeviceFactory
-                    (activity, deviceFactory);
+                    (context, deviceFactory);
             androidDeviceFactory.getDeviceCreated().addCallback(new IButtplugCallback() {
                 @Override
                 public void invoke(ButtplugEvent event) {
@@ -83,32 +79,32 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
             this.deviceFactories.add(androidDeviceFactory);
         }
 
-        if (!activity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+        if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             this.bpLogger.trace("BLE not supported.");
             return;
         }
 
-        if (ContextCompat.checkSelfPermission(activity, Manifest.permission
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission
                 .ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission
+            ActivityCompat.requestPermissions(((AppCompatActivity) context), new String[]{Manifest.permission
                     .ACCESS_COARSE_LOCATION}, REQUEST_COARSE_LOCATION);
         }
 
-        this.bluetoothManager = (BluetoothManager) activity.getSystemService(Context
+        BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context
                 .BLUETOOTH_SERVICE);
-        if (this.bluetoothManager == null) {
+        if (bluetoothManager == null) {
             this.bpLogger.trace("bluetoothManager is null.");
             return;
         }
 
-        this.bluetoothAdapter = this.bluetoothManager.getAdapter();
+        this.bluetoothAdapter = bluetoothManager.getAdapter();
         if (this.bluetoothAdapter == null) {
             this.bpLogger.trace("bluetoothAdapter is null.");
             return;
         }
         if (!this.bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            ((AppCompatActivity) context).startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
     }
 
@@ -176,6 +172,7 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
         }
     };
 
+    @SuppressWarnings("deprecation")
     @Override
     public void startScanning() {
         this.bpLogger.trace("Starting BLE Scanning");
@@ -195,6 +192,7 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void stopScanning() {
         this.bpLogger.trace("Stopping BLE Scanning");

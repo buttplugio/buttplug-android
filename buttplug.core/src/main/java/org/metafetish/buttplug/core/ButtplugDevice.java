@@ -2,15 +2,16 @@ package org.metafetish.buttplug.core;
 
 import android.support.annotation.NonNull;
 
+import com.google.common.util.concurrent.SettableFuture;
+
 import org.metafetish.buttplug.core.Messages.Error;
 import org.metafetish.buttplug.core.Messages.MessageAttributes;
 import org.metafetish.buttplug.core.Messages.Ok;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.SettableListenableFuture;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 public abstract class ButtplugDevice implements IButtplugDevice {
     private String name;
@@ -110,9 +111,9 @@ public abstract class ButtplugDevice implements IButtplugDevice {
     }
 
     @NonNull
-    public ListenableFuture<ButtplugMessage> parseMessage(@NonNull ButtplugDeviceMessage msg)
+    public Future<ButtplugMessage> parseMessage(@NonNull ButtplugDeviceMessage msg)
             throws InvocationTargetException, IllegalAccessException {
-        SettableListenableFuture<ButtplugMessage> promise = new SettableListenableFuture<>();
+        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
         if (this.isDisconnected) {
             promise.set(new Error(
                     String.format("%s has disconnected and can no longer process messages.",
@@ -134,8 +135,8 @@ public abstract class ButtplugDevice implements IButtplugDevice {
     }
 
     @NonNull
-    public ListenableFuture<ButtplugMessage> initialize() {
-        SettableListenableFuture<ButtplugMessage> promise = new SettableListenableFuture<>();
+    public Future<ButtplugMessage> initialize() {
+        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
         promise.set(new Ok(ButtplugConsts.SystemMsgId));
         return promise;
     }

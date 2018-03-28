@@ -1,6 +1,5 @@
 package org.metafetish.buttplug.apps.exampleclientgui;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,10 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.metafetish.buttplug.components.controls.ButtplugTabControl;
 import org.metafetish.buttplug.core.ButtplugLogManager;
 import org.metafetish.buttplug.core.IButtplugLog;
-import org.metafetish.buttplug.server.IButtplugServerFactory;
 
 
 public class ExampleClientPanel extends Fragment {
@@ -21,7 +18,6 @@ public class ExampleClientPanel extends Fragment {
     private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
 
     private AppCompatActivity activity;
-    private IButtplugServerFactory bpFactory;
 
     private SharedPreferences sharedPreferences;
 
@@ -29,20 +25,11 @@ public class ExampleClientPanel extends Fragment {
         // Required empty public constructor
     }
 
-    //TODO: Switch to getParentFragment()
-    @SuppressLint("ValidFragment")
-    public ExampleClientPanel(ButtplugTabControl bpTabControl) {
-        this.bpFactory = bpTabControl;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (this.activity != null) {
             this.sharedPreferences = this.activity.getPreferences(Context.MODE_PRIVATE);
-
-            //TODO: Why doesn't this work?
-            //this.bpFactory = (ButtplugTabControl) getParentFragment();
         }
     }
 

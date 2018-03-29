@@ -7,7 +7,6 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Handler;
 import android.os.ParcelUuid;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -23,14 +22,11 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 public class AndroidBluetoothManager extends BluetoothSubtypeManager {
     private static final int REQUEST_COARSE_LOCATION = 1;
     private static final int REQUEST_ENABLE_BT = 1;
-    private static final long SCAN_PERIOD = 5000;
 
-    private Handler handler;
     private boolean scanning;
 
     private BluetoothAdapter bluetoothAdapter;
@@ -43,12 +39,6 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
 
     public AndroidBluetoothManager(Context context) {
         this.bpLogger.trace("Loading Android Bluetooth Manager");
-        ((AppCompatActivity) context).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                AndroidBluetoothManager.this.handler = new Handler();
-            }
-        });
         this.currentlyConnecting = new ArrayList<>();
 
         // Introspect the ButtplugDevices namespace for all Factory classes, then create
@@ -56,8 +46,8 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
         for (IBluetoothDeviceInfo deviceFactory : this.builtinDevices) {
             this.bpLogger.trace(String.format("Loading Bluetooth Device Factory: %s",
                     deviceFactory.getClass().getSimpleName()));
-            AndroidBluetoothDeviceFactory androidDeviceFactory = new AndroidBluetoothDeviceFactory
-                    (context, deviceFactory);
+            AndroidBluetoothDeviceFactory androidDeviceFactory = new AndroidBluetoothDeviceFactory(
+                    context, deviceFactory);
             androidDeviceFactory.getDeviceCreated().addCallback(new IButtplugCallback() {
                 @Override
                 public void invoke(ButtplugEvent event) {
@@ -164,11 +154,7 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
                     factory.getClass().getSimpleName()));
 
             // If we actually have a factory for this device, go ahead and create the device
-            try {
-                factory.createDeviceAsync(device);
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-            }
+            factory.createDeviceAsync(device);
         }
     };
 
@@ -177,13 +163,6 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
     public void startScanning() {
         this.bpLogger.trace("Starting BLE Scanning");
         if (!this.scanning) {
-            this.handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    AndroidBluetoothManager.this.stopScanning();
-                }
-            }, SCAN_PERIOD);
-
             this.scanning = true;
             this.bluetoothAdapter.startLeScan(this.leScanCallback);
             this.bpLogger.trace("Started BLE Scanning");

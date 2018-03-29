@@ -311,7 +311,12 @@ public class WebsocketServerControl extends Fragment {
             this.connUrls = this.ws.getHostPairs(this.loopback);
             this.ws.startServer(this.bpFactory, this.loopback, (int) this.port, this.secure ?
                     connUrls : null);
-            this.onServerStart();
+            WebsocketServerControl.this.activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    WebsocketServerControl.this.onServerStart();
+                }
+            });
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -320,8 +325,13 @@ public class WebsocketServerControl extends Fragment {
     private void stopServer() {
         this.serverStarted = false;
         this.ws.stopServer();
-        this.onClientDisonnected();
-        this.onServerStop();
+        WebsocketServerControl.this.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                WebsocketServerControl.this.onClientDisonnected();
+                WebsocketServerControl.this.onServerStop();
+            }
+        });
     }
 
     private void onServerStart() {

@@ -42,7 +42,7 @@ public class VorzeA10CycloneInfo implements IBluetoothDeviceInfo {
     }
 
     @NonNull
-    public IButtplugDevice CreateDevice(@NonNull IBluetoothDeviceInterface iface) {
+    public IButtplugDevice createDevice(@NonNull IBluetoothDeviceInterface iface) {
         return new VorzeA10Cyclone(iface, this);
     }
 }

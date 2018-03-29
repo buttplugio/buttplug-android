@@ -48,7 +48,7 @@ public class VibratissimoBluetoothInfo implements IBluetoothDeviceInfo {
     }
 
     @NonNull
-    public IButtplugDevice CreateDevice(@NonNull IBluetoothDeviceInterface iface) {
+    public IButtplugDevice createDevice(@NonNull IBluetoothDeviceInterface iface) {
         return new Vibratissimo(iface, this);
     }
 }

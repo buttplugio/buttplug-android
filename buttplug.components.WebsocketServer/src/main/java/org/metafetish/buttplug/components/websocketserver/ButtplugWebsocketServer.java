@@ -204,12 +204,11 @@ public class ButtplugWebsocketServer {
             @Override
             public void onClose(WebSocket ws, int code, String reason, boolean remote) {
                 String remoteId = ButtplugWebsocketServer.this.connections.keys().nextElement();
-                ButtplugServer buttplug = ButtplugWebsocketServer.this.connections.get(remoteId)
-                        .second;
-                buttplug.getMessageReceived().removeCallback(ButtplugWebsocketServer.this
-                        .messageReceivedCallback);
+                ButtplugServer buttplug = ButtplugWebsocketServer.this.connections.get(remoteId).second;
+                buttplug.getMessageReceived().removeCallback(ButtplugWebsocketServer.this.messageReceivedCallback);
 
                 try {
+                    //TODO: Figure out why this sometimes dies on disconnect
                     buttplug.shutdown();
                 } catch (ExecutionException | InterruptedException | IllegalAccessException |
                         InvocationTargetException e) {
@@ -340,6 +339,7 @@ public class ButtplugWebsocketServer {
                     ws.send((new ButtplugJsonMessageParser()).serialize(msg, 0));
                 } catch (WebsocketNotConnectedException | IOException e) {
                     e.printStackTrace();
+                    ws.close();
                 }
                 if (msg instanceof Error && ((Error) msg).errorCode == Error.ErrorClass
                         .ERROR_PING) {

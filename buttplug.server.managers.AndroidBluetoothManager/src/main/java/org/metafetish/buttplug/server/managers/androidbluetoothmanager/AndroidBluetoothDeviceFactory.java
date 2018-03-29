@@ -70,8 +70,7 @@ class AndroidBluetoothDeviceFactory {
     // TODO Have this throw exceptions instead of return null.
     // Once we've made it this far, if we don't find what we're expecting, that's weird.
     // [ItemCanBeNull]
-    void createDeviceAsync(@NonNull BluetoothDevice device) throws ExecutionException,
-            InterruptedException {
+    void createDeviceAsync(@NonNull BluetoothDevice device) {
         // TODO This assumes we're always planning on having the UUIDs sorted in the Info classes
         // which is probably not true.
         AndroidBluetoothDeviceInterface bleInterface = new AndroidBluetoothDeviceInterface(
@@ -85,7 +84,7 @@ class AndroidBluetoothDeviceFactory {
                 if (btAddr == null) {
                     return;
                 }
-                AndroidBluetoothDeviceInterface bleInterface = bleInterfaces.get(btAddr);
+                AndroidBluetoothDeviceInterface bleInterface = AndroidBluetoothDeviceFactory.this.bleInterfaces.get(btAddr);
                 if (bleInterface == null) {
                     return;
                 }
@@ -157,7 +156,7 @@ class AndroidBluetoothDeviceFactory {
                 }
                 bleInterface.setGattCharacteristics(gattCharacteristics);
 
-                IButtplugDevice device = deviceInfo.CreateDevice(bleInterface);
+                IButtplugDevice device = deviceInfo.createDevice(bleInterface);
                 ButtplugMessage msg = null;
                 try {
                     msg = device.initialize().get();
@@ -165,12 +164,12 @@ class AndroidBluetoothDeviceFactory {
                     e.printStackTrace();
                 }
                 if (msg instanceof Ok) {
-                    deviceCreated.invoke(new ButtplugEvent(device));
+                    AndroidBluetoothDeviceFactory.this.deviceCreated.invoke(new ButtplugEvent(device));
                     return;
                 }
                 // If initialization fails, don't actually send the message back. Just return
                 // null, we'll have the info in the logs.
-                deviceCreated.invoke(new ButtplugEvent(btAddr));
+                AndroidBluetoothDeviceFactory.this.deviceCreated.invoke(new ButtplugEvent(btAddr));
             }
         });
     }

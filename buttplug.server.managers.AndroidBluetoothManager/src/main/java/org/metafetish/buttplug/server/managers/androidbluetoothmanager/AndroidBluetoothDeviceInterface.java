@@ -22,6 +22,7 @@ import org.metafetish.buttplug.core.Messages.Error;
 import org.metafetish.buttplug.core.Messages.Ok;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ import java.util.concurrent.Future;
 public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterface {
 
     public String getName() {
-        return bleDevice.getDevice().getName();
+        return this.bleDevice.getDevice().getName();
     }
 
     @NonNull
@@ -73,14 +74,16 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
                 if (newState == BluetoothAdapter.STATE_CONNECTED) {
                     gatt.discoverServices();
                 } else if (newState == BluetoothAdapter.STATE_DISCONNECTED) {
-                    deviceRemoved.invoke(new ButtplugEvent(gatt.getDevice().getAddress()));
+                    AndroidBluetoothDeviceInterface.this.deviceRemoved.invoke(
+                            new ButtplugEvent(gatt.getDevice().getAddress()));
                 }
             }
 
             @Override
             public void onServicesDiscovered(BluetoothGatt gatt, int status) {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
-                    deviceConnected.invoke(new ButtplugEvent(gatt.getDevice().getAddress()));
+                    AndroidBluetoothDeviceInterface.this.deviceConnected.invoke(
+                            new ButtplugEvent(gatt.getDevice().getAddress()));
                 } else {
                     gatt.disconnect();
                 }
@@ -125,6 +128,8 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
             return promise;
         }
         isCommunicating = true;
+        this.bpLogger.trace(String.format("Writing %s to %s.", Arrays.toString(value),
+                characteristicIndex.toString()));
         gattCharacteristic.setValue(value);
         boolean success = bleDevice.writeCharacteristic(gattCharacteristic);
         if (!success) {

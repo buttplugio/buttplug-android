@@ -50,7 +50,7 @@ public class KiirooGen2VibeBluetoothInfo implements IBluetoothDeviceInfo {
     }
 
     @NonNull
-    public IButtplugDevice CreateDevice(@NonNull IBluetoothDeviceInterface iface) {
+    public IButtplugDevice createDevice(@NonNull IBluetoothDeviceInterface iface) {
         return new KiirooGen2Vibe(iface, this);
     }
 }

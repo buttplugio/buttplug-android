@@ -18,5 +18,5 @@ public interface IBluetoothDeviceInfo {
     List<UUID> getCharacteristics();
 
     @NonNull
-    IButtplugDevice CreateDevice(@NonNull IBluetoothDeviceInterface deviceInterface);
+    IButtplugDevice createDevice(@NonNull IBluetoothDeviceInterface deviceInterface);
 }

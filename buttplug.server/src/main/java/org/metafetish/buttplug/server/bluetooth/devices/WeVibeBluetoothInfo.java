@@ -59,7 +59,7 @@ public class WeVibeBluetoothInfo implements IBluetoothDeviceInfo {
     }
 
     @NonNull
-    public IButtplugDevice CreateDevice(@NonNull IBluetoothDeviceInterface iface) {
+    public IButtplugDevice createDevice(@NonNull IBluetoothDeviceInterface iface) {
         return new WeVibe(iface, this);
     }
 }

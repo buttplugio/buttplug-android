@@ -47,7 +47,7 @@ public class FleshlightLaunchBluetoothInfo implements IBluetoothDeviceInfo {
     }
 
     @NonNull
-    public IButtplugDevice CreateDevice(@NonNull IBluetoothDeviceInterface iface) {
+    public IButtplugDevice createDevice(@NonNull IBluetoothDeviceInterface iface) {
         return new FleshlightLaunch(iface, this);
     }
 }

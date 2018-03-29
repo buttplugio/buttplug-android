@@ -106,7 +106,7 @@ public abstract class ButtplugDevice implements IButtplugDevice {
     protected void invokeDeviceRemoved() {
         this.isDisconnected = true;
         if (this.deviceRemoved != null) {
-            this.deviceRemoved.invoke(new ButtplugEvent());
+            this.deviceRemoved.invoke(new ButtplugEvent(this));
         }
     }
 

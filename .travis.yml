@@ -42,13 +42,13 @@ deploy:
   - buttplug.apps.BluetoothDeviceEmulator/build/outputs/apk/debug/buttplug.apps.BluetoothDeviceEmulator-$TAG_NAME-debug.apk
 #  - buttplug.apps.ExampleClientGUI/build/outputs/apk/debug/buttplug.apps.ExampleClientGUI-$TAG_NAME-debug.apk
   - buttplug.apps.WebsocketServerGUI/build/outputs/apk/debug/buttplug.apps.WebsocketServerGUI-$TAG_NAME-debug.apk
-#  - buttplug.client/build/outputs/aar/buttplug.client-$TAG_NAME-debug.apk
-  - buttplug.components.controls/build/outputs/aar/buttplug.components.controls-$TAG_NAME-debug.apk
-  - buttplug.components.WebsocketServer/build/outputs/aar/buttplug.components.WebsocketServer-$TAG_NAME-debug.apk
-  - buttplug.core/build/outputs/aar/buttplug.core-$TAG_NAME-debug.apk
-  - buttplug.server/build/outputs/aar/buttplug.server-$TAG_NAME-debug.apk
-  - buttplug.core/build/outputs/aar/buttplug.core-$TAG_NAME-debug.apk
-  - buttplug.server.managers.AndroidBluetoothManager/build/outputs/aar/buttplug.server.managers.AndroidBluetoothManager-$TAG_NAME-debug.apk
+#  - buttplug.client/build/outputs/aar/buttplug.client-$TAG_NAME-debug.aar
+  - buttplug.components.controls/build/outputs/aar/buttplug.components.controls-$TAG_NAME-debug.aar
+  - buttplug.components.WebsocketServer/build/outputs/aar/buttplug.components.WebsocketServer-$TAG_NAME-debug.aar
+  - buttplug.core/build/outputs/aar/buttplug.core-$TAG_NAME-debug.aar
+  - buttplug.server/build/outputs/aar/buttplug.server-$TAG_NAME-debug.aar
+  - buttplug.core/build/outputs/aar/buttplug.core-$TAG_NAME-debug.aar
+  - buttplug.server.managers.AndroidBluetoothManager/build/outputs/aar/buttplug.server.managers.AndroidBluetoothManager-$TAG_NAME-debug.aar
   prerelease: true
   skip_cleanup: true
   on:

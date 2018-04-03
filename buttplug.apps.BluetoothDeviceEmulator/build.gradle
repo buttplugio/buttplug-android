@@ -29,12 +29,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            def outputFile = output.outputFile
-            if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                def buildType = variant.variantData.variantConfiguration.buildType.name
-                def fileName = "${project.name}-${variant.versionName}-${buildType}.apk"
-                outputFileName = fileName
-            }
+            outputFileName = "${project.name}-${variant.versionName}-${variant.name}.apk"
         }
     }
 

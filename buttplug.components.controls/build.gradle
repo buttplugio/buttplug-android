@@ -26,6 +26,12 @@ android {
         }
     }
 
+    libraryVariants.all { variant ->
+        variant.outputs.all { output ->
+            outputFileName = "${project.name}-${versionName}${variant.buildType.versionNameSuffix ?: ''}-${variant.name}.aar"
+        }
+    }
+
     lintOptions {
         abortOnError false
     }

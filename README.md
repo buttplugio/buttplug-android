@@ -1,6 +1,6 @@
 # Buttplug - Android Server Implementation
 
-[![Build Status](https://travis-ci.org/mftrips/buttplug-android.svg?branch=master)](https://travis-ci.org/mftrips/buttplug-android) [![Patreon donate button](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/qdot)
+[![Build Status](https://travis-ci.org/metafetish/buttplug-android.svg?branch=master)](https://travis-ci.org/metafetish/buttplug-android) [![Patreon donate button](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/qdot)
 
 Buttplug is a framework for hooking up hardware to interfaces, where
 hardware usually means sex toys, but could honestly be just about

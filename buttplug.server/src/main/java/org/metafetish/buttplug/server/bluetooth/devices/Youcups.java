@@ -32,11 +32,11 @@ public class Youcups extends ButtplugBluetoothDevice {
     public Youcups(@NonNull IBluetoothDeviceInterface iface,
                   @NonNull IBluetoothDeviceInfo info) {
         super(String.format("Lovense Device %s", Youcups.friendlyNames.get(iface.getName())), iface, info);
-        msgFuncs.put(SingleMotorVibrateCmd.class, new ButtplugDeviceWrapper(
+        msgFuncs.put(SingleMotorVibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(
                 this.handleSingleMotorVibrateCmd, new MessageAttributes(1)));
-        msgFuncs.put(VibrateCmd.class, new ButtplugDeviceWrapper(this.handleVibrateCmd,
+        msgFuncs.put(VibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleVibrateCmd,
                 new MessageAttributes(1)));
-        msgFuncs.put(StopDeviceCmd.class, new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
+        msgFuncs.put(StopDeviceCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
     }
 
     private IButtplugDeviceMessageCallback handleStopDeviceCmd = new IButtplugDeviceMessageCallback() {

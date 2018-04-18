@@ -49,9 +49,9 @@ public class KiirooGen2Vibe extends ButtplugBluetoothDevice {
                           @NonNull IBluetoothDeviceInfo info) {
         super(String.format("%s %s", devInfos.get(iface.getName()), iface.getName()), iface, info);
         this.devInfo = this.devInfos.get(iface.getName());
-        msgFuncs.put(StopDeviceCmd.class, new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
-        msgFuncs.put(VibrateCmd.class, new ButtplugDeviceWrapper(this.handleVibrateCmd, new MessageAttributes(devInfo.vibeCount)));
-        msgFuncs.put(SingleMotorVibrateCmd.class, new ButtplugDeviceWrapper(this.handleSingleMotorVibrateCmd));
+        msgFuncs.put(StopDeviceCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
+        msgFuncs.put(VibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleVibrateCmd, new MessageAttributes(devInfo.vibeCount)));
+        msgFuncs.put(SingleMotorVibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleSingleMotorVibrateCmd));
     }
 
     private IButtplugDeviceMessageCallback handleStopDeviceCmd = new IButtplugDeviceMessageCallback() {

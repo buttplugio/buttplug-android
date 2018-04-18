@@ -52,12 +52,12 @@ public class Lovense extends ButtplugBluetoothDevice {
             ++vibratorCount;
         }
 
-        msgFuncs.put(SingleMotorVibrateCmd.class, new ButtplugDeviceWrapper(this.handleSingleMotorVibrateCmd));
-        msgFuncs.put(VibrateCmd.class, new ButtplugDeviceWrapper(this.handleVibrateCmd, new MessageAttributes(vibratorCount)));
-        msgFuncs.put(StopDeviceCmd.class, new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
+        msgFuncs.put(SingleMotorVibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleSingleMotorVibrateCmd));
+        msgFuncs.put(VibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleVibrateCmd, new MessageAttributes(vibratorCount)));
+        msgFuncs.put(StopDeviceCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
 
         if (Lovense.friendlyNames.get(iface.getName()).equals("Nora")) {
-            msgFuncs.put(RotateCmd.class, new ButtplugDeviceWrapper(this.handleRotateCmd, new MessageAttributes(1)));
+            msgFuncs.put(RotateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleRotateCmd, new MessageAttributes(1)));
         }
     }
 

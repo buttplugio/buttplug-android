@@ -1,6 +1,7 @@
 package org.metafetish.buttplug.server.managers.androidbluetoothmanager;
 
 import android.Manifest;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -11,7 +12,6 @@ import android.os.ParcelUuid;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 
 import org.metafetish.buttplug.core.ButtplugEvent;
 import org.metafetish.buttplug.core.IButtplugCallback;
@@ -40,6 +40,7 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
     public AndroidBluetoothManager(Context context) {
         this.bpLogger.trace("Loading Android Bluetooth Manager");
         this.currentlyConnecting = new ArrayList<>();
+
 
         // Introspect the ButtplugDevices namespace for all Factory classes, then create
         // instances of all of them.
@@ -76,7 +77,7 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
 
         if (ContextCompat.checkSelfPermission(context, Manifest.permission
                 .ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(((AppCompatActivity) context), new String[]{Manifest.permission
+            ActivityCompat.requestPermissions(((Activity) context), new String[]{Manifest.permission
                     .ACCESS_COARSE_LOCATION}, REQUEST_COARSE_LOCATION);
         }
 
@@ -94,7 +95,7 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
         }
         if (!this.bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            ((AppCompatActivity) context).startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            ((Activity) context).startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
     }
 

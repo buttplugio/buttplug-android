@@ -23,6 +23,14 @@ public class FleshlightLaunchFW12Cmd extends ButtplugDeviceMessage {
     }
 
     @SuppressWarnings("unused")
+    public FleshlightLaunchFW12Cmd(int speed, int position) {
+        super(ButtplugConsts.DefaultMsgId, -1);
+
+        setSpeed(speed);
+        setPosition(position);
+    }
+
+    @SuppressWarnings("unused")
     private FleshlightLaunchFW12Cmd() {
         super(ButtplugConsts.DefaultMsgId, -1);
 

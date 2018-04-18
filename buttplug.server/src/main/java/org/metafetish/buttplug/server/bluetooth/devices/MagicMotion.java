@@ -26,11 +26,11 @@ public class MagicMotion extends ButtplugBluetoothDevice {
     public MagicMotion(@NonNull IBluetoothDeviceInterface iface,
                   @NonNull IBluetoothDeviceInfo info) {
         super(String.format("MagicMotion %s", iface.getName()), iface, info);
-        msgFuncs.put(SingleMotorVibrateCmd.class, new ButtplugDeviceWrapper(
+        msgFuncs.put(SingleMotorVibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(
                 this.handleSingleMotorVibrateCmd, new MessageAttributes(1)));
-        msgFuncs.put(VibrateCmd.class, new ButtplugDeviceWrapper(this.handleVibrateCmd,
+        msgFuncs.put(VibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleVibrateCmd,
                 new MessageAttributes(1)));
-        msgFuncs.put(StopDeviceCmd.class, new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
+        msgFuncs.put(StopDeviceCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
     }
 
     private IButtplugDeviceMessageCallback handleStopDeviceCmd = new IButtplugDeviceMessageCallback() {

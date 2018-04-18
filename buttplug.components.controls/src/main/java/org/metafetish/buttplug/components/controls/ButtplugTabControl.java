@@ -19,7 +19,6 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import org.metafetish.buttplug.core.ButtplugEventHandler;
 import org.metafetish.buttplug.core.ButtplugLogManager;
@@ -33,7 +32,7 @@ import org.metafetish.buttplug.server.managers.androidbluetoothmanager.AndroidBl
 
 public class ButtplugTabControl extends Fragment implements IButtplugTabControl, IButtplugServerFactory {
     private ButtplugLogManager bpLogManager = new ButtplugLogManager();
-    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass().getSimpleName());
 
     private AppCompatActivity activity;
     private String serverName;
@@ -219,55 +218,6 @@ public class ButtplugTabControl extends Fragment implements IButtplugTabControl,
         return this.initializeButtplugServer(this.serverName, this.maxPingTime);
     }
 
-    //TODO: Remove when all tabs are complete.
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        public PlaceholderFragment() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout
-                    .fragment_buttplug_tab_control_placeholder_fragment, container, false);
-
-            AppCompatActivity activity = (AppCompatActivity) getActivity();
-            if (activity != null) {
-                TabLayout tabLayout = (TabLayout) activity.findViewById(R.id.tabs);
-                int tabIndex = getArguments().getInt(ARG_SECTION_NUMBER);
-                if (tabIndex >= 0 && tabIndex <= tabLayout.getTabCount() - 1) {
-                    String tabText = tabLayout.getTabAt(tabIndex).getText().toString();
-
-                    TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-                    textView.setText(getString(R.string.section_format, tabText));
-                }
-            }
-            return rootView;
-        }
-    }
-
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -289,13 +239,10 @@ public class ButtplugTabControl extends Fragment implements IButtplugTabControl,
                 return new ButtplugLogControl();
             } else if (position == this.count - 1) {
                 return new ButtplugAboutControl();
+            } else if (ButtplugTabControl.this.hasDevicePanel && position == 1) {
+                return new ButtplugDeviceControl();
             } else {
-                Fragment fragment = this.instances.get(position);
-                if (fragment == null) {
-                    return PlaceholderFragment.newInstance(position);
-                } else {
-                    return fragment;
-                }
+                return this.instances.get(position);
             }
         }
 

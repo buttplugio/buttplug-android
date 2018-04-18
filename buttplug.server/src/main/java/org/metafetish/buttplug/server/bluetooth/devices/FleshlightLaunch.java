@@ -3,6 +3,8 @@ package org.metafetish.buttplug.server.bluetooth.devices;
 
 import android.support.annotation.NonNull;
 
+import com.google.common.util.concurrent.SettableFuture;
+
 import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 import org.metafetish.buttplug.core.ButtplugMessage;
@@ -19,6 +21,7 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 import org.metafetish.buttplug.server.util.FleshlightHelper;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class FleshlightLaunch extends ButtplugBluetoothDevice {
@@ -28,20 +31,28 @@ public class FleshlightLaunch extends ButtplugBluetoothDevice {
                             @NonNull IBluetoothDeviceInfo info) {
         super("Fleshlight Launch", iface, info);
         // Setup message function array
-        msgFuncs.put(FleshlightLaunchFW12Cmd.class, new ButtplugDeviceWrapper(this
+        msgFuncs.put(FleshlightLaunchFW12Cmd.class.getSimpleName(), new ButtplugDeviceWrapper(this
                 .handleFleshlightLaunchRawCmd));
-        msgFuncs.put(LinearCmd.class, new ButtplugDeviceWrapper(this.handleLinearCmd, new
+        msgFuncs.put(LinearCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleLinearCmd, new
                 MessageAttributes(1)));
-        msgFuncs.put(StopDeviceCmd.class, new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
+        msgFuncs.put(StopDeviceCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
     }
 
     public Future<ButtplugMessage> initialize() {
-        return iface.writeValue(
-                ButtplugConsts.SystemMsgId,
-                info.getCharacteristics().get(FleshlightLaunchBluetoothInfo.Chrs.Cmd.ordinal()),
-                new byte[]{0},
-                true
-        );
+        final SettableFuture<ButtplugMessage> promise = SettableFuture.create();
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    promise.set(FleshlightLaunch.this.iface.writeValue(ButtplugConsts.SystemMsgId,
+                            info.getCharacteristics().get(FleshlightLaunchBluetoothInfo.Chrs.Cmd.ordinal()),
+                            new byte[]{0}, true).get());
+                } catch (InterruptedException | ExecutionException e) {
+                    promise.set(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.DefaultMsgId));
+                }
+            }
+        });
+        return promise;
     }
 
     private IButtplugDeviceMessageCallback handleStopDeviceCmd = new

@@ -15,6 +15,12 @@ public class RequestServerInfo extends ButtplugMessage {
     @JsonProperty(value = "MessageVersion")
     public long messageVersion;
 
+    public RequestServerInfo(String clientName) {
+        super(ButtplugConsts.DefaultMsgId);
+        this.clientName = clientName;
+        this.messageVersion = currentSchemaVersion;
+    }
+
     public RequestServerInfo(String clientName, long id, long messageVersion) {
         super(id);
         this.clientName = clientName;

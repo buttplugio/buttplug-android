@@ -2,6 +2,7 @@ package org.metafetish.buttplug.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 public class ButtplugEventHandler {
     private List<IButtplugCallback> callbacks = new ArrayList<>();
@@ -18,9 +19,14 @@ public class ButtplugEventHandler {
         }
     }
 
-    public void invoke(ButtplugEvent event) {
-        for (IButtplugCallback callback : this.callbacks) {
-            callback.invoke(event);
-        }
+    public void invoke(final ButtplugEvent event) {
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                for (IButtplugCallback callback : ButtplugEventHandler.this.callbacks) {
+                    callback.invoke(event);
+                }
+            }
+        });
     }
 }

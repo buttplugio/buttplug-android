@@ -11,6 +11,7 @@ import org.metafetish.buttplug.core.Messages.Ok;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public abstract class ButtplugDevice implements IButtplugDevice {
@@ -62,10 +63,10 @@ public abstract class ButtplugDevice implements IButtplugDevice {
     protected IButtplugLogManager bpLogManager = new ButtplugLogManager();
 
     @NonNull
-    protected IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
+    protected IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass().getSimpleName());
 
     @NonNull
-    protected Map<Class, ButtplugDeviceWrapper> msgFuncs;
+    protected Map<String, ButtplugDeviceWrapper> msgFuncs;
 
     private boolean isDisconnected;
 
@@ -86,19 +87,19 @@ public abstract class ButtplugDevice implements IButtplugDevice {
 
     protected ButtplugDevice(@NonNull String name,
                              @NonNull String identifier) {
-        msgFuncs = new HashMap<>();
+        this.msgFuncs = new HashMap<>();
         this.name = name;
         this.identifier = identifier;
     }
 
     @NonNull
-    public Iterable<Class> getAllowedMessageTypes() {
+    public Iterable<String> getAllowedMessageTypes() {
         return this.msgFuncs.keySet();
     }
 
-    public MessageAttributes getMessageAttrs(Class msg) {
-        if (this.msgFuncs.containsKey(msg)) {
-            return this.msgFuncs.get(msg).attrs;
+    public MessageAttributes getMessageAttrs(String msgType) {
+        if (this.msgFuncs.containsKey(msgType)) {
+            return this.msgFuncs.get(msgType).attrs;
         }
         return new MessageAttributes();
     }
@@ -111,33 +112,37 @@ public abstract class ButtplugDevice implements IButtplugDevice {
     }
 
     @NonNull
-    public Future<ButtplugMessage> parseMessage(@NonNull ButtplugDeviceMessage msg)
+    public Future<ButtplugMessage> parseMessage(final @NonNull ButtplugDeviceMessage msg)
             throws InvocationTargetException, IllegalAccessException {
-        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
-        if (this.isDisconnected) {
-            promise.set(new Error(
-                    String.format("%s has disconnected and can no longer process messages.",
-                            this.name),
-                    Error.ErrorClass.ERROR_DEVICE, msg.id));
-            return promise;
-        }
-        if (!msgFuncs.containsKey(msg.getClass())) {
-            promise.set(new Error(
-                    String.format("%s cannot handle message of type %s",
-                        this.name,
-                        msg.getClass().getSimpleName()),
-                    Error.ErrorClass.ERROR_DEVICE, msg.id));
-            return promise;
-        }
-        // We just checked whether the key exists above, so we're ok.
-        promise.set(this.msgFuncs.get(msg.getClass()).callback.invoke(msg));
+        final SettableFuture<ButtplugMessage> promise = SettableFuture.create();
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                if (ButtplugDevice.this.isDisconnected) {
+                    promise.set(new Error(String.format("%s has disconnected and can no longer process messages.",
+                                    ButtplugDevice.this.name), Error.ErrorClass.ERROR_DEVICE, msg.id));
+                } else if (!ButtplugDevice.this.msgFuncs.containsKey(msg.getClass().getSimpleName())) {
+                    promise.set(new Error(String.format("%s cannot handle message of type %s",
+                            ButtplugDevice.this.name, msg.getClass().getSimpleName()),
+                            Error.ErrorClass.ERROR_DEVICE, msg.id));
+                } else {
+                    // We just checked whether the key exists above, so we're ok.
+                    promise.set(ButtplugDevice.this.msgFuncs.get(msg.getClass().getSimpleName()).callback.invoke(msg));
+                }
+            }
+        });
         return promise;
     }
 
     @NonNull
     public Future<ButtplugMessage> initialize() {
-        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
-        promise.set(new Ok(ButtplugConsts.SystemMsgId));
+        final SettableFuture<ButtplugMessage> promise = SettableFuture.create();
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                promise.set(new Ok(ButtplugConsts.SystemMsgId));
+            }
+        });
         return promise;
     }
 

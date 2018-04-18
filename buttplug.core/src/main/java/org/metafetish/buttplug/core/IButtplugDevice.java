@@ -29,7 +29,7 @@ public interface IButtplugDevice {
     ButtplugEventHandler getMessageEmitted();
 
     @NonNull
-    Iterable<Class> getAllowedMessageTypes();
+    Iterable<String> getAllowedMessageTypes();
 
     @NonNull
     Future<ButtplugMessage> parseMessage(ButtplugDeviceMessage msg) throws
@@ -41,5 +41,5 @@ public interface IButtplugDevice {
     void disconnect();
 
     @NonNull
-    MessageAttributes getMessageAttrs(Class msg);
+    MessageAttributes getMessageAttrs(String msgType);
 }

@@ -5,4 +5,6 @@
     <string name="default_address">wss://localhost:12345/buttplug</string>
     <string name="client_connect">Connect</string>
     <string name="client_disconnect">Disconnect</string>
+    <string name="status">Status</string>
+    <string name="last_error">Last Error</string>
 </resources>

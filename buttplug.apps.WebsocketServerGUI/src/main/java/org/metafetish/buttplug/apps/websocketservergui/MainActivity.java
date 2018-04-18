@@ -21,7 +21,7 @@ import org.metafetish.buttplug.core.IButtplugLog;
 
 public class MainActivity extends AppCompatActivity {
     private ButtplugLogManager bpLogManager = new ButtplugLogManager();
-    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass().getSimpleName());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

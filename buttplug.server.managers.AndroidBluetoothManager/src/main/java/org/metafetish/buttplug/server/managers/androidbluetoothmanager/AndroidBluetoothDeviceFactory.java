@@ -31,7 +31,7 @@ class AndroidBluetoothDeviceFactory {
     private IButtplugLogManager bpLogManager = new ButtplugLogManager();
 
     @NonNull
-    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass().getSimpleName());
 
     @NonNull
     private IBluetoothDeviceInfo deviceInfo;

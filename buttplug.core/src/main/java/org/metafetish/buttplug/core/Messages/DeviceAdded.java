@@ -17,8 +17,12 @@ public class DeviceAdded extends ButtplugDeviceMessage implements IButtplugMessa
     @JsonProperty(value = "DeviceMessages", required = true)
     public LinkedHashMap<String, MessageAttributes> deviceMessages;
 
-    public DeviceAdded(long deviceIndex, String deviceName, LinkedHashMap<String, MessageAttributes>
-            deviceMessages) {
+    public DeviceAdded(DeviceMessageInfo deviceInfo) {
+        this(deviceInfo.deviceIndex, deviceInfo.deviceName, deviceInfo.deviceMessages);
+    }
+
+    public DeviceAdded(long deviceIndex, String deviceName,
+                       LinkedHashMap<String, MessageAttributes> deviceMessages) {
         super(ButtplugConsts.SystemMsgId, deviceIndex);
 
         this.deviceName = deviceName;

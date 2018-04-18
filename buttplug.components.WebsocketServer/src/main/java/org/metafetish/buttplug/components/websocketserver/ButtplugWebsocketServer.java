@@ -61,7 +61,7 @@ public class ButtplugWebsocketServer {
     private IButtplugLogManager bpLogManager = new ButtplugLogManager();
 
     @NonNull
-    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass().getSimpleName());
 
     private ButtplugEventHandler onException = new ButtplugEventHandler();
 
@@ -209,7 +209,7 @@ public class ButtplugWebsocketServer {
 
                 try {
                     //TODO: Figure out why this sometimes dies on disconnect
-                    buttplug.shutdown();
+                    buttplug.shutdown().get();
                 } catch (ExecutionException | InterruptedException | IllegalAccessException |
                         InvocationTargetException e) {
                     e.printStackTrace();

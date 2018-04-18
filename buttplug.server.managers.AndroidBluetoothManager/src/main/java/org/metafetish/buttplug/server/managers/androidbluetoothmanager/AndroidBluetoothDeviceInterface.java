@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 
 import com.google.common.util.concurrent.SettableFuture;
 
+import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugEvent;
 import org.metafetish.buttplug.core.ButtplugEventHandler;
 import org.metafetish.buttplug.core.ButtplugLogManager;
@@ -27,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterface {
@@ -42,13 +45,13 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
     private IButtplugLogManager bpLogManager = new ButtplugLogManager();
 
     @NonNull
-    private IButtplugLog bpLogger = bpLogManager.getLogger(this.getClass());
+    private IButtplugLog bpLogger = bpLogManager.getLogger(this.getClass().getSimpleName());
 
     @NonNull
     private BluetoothGatt bleDevice;
 
     @Nullable
-    private Boolean isCommunicating;
+    private Future<?> currentTask;
 
     private ButtplugEventHandler deviceConnected = new ButtplugEventHandler();
 
@@ -108,36 +111,64 @@ public class AndroidBluetoothDeviceInterface implements IBluetoothDeviceInterfac
         return bleDevice.getDevice().getAddress();
     }
 
-    public Future<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex,
-                                              byte[] value) {
-        return writeValue(msgId, characteristicIndex, value, false);
+    public Future<ButtplugMessage> writeValue(final long msgId, final UUID characteristicIndex, final byte[] value) {
+        final SettableFuture<ButtplugMessage> promise = SettableFuture.create();
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    promise.set(AndroidBluetoothDeviceInterface.this.writeValue(
+                            msgId, characteristicIndex, value, false).get());
+                } catch (InterruptedException | ExecutionException e) {
+                    promise.set(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.DefaultMsgId));
+                }
+            }
+        });
+        return promise;
     }
 
-    public Future<ButtplugMessage> writeValue(long msgId, UUID characteristicIndex,
-                                                        byte[] value, boolean writeWithResponse) {
-        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
-        if (isCommunicating != null && isCommunicating) {
-            this.bpLogger.trace("Device transfer in progress, cancelling new transfer.");
-        }
+    public Future<ButtplugMessage> writeValue(final long msgId, final UUID characteristicIndex,
+                                              final byte[] value, final boolean writeWithResponse) {
+        final SettableFuture<ButtplugMessage> promise = SettableFuture.create();
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
 
-        BluetoothGattCharacteristic gattCharacteristic = gattCharacteristics.get
-                (characteristicIndex);
-        if (gattCharacteristic == null) {
-            promise.set(new Error(String.format("Requested characteristic %s not found",
-                    characteristicIndex.toString()), Error.ErrorClass.ERROR_DEVICE, msgId));
-            return promise;
-        }
-        isCommunicating = true;
-        this.bpLogger.trace(String.format("Writing %s to %s.", Arrays.toString(value),
-                characteristicIndex.toString()));
-        gattCharacteristic.setValue(value);
-        boolean success = bleDevice.writeCharacteristic(gattCharacteristic);
-        if (!success) {
-            promise.set(new Error(String.format("Failed to write to characteristic %s",
-                    characteristicIndex.toString()), Error.ErrorClass.ERROR_DEVICE, msgId));
-            return promise;
-        }
-        promise.set(new Ok(msgId));
+                if (AndroidBluetoothDeviceInterface.this.currentTask != null) {
+                    AndroidBluetoothDeviceInterface.this.currentTask.cancel(true);
+                    AndroidBluetoothDeviceInterface.this.bpLogger.trace(
+                            "Cancelling device transfer in progress for new transfer.");
+                }
+
+                final BluetoothGattCharacteristic gattCharacteristic = gattCharacteristics.get(characteristicIndex);
+                if (gattCharacteristic == null) {
+                    promise.set(new Error(String.format("Requested characteristic %s not found",
+                            characteristicIndex.toString()), Error.ErrorClass.ERROR_DEVICE, msgId));
+                } else {
+                    AndroidBluetoothDeviceInterface.this.currentTask = Executors.newSingleThreadExecutor().submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            AndroidBluetoothDeviceInterface.this.bpLogger.trace(String.format("Writing %s to %s.",
+                                    Arrays.toString(value), characteristicIndex.toString()));
+                            gattCharacteristic.setValue(value);
+                            boolean success = AndroidBluetoothDeviceInterface.this.bleDevice.writeCharacteristic(gattCharacteristic);
+                            if (!success) {
+                                promise.set(new Error(String.format("Failed to write to characteristic %s",
+                                        characteristicIndex.toString()), Error.ErrorClass.ERROR_DEVICE, msgId));
+                            } else {
+                                promise.set(new Ok(msgId));
+                            }
+                        }
+                    });
+                    try {
+                        AndroidBluetoothDeviceInterface.this.currentTask.get();
+                        AndroidBluetoothDeviceInterface.this.currentTask = null;
+                    } catch (InterruptedException | ExecutionException e) {
+                        promise.set(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.DefaultMsgId));
+                    }
+                }
+            }
+        });
         return promise;
     }
 

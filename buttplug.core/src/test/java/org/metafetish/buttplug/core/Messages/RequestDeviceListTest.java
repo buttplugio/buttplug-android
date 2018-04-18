@@ -26,9 +26,9 @@ public class RequestDeviceListTest {
         ButtplugJsonMessageParser parser = new ButtplugJsonMessageParser();
         List<ButtplugMessage> msgs = parser.deserialize(testStr);
 
-        Assert.assertEquals(msgs.size(), 1);
-        Assert.assertEquals(msgs.get(0).getClass(), RequestDeviceList.class);
-        Assert.assertEquals(msgs.get(0).id, 1);
+        Assert.assertEquals(1, msgs.size());
+        Assert.assertEquals(RequestDeviceList.class, msgs.get(0).getClass());
+        Assert.assertEquals(1, msgs.get(0).id);
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readValue(testStr, JsonNode.class);

@@ -145,9 +145,8 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
         }
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return filteredDataSet.size();
+        return this.filteredDataSet.size();
     }
 }

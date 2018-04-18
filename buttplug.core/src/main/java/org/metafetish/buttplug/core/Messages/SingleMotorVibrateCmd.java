@@ -17,6 +17,11 @@ public class SingleMotorVibrateCmd extends ButtplugDeviceMessage {
         setSpeed(speed);
     }
 
+    public SingleMotorVibrateCmd(double speed) {
+        super(ButtplugConsts.DefaultMsgId, -1);
+        setSpeed(speed);
+    }
+
     @SuppressWarnings("unused")
     private SingleMotorVibrateCmd() {
         super(ButtplugConsts.DefaultMsgId, -1);

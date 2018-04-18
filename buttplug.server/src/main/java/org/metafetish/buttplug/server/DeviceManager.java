@@ -175,7 +175,7 @@ public class DeviceManager {
 
     public DeviceManager(IButtplugLogManager logManager) {
         this.bpLogManager = logManager;
-        this.bpLogger = this.bpLogManager.getLogger(this.getClass());
+        this.bpLogger = this.bpLogManager.getLogger(this.getClass().getSimpleName());
         this.bpLogger.info("Setting up DeviceManager");
         this.sentFinished = true;
         this.devices = new ConcurrentHashMap<>();
@@ -187,8 +187,8 @@ public class DeviceManager {
     private static LinkedHashMap<String, MessageAttributes> getAllowedMessageTypesAsDictionary
             (@NonNull IButtplugDevice device) {
         LinkedHashMap<String, MessageAttributes> msgs = new LinkedHashMap<>();
-        for (Class msg : device.getAllowedMessageTypes()) {
-            msgs.put(msg.getSimpleName(), device.getMessageAttrs(msg));
+        for (String msgType : device.getAllowedMessageTypes()) {
+            msgs.put(msgType, device.getMessageAttrs(msgType));
         }
 
         return msgs;

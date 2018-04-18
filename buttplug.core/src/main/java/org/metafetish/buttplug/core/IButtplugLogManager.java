@@ -7,7 +7,7 @@ public interface IButtplugLogManager {
     ButtplugEventHandler getLogMessageReceived();
 
     @NonNull
-    IButtplugLog getLogger(Class classDefinition);
+    IButtplugLog getLogger(String className);
 
     void setButtplugLogLevel(ButtplugLogLevel level);
 }

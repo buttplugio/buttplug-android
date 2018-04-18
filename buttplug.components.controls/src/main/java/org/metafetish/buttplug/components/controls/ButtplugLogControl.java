@@ -50,7 +50,7 @@ public class ButtplugLogControl extends Fragment {
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 1;
 
     private ButtplugLogManager bpLogManager = new ButtplugLogManager();
-    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass().getSimpleName());
     private ButtplugLogLevel logLevel = ButtplugLogLevel.DEBUG;
 
     private AppCompatActivity activity;
@@ -168,7 +168,7 @@ public class ButtplugLogControl extends Fragment {
 
         if (this.appBarLayout != null) {
             if (isVisibleToUser) {
-                appBarLayout.setExpanded(false);
+                this.appBarLayout.setExpanded(false);
             }
         }
     }

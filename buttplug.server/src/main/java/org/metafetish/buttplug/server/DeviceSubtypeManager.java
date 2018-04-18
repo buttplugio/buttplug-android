@@ -12,7 +12,7 @@ public abstract class DeviceSubtypeManager implements IDeviceSubtypeManager {
     protected IButtplugLogManager bpLogManager = new ButtplugLogManager();
 
     @NonNull
-    protected IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
+    protected IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass().getSimpleName());
 
     private ButtplugEventHandler deviceAdded = new ButtplugEventHandler();
 

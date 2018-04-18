@@ -51,9 +51,9 @@ public class ButtplugLogManager implements IButtplugLogManager {
     };
 
     @NonNull
-    public IButtplugLog getLogger(@NonNull Class classDefinition) {
+    public IButtplugLog getLogger(@NonNull String className) {
         // Just pass the type in instead of traversing the stack to find it.
-        IButtplugLog logger = new ButtplugLog(classDefinition);
+        IButtplugLog logger = new ButtplugLog(className);
         logger.getLogMessageReceived().addCallback(logMessageCallback);
         return logger;
     }

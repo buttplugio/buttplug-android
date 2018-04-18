@@ -71,7 +71,7 @@ import org.metafetish.buttplug.core.Messages.VorzeA10CycloneCmd;
 public abstract class ButtplugMessage {
 
     @JsonIgnore
-    protected final long currentSchemaVersion = 1;
+    public static final long currentSchemaVersion = 1;
 
     @JsonProperty(value = "Id", required = true)
     public long id;

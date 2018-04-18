@@ -40,9 +40,9 @@ public class WeVibe extends ButtplugBluetoothDevice {
             ++vibratorCount;
         }
 
-        msgFuncs.put(SingleMotorVibrateCmd.class, new ButtplugDeviceWrapper(this.handleSingleMotorVibrateCmd));
-        msgFuncs.put(VibrateCmd.class, new ButtplugDeviceWrapper(this.handleVibrateCmd, new MessageAttributes(vibratorCount)));
-        msgFuncs.put(StopDeviceCmd.class, new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
+        msgFuncs.put(SingleMotorVibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleSingleMotorVibrateCmd));
+        msgFuncs.put(VibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleVibrateCmd, new MessageAttributes(vibratorCount)));
+        msgFuncs.put(StopDeviceCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
     }
 
     private IButtplugDeviceMessageCallback handleStopDeviceCmd = new IButtplugDeviceMessageCallback() {

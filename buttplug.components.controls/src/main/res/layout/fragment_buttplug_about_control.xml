@@ -19,13 +19,13 @@
 
             <ImageView
                 android:id="@+id/logo"
-                android:layout_width="108dp"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:src="@drawable/buttplug_logo"
-                android:contentDescription="@string/logo_desc"
+                android:layout_width="126dp"
+                android:layout_height="126dp"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/logo_desc"
+                android:src="@drawable/buttplug_logo"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -47,15 +47,13 @@
                 android:id="@+id/header_links"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/header_links"
-                android:linksClickable="true"
-                android:layout_marginTop="0dp"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                android:layout_marginBottom="@dimen/activity_vertical_margin"
-                app:layout_constraintTop_toBottomOf="@id/header_text"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:linksClickable="true"
+                android:text="@string/header_links"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/logo"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/header_text" />
 
         </android.support.constraint.ConstraintLayout>
 

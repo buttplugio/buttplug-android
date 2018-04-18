@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -35,5 +35,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/client_connect" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="144dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/last_error" />
+
+            <TextView
+                android:id="@+id/last_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+        </LinearLayout>
     </LinearLayout>
-</FrameLayout>
+</android.support.v4.widget.NestedScrollView>

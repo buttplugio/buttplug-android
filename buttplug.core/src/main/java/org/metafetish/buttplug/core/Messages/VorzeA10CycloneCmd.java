@@ -22,6 +22,13 @@ public class VorzeA10CycloneCmd extends ButtplugDeviceMessage {
     }
 
     @SuppressWarnings("unused")
+    public VorzeA10CycloneCmd(int speed, boolean clockwise) {
+        super(ButtplugConsts.DefaultMsgId, -1);
+        setSpeed(speed);
+        this.clockwise = clockwise;
+    }
+
+    @SuppressWarnings("unused")
     private VorzeA10CycloneCmd() {
         super(ButtplugConsts.DefaultMsgId, -1);
         setSpeed(0);

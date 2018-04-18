@@ -4,12 +4,11 @@
     <string name="devices">Devices</string>
     <string name="log">Log</string>
     <string name="about">About</string>
-    <string name="section_format">This is a placeholder for the %1$s tab.</string>
     <string name="logo_desc">Buttplug logo</string>
     <string name="patreon_desc">Patreon link</string>
 
     <string name="header_title">Buttplug %1$s</string>>
-    <string name="header_links">By <a href="https://www.metafetish.com/">Metafetish</a>\n\n<a href="https://buttplug.io/">Software updates</a>\n<a href="https://github.com/mftrips/buttplug-android">Source Code</a>\n<a href="https://github.com/mftrips/buttplug-android/blob/master/LICENSE">License information</a></string>
+    <string name="header_links">By <a href="https://www.metafetish.com/">Metafetish</a>\n\n<a href="https://buttplug.io/">Software updates</a>\n<a href="https://github.com/mftrips/buttplug-android">Source Code</a>\n<a href="https://github.com/mftrips/buttplug-android/blob/master/LICENSE">License</a>\n<a href="https://github.com/mftrips/buttplug-android/blob/master/NOTICE.md">Open source notice</a></string>
     <string name="body">Buttplug and the corresponding applications and libraries are provided open source and free of charge. If you would like to help sponsor further development of this and other adult toy and interface software, please consider donating to our patreon campaign at http://patreon.com/qdot, or by clicking on the Patreon image below. Thanks, and enjoy buttplugging!</string>
     <string name="legal">The Buttplug name and logo are used with permission of Nonpolynomial Labs, LLC.</string>
 
@@ -25,4 +24,7 @@
     </string-array>
     <string name="clear_log">Clear Log</string>
     <string name="save_log">Save to File</string>
+
+    <string name="start_scanning">Start Scanning</string>
+    <string name="stop_scanning">Stop Scanning</string>
 </resources>

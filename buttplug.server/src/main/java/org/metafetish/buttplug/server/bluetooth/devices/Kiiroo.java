@@ -28,13 +28,13 @@ public class Kiiroo extends ButtplugBluetoothDevice {
                   @NonNull IBluetoothDeviceInfo info) {
         super(String.format("Kiiroo %s", iface.getName()), iface, info);
         // Setup message function array
-        msgFuncs.put(KiirooCmd.class, new ButtplugDeviceWrapper(this.handleKiirooRawCmd));
-        msgFuncs.put(StopDeviceCmd.class, new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
+        msgFuncs.put(KiirooCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleKiirooRawCmd));
+        msgFuncs.put(StopDeviceCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
         if (iface.getName().equals("PEARL")) {
-            msgFuncs.put(VibrateCmd.class, new ButtplugDeviceWrapper(this.handleVibrateCmd, new
+            msgFuncs.put(VibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleVibrateCmd, new
                     MessageAttributes(1)));
 
-            msgFuncs.put(SingleMotorVibrateCmd.class, new ButtplugDeviceWrapper(this
+            msgFuncs.put(SingleMotorVibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this
                     .handleSingleMotorVibrateCmd, new MessageAttributes(1)));
         }
     }

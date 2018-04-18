@@ -26,9 +26,9 @@ public class VorzeA10Cyclone extends ButtplugBluetoothDevice {
                    IBluetoothDeviceInfo info) {
         super("Vorze A10 Cyclone", iface, info);
 
-        msgFuncs.put(VorzeA10CycloneCmd.class, new ButtplugDeviceWrapper(this.handleVorzeA10CycloneCmd));
-        msgFuncs.put(RotateCmd.class, new ButtplugDeviceWrapper(this.handleRotateCmd, new MessageAttributes(1)));
-        msgFuncs.put(StopDeviceCmd.class, new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
+        msgFuncs.put(VorzeA10CycloneCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleVorzeA10CycloneCmd));
+        msgFuncs.put(RotateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleRotateCmd, new MessageAttributes(1)));
+        msgFuncs.put(StopDeviceCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
     }
 
     private IButtplugDeviceMessageCallback handleStopDeviceCmd = new IButtplugDeviceMessageCallback() {

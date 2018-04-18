@@ -37,6 +37,7 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInfo;
 import org.metafetish.buttplug.server.bluetooth.devices.FleshlightLaunchBluetoothInfo;
 import org.metafetish.buttplug.server.bluetooth.devices.KiirooBluetoothInfo;
 import org.metafetish.buttplug.server.bluetooth.devices.VorzeA10CycloneInfo;
+import org.metafetish.buttplug.server.bluetooth.devices.WeVibeBluetoothInfo;
 import org.metafetish.buttplug.server.util.FleshlightHelper;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private ButtplugLogManager bpLogManager = new ButtplugLogManager();
-    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass().getSimpleName());
 
     private List<IBluetoothDeviceInfo> deviceInfos;
 
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView status;
     private ImageView icon;
+    private ImageView icon2;
     private BluetoothGattServer bluetoothGattServer;
     private BluetoothGattCharacteristic tx;
     private BluetoothLeAdvertiser bluetoothLeAdvertiser;
@@ -77,11 +79,13 @@ public class MainActivity extends AppCompatActivity {
         this.deviceInfos = new ArrayList<>();
         deviceInfos.add(new FleshlightLaunchBluetoothInfo());
         deviceInfos.add(new KiirooBluetoothInfo());
+        deviceInfos.add(new WeVibeBluetoothInfo());
         deviceInfos.add(new VorzeA10CycloneInfo());
 
         List<String> deviceNames = new ArrayList<>();
         deviceNames.add("Fleshlight Launch");
         deviceNames.add("Kiiroo Pearl");
+        deviceNames.add("WeVibe Cougar");
         deviceNames.add("Vorze A10 Cyclone");
 
         this.sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
@@ -116,12 +120,22 @@ public class MainActivity extends AppCompatActivity {
     private void prepareDevice() {
         this.status = findViewById(R.id.status);
         this.icon = findViewById(R.id.icon);
+        this.icon2 = findViewById(R.id.icon2);
 
         if (this.objectAnimator != null) {
             this.objectAnimator.cancel();
         }
+        IBluetoothDeviceInfo deviceInfo = this.deviceInfos.get(
+                ((Spinner) findViewById(R.id.device)).getSelectedItemPosition());
+
         this.icon.setTranslationY(0);
         this.icon.setRotation(0);
+        this.icon2.setRotation(0);
+        if (deviceInfo instanceof WeVibeBluetoothInfo) {
+            this.icon2.setVisibility(View.VISIBLE);
+        } else {
+            this.icon2.setVisibility(View.INVISIBLE);
+        }
 
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context
                 .BLUETOOTH_SERVICE);
@@ -197,9 +211,6 @@ public class MainActivity extends AppCompatActivity {
                     });
             this.bpLogger.trace(String.format("bluetoothGattServer services size: %s",
                     this.bluetoothGattServer.getServices().size()));
-
-            IBluetoothDeviceInfo deviceInfo = this.deviceInfos.get(
-                    ((Spinner) findViewById(R.id.device)).getSelectedItemPosition());
 
             BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
             this.bpLogger.trace(String.format("bluetoothAdapter name: %s", bluetoothAdapter.getName()));
@@ -353,22 +364,13 @@ public class MainActivity extends AppCompatActivity {
                     objectAnimator.setInterpolator(new LinearInterpolator());
                     objectAnimator.start();
                 } else if (deviceInfo instanceof KiirooBluetoothInfo) {
-                    MainActivity.this.icon.setTranslationY(0);
-                    MainActivity.this.icon.setRotation(0);
                     float degrees = MainActivity.this.lastCommand[0] - 48;
-                    if (degrees > 0) {
-                        RotateAnimation rotateAnimation = new RotateAnimation(-degrees, degrees,
-                                Animation.RELATIVE_TO_SELF,
-                                0.5f,
-                                Animation.RELATIVE_TO_SELF,
-                                0.5f);
-                        rotateAnimation.setDuration(10);
-                        rotateAnimation.setRepeatCount(Animation.INFINITE);
-                        rotateAnimation.setRepeatMode(Animation.REVERSE);
-                        MainActivity.this.icon.startAnimation(rotateAnimation);
-                    } else {
-                        MainActivity.this.icon.clearAnimation();
-                    }
+                    MainActivity.this.vibrateImageView(MainActivity.this.icon, degrees);
+                } else if (deviceInfo instanceof WeVibeBluetoothInfo) {
+                    float degreesExt = (float) (MainActivity.this.lastCommand[3] & 0x0f) / 4;
+                    MainActivity.this.vibrateImageView(MainActivity.this.icon, degreesExt);
+                    float degreesInt = (float) ((MainActivity.this.lastCommand[3] & 0xf0) >> 4) / 4;
+                    MainActivity.this.vibrateImageView(MainActivity.this.icon2, degreesInt);
                 } else if (deviceInfo instanceof VorzeA10CycloneInfo) {
                     MainActivity.this.icon.setTranslationY(0);
                     float speed = MainActivity.this.lastCommand[2];
@@ -393,6 +395,24 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void vibrateImageView(ImageView icon, float degrees) {
+        icon.setTranslationY(0);
+        icon.setRotation(0);
+        if (degrees > 0) {
+            RotateAnimation rotateAnimation = new RotateAnimation(-degrees, degrees,
+                    Animation.RELATIVE_TO_SELF,
+                    0.5f,
+                    Animation.RELATIVE_TO_SELF,
+                    0.5f);
+            rotateAnimation.setDuration(10);
+            rotateAnimation.setRepeatCount(Animation.INFINITE);
+            rotateAnimation.setRepeatMode(Animation.REVERSE);
+            icon.startAnimation(rotateAnimation);
+        } else {
+            icon.clearAnimation();
+        }
     }
 
     private float fromDp(double dp) {

@@ -30,6 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ButtplugServer {
@@ -58,7 +59,7 @@ public class ButtplugServer {
     protected IButtplugLogManager bpLogManager = new ButtplugLogManager();
 
     @NonNull
-    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass().getSimpleName());
 
     @NonNull
     private DeviceManager deviceManager;
@@ -72,8 +73,16 @@ public class ButtplugServer {
     private boolean receivedRequestServerInfo;
     private long clientMessageVersion;
 
+    public ButtplugServer(String serverName) {
+        this(serverName, 0, null);
+    }
+
     public ButtplugServer(String serverName, long maxPingTime) {
         this(serverName, maxPingTime, null);
+    }
+
+    public ButtplugServer(String serverName, DeviceManager deviceManager) {
+        this(serverName, 0, deviceManager);
     }
 
     public ButtplugServer(@NonNull String serverName, long maxPingTime, DeviceManager
@@ -138,102 +147,124 @@ public class ButtplugServer {
         this.pingTimedOut = true;
     }
 
-    protected Future<ButtplugMessage> sendMessage(ButtplugMessage msg) throws
+    public Future<ButtplugMessage> sendMessage(final ButtplugMessage msg) throws
             ExecutionException, InterruptedException, InvocationTargetException,
             IllegalAccessException {
-        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
+        final SettableFuture<ButtplugMessage> promise = SettableFuture.create();
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                ButtplugServer.this.bpLogger.trace(String.format("Got Message %s of type %s to send",
+                        msg.id, msg.getClass().getSimpleName()));
+                long id = msg.id;
+                if (id == 0) {
+                    promise.set(ButtplugServer.this.bpLogger.logWarnMsg(id, Error.ErrorClass.ERROR_MSG,
+                            "Message Id 0 is reserved for outgoing system messages. Please use another Id."));
+                } else if (msg instanceof IButtplugMessageOutgoingOnly) {
+                    promise.set(ButtplugServer.this.bpLogger.logWarnMsg(id, Error.ErrorClass.ERROR_MSG, String.format(
+                            "Message of type %s cannot be sent to server", msg.getClass().getSimpleName())));
+                } else if (ButtplugServer.this.pingTimedOut) {
+                    promise.set(ButtplugServer.this.bpLogger.logWarnMsg(id, Error.ErrorClass.ERROR_PING, "Ping timed out."));
+                } else if (!ButtplugServer.this.receivedRequestServerInfo && !(msg instanceof RequestServerInfo)) {
+                    promise.set(ButtplugServer.this.bpLogger.logErrorMsg(id, Error.ErrorClass.ERROR_INIT,
+                            "RequestServerInfo must be first message received by server!"));
+                } else  if (msg instanceof RequestLog) {
+                    ButtplugServer.this.bpLogger.debug("Got RequestLog Message");
+                    ButtplugServer.this.bpLogManager.setButtplugLogLevel(((RequestLog) msg).logLevel);
+                    promise.set(new Ok(id));
+                } else if (msg instanceof Ping) {
+                    if (ButtplugServer.this.pingTimeoutHandler != null && ButtplugServer.this.maxPingTime != 0) {
+                        ButtplugServer.this.pingTimeoutHandler.removeCallbacks(ButtplugServer.this.pingTimeoutCallback);
+                        ButtplugServer.this.pingTimeoutHandler.postDelayed(ButtplugServer.this.pingTimeoutCallback, MAX_PING_TIMEOUT);
+                    }
+                    promise.set(new Ok(id));
+                } else if (msg instanceof RequestServerInfo) {
+                    ButtplugServer.this.bpLogger.debug("Got RequestServerInfo Message");
+                    ButtplugServer.this.receivedRequestServerInfo = true;
+                    ButtplugServer.this.clientMessageVersion = ((RequestServerInfo) msg).messageVersion;
 
-        this.bpLogger.trace(String.format("Got Message %s of type %s to send",
-                msg.id,
-                msg.getClass().getSimpleName()));
-        long id = msg.id;
-        if (id == 0) {
-            promise.set(this.bpLogger.logWarnMsg(id, Error.ErrorClass.ERROR_MSG,"Message Id 0" +
-                    " is reserved for outgoing system messages. Please use another Id."));
-            return promise;
-        }
+                    if (ButtplugServer.this.pingTimeoutHandler != null && ButtplugServer.this.maxPingTime != 0) {
+                        ButtplugServer.this.pingTimeoutHandler.postDelayed(ButtplugServer.this.pingTimeoutCallback, MAX_PING_TIMEOUT);
+                    }
+                    ButtplugServer.this.clientConnected.invoke(new ButtplugEvent(msg));
 
-        if (msg instanceof IButtplugMessageOutgoingOnly) {
-            promise.set(this.bpLogger.logWarnMsg(id, Error.ErrorClass.ERROR_MSG, String.format(
-                    "Message of type %s cannot be sent to server",
-                    msg.getClass().getSimpleName())));
-            return promise;
-        }
+                    promise.set(new ServerInfo(ButtplugServer.this.serverName, 1, ButtplugServer.this.maxPingTime, id));
+                    ButtplugServer.this.bpLogger.debug("RSI promise set");
+                } else if (msg instanceof Test) {
+                    promise.set(new Test(((Test) msg).getTestString(), id));
+                } else {
+                    try {
+                        promise.set(ButtplugServer.this.deviceManager.sendMessage(msg).get());
+                    } catch (InterruptedException | ExecutionException | InvocationTargetException | IllegalAccessException e) {
+                        promise.set(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.DefaultMsgId));
 
-
-        if (this.pingTimedOut) {
-            promise.set(this.bpLogger.logWarnMsg(id, Error.ErrorClass.ERROR_PING, "Ping timed out."));
-            return promise;
-        }
-
-        if (!this.receivedRequestServerInfo && !(msg instanceof RequestServerInfo)) {
-            promise.set(this.bpLogger.logErrorMsg(id, Error.ErrorClass.ERROR_INIT,
-                    "RequestServerInfo must be first message received by server!"));
-            return promise;
-        }
-
-        if (msg instanceof RequestLog) {
-            this.bpLogger.debug("Got RequestLog Message");
-            this.bpLogManager.setButtplugLogLevel(((RequestLog) msg).logLevel);
-            promise.set(new Ok(id));
-            return promise;
-        } else if (msg instanceof Ping) {
-            if (this.pingTimeoutHandler != null && this.maxPingTime != 0) {
-                this.pingTimeoutHandler.removeCallbacks(this.pingTimeoutCallback);
-                this.pingTimeoutHandler.postDelayed(this.pingTimeoutCallback, MAX_PING_TIMEOUT);
+                    }
+                }
             }
-            promise.set(new Ok(id));
-            return promise;
-        } else if (msg instanceof RequestServerInfo) {
-            this.bpLogger.debug("Got RequestServerInfo Message");
-            this.receivedRequestServerInfo = true;
-            this.clientMessageVersion = ((RequestServerInfo) msg).messageVersion;
-
-            if (this.pingTimeoutHandler != null && this.maxPingTime != 0) {
-                this.pingTimeoutHandler.postDelayed(this.pingTimeoutCallback, MAX_PING_TIMEOUT);
-            }
-            this.clientConnected.invoke(new ButtplugEvent(msg));
-
-            promise.set(new ServerInfo(this.serverName, 1, this.maxPingTime, id));
-            return promise;
-        } else if (msg instanceof Test) {
-            promise.set(new Test(((Test) msg).getTestString(), id));
-            return promise;
-        }
-        promise.set(this.deviceManager.sendMessage(msg).get());
+        });
         return promise;
     }
 
     public Future<Void> shutdown() throws ExecutionException, InterruptedException,
             InvocationTargetException, IllegalAccessException {
-        SettableFuture<Void> promise = SettableFuture.create();
-        ButtplugMessage msg = this.deviceManager.sendMessage(new StopAllDevices()).get();
-        if (msg instanceof Error) {
-            this.bpLogger.error("An error occured while stopping devices on shutdown.");
-            this.bpLogger.error(((Error) msg).errorMessage);
-        }
+        final SettableFuture<Void> promise = SettableFuture.create();
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                ButtplugMessage msg = null;
+                try {
+                    msg = ButtplugServer.this.deviceManager.sendMessage(new StopAllDevices()).get();
+                } catch (InterruptedException | ExecutionException | IllegalAccessException | InvocationTargetException e) {
+                    ButtplugServer.this.bpLogger.logException(e);
+                }
+                if (msg instanceof Error) {
+                    ButtplugServer.this.bpLogger.error("An error occured while stopping devices on shutdown.");
+                    ButtplugServer.this.bpLogger.error(((Error) msg).errorMessage);
+                }
 
-        this.deviceManager.stopScanning();
-        this.deviceManager.getDeviceMessageReceived().removeCallback(this.deviceMessageReceivedCallback);
-        this.deviceManager.getScanningFinished().removeCallback(this.scanningFinishedCallback);
-        this.bpLogManager.getLogMessageReceived().removeCallback(this.logMessageReceivedCallback);
+                ButtplugServer.this.deviceManager.stopScanning();
+                ButtplugServer.this.deviceManager.getDeviceMessageReceived().removeCallback(ButtplugServer.this.deviceMessageReceivedCallback);
+                ButtplugServer.this.deviceManager.getScanningFinished().removeCallback(ButtplugServer.this.scanningFinishedCallback);
+                ButtplugServer.this.bpLogManager.getLogMessageReceived().removeCallback(ButtplugServer.this.logMessageReceivedCallback);
+                promise.set(null);
+            }
+        });
         return promise;
     }
 
-    public Future<List<ButtplugMessage>> sendMessage(String jsonMsgs) throws
+    public Future<List<ButtplugMessage>> sendMessage(final String jsonMsgs) throws
             ExecutionException, InterruptedException, IOException, InvocationTargetException,
             IllegalAccessException {
-        SettableFuture<List<ButtplugMessage>> promise = SettableFuture.create();
-        List<ButtplugMessage> msgs = this.parser.deserialize(jsonMsgs);
-        List<ButtplugMessage> res = new ArrayList<>();
-        for (ButtplugMessage msg : msgs) {
-            if (msg instanceof Error) {
-                res.add(msg);
-            } else {
-                res.add(this.sendMessage(msg).get());
+        final SettableFuture<List<ButtplugMessage>> promise = SettableFuture.create();
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                List<ButtplugMessage> msgs = null;
+                try {
+                    msgs = ButtplugServer.this.parser.deserialize(jsonMsgs);
+                    List<ButtplugMessage> res = new ArrayList<>();
+                    for (ButtplugMessage msg : msgs) {
+                        if (msg instanceof Error) {
+                            res.add(msg);
+                        } else {
+                            try {
+                                res.add(ButtplugServer.this.sendMessage(msg).get());
+                            } catch (final InterruptedException | ExecutionException | InvocationTargetException | IllegalAccessException e) {
+                                promise.set(new ArrayList<ButtplugMessage>(){{
+                                    add(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.DefaultMsgId));
+                                }});
+                                return;
+                            }
+                        }
+                    }
+                    promise.set(res);
+                } catch (final IOException e) {
+                    promise.set(new ArrayList<ButtplugMessage>(){{
+                        add(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.DefaultMsgId));
+                    }});
+                }
             }
-        }
-        promise.set(res);
+        });
         return promise;
     }
 

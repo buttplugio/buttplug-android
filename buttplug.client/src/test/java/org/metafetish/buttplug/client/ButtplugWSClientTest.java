@@ -3,6 +3,9 @@ package org.metafetish.buttplug.client;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.metafetish.buttplug.core.ButtplugMessage;
+import org.metafetish.buttplug.core.Messages.DeviceMessageInfo;
+import org.metafetish.buttplug.core.Messages.Ok;
 import org.metafetish.buttplug.core.Messages.SingleMotorVibrateCmd;
 import org.metafetish.buttplug.core.Messages.StopAllDevices;
 
@@ -14,21 +17,22 @@ public class ButtplugWSClientTest {
     @Test
     public void TestConnect() throws Exception {
         ButtplugWSClient client = new ButtplugWSClient("Java Test");
-        client.Connect(new URI("wss://localhost:12345/buttplug"), true);
-        client.startScanning();
+        client.connect(new URI("wss://localhost:12345/buttplug"), true);
+        Assert.assertTrue(client.startScanning());
 
         Thread.sleep(5000);
         client.requestDeviceList();
-        for (ButtplugClientDevice dev : client.getDevices()) {
-            if (dev.allowedMessages.contains(SingleMotorVibrateCmd.class.getSimpleName())) {
-                client.sendDeviceMessage(dev, new SingleMotorVibrateCmd(dev.index, 0.5, client
-                        .getNextMsgId()));
+        for (DeviceMessageInfo deviceInfo : client.getDevices().values()) {
+            if (deviceInfo.deviceMessages.keySet().contains(SingleMotorVibrateCmd.class.getSimpleName())) {
+                ButtplugMessage msg = client.sendDeviceMessage(deviceInfo.deviceIndex, new SingleMotorVibrateCmd(deviceInfo.deviceIndex, 0.5, client
+                        .getNextMsgId())).get();
+                Assert.assertEquals(Ok.class, msg.getClass());
             }
         }
 
         Thread.sleep(1000);
         Assert.assertTrue(client.sendMessageExpectOk(new StopAllDevices(client.getNextMsgId())));
 
-        client.Disconnect();
+        client.disconnect();
     }
 }

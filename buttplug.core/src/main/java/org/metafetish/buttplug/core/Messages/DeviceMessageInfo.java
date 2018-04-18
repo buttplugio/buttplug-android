@@ -17,9 +17,12 @@ public class DeviceMessageInfo {
     @JsonProperty(value = "DeviceMessages", required = true)
     public LinkedHashMap<String, MessageAttributes> deviceMessages;
 
-    public DeviceMessageInfo(long deviceIndex, String deviceName, LinkedHashMap<String,
-            MessageAttributes>
-            deviceMessages) {
+    public DeviceMessageInfo(DeviceAdded deviceInfo) {
+        this(deviceInfo.deviceIndex, deviceInfo.deviceName, deviceInfo.deviceMessages);
+    }
+
+    public DeviceMessageInfo(long deviceIndex, String deviceName,
+                             LinkedHashMap<String, MessageAttributes> deviceMessages) {
         this.deviceName = deviceName;
         this.deviceIndex = deviceIndex;
         this.deviceMessages = deviceMessages;

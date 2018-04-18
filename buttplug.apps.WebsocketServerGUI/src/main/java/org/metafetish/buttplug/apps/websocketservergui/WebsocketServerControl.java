@@ -41,19 +41,19 @@ public class WebsocketServerControl extends Fragment {
     private IButtplugServerFactory bpFactory;
     //TODO: Implement ButtplugConfig?
     private ButtplugLogManager bpLogManager = new ButtplugLogManager();
-    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass());
+    private IButtplugLog bpLogger = this.bpLogManager.getLogger(this.getClass().getSimpleName());
     private boolean loopback;
     private long port;
     private boolean secure;
 
     private SharedPreferences sharedPreferences;
 
-    private boolean serverStarted;
-    private boolean clientConnected;
+    private boolean serverStarted = false;
+    private boolean clientConnected = false;
 
     private Map<String, String> connUrls;
-    private String remoteId;
-    private String currentExceptionMessage;
+    private String remoteId = "";
+    private String currentExceptionMessage = "";
 
     public WebsocketServerControl() {
         // Required empty public constructor
@@ -78,7 +78,7 @@ public class WebsocketServerControl extends Fragment {
 //              this._config = new ButtplugConfig("Buttplug");
 //              this._connUrls = new ConnUrlList();
 
-            this.port = this.sharedPreferences.getLong("port", 12345);
+            this.port = this.sharedPreferences.getLong("port", Long.parseLong(this.getString(R.string.default_port)));
             this.loopback = this.sharedPreferences.getBoolean("loopback", false);
             this.secure = this.sharedPreferences.getBoolean("secure", false);
 
@@ -103,7 +103,7 @@ public class WebsocketServerControl extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
         if (this.activity != null) {
-            EditText portText = (EditText) this.activity.findViewById(R.id.port);
+            EditText portText = this.activity.findViewById(R.id.port);
             portText.setText(String.valueOf(this.port));
             portText.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -153,11 +153,11 @@ public class WebsocketServerControl extends Fragment {
             serverToggle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (((Button) view).getText().toString().equals(getString(R.string
-                            .server_start))) {
+                    if (((Button) view).getText().toString().equals(
+                            WebsocketServerControl.this.getString(R.string.server_start))) {
                         WebsocketServerControl.this.startServer();
-                    } else if (((Button) view).getText().toString().equals(getString(R.string
-                            .server_stop))) {
+                    } else if (((Button) view).getText().toString().equals(
+                            WebsocketServerControl.this.getString(R.string.server_stop))) {
                         WebsocketServerControl.this.stopServer();
                     }
                 }
@@ -212,10 +212,7 @@ public class WebsocketServerControl extends Fragment {
     }
 
     public boolean isUiReady() {
-        if (this.activity != null && this.view != null) {
-            return true;
-        }
-        return false;
+        return this.activity != null && this.view != null;
     }
 
     private IButtplugCallback websocketException = new IButtplugCallback() {
@@ -359,8 +356,8 @@ public class WebsocketServerControl extends Fragment {
 
     private void onClientConnected() {
         if (this.isUiReady()) {
-            ((TextView) this.activity.findViewById(R.id.status)).setText(getString(R.string
-                    .status_connected, this.remoteId));
+            ((TextView) this.activity.findViewById(R.id.status)).setText(
+                    this.getString(R.string.status_connected, this.remoteId));
             this.activity.findViewById(R.id.client_toggle).setEnabled(true);
         }
     }

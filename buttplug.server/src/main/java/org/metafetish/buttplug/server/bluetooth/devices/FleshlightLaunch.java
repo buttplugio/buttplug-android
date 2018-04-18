@@ -38,6 +38,7 @@ public class FleshlightLaunch extends ButtplugBluetoothDevice {
         msgFuncs.put(StopDeviceCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
     }
 
+    @NonNull
     public Future<ButtplugMessage> initialize() {
         final SettableFuture<ButtplugMessage> promise = SettableFuture.create();
         Executors.newSingleThreadExecutor().submit(new Runnable() {

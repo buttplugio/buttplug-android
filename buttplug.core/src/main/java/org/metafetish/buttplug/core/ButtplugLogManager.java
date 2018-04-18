@@ -42,7 +42,7 @@ public class ButtplugLogManager implements IButtplugLogManager {
                     ()) {
                 logMessageReceived.invoke(event);
             }
-            ButtplugLogManager.lastLogMessagesReceived.add(new Pair<Date, Log>(new Date(), msg));
+            ButtplugLogManager.lastLogMessagesReceived.add(new Pair<>(new Date(), msg));
             if (ButtplugLogManager.lastLogMessagesReceived.size() > 25) {
                 ButtplugLogManager.lastLogMessagesReceived.remove(0);
             }

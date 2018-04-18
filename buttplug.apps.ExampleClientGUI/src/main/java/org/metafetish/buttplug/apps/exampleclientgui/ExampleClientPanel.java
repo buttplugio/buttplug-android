@@ -24,7 +24,6 @@ import org.metafetish.buttplug.core.IButtplugLog;
 import org.metafetish.buttplug.core.Messages.DeviceMessageInfo;
 import org.metafetish.buttplug.core.Messages.Error;
 
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -66,7 +65,7 @@ public class ExampleClientPanel extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_example_client_panel, container, false);
@@ -97,7 +96,7 @@ public class ExampleClientPanel extends Fragment {
                 }
             });
 
-            Button clientToggle = (Button) this.activity.findViewById(R.id.client_toggle);
+            Button clientToggle = this.activity.findViewById(R.id.client_toggle);
             clientToggle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -125,7 +124,7 @@ public class ExampleClientPanel extends Fragment {
         public void invoke(ButtplugEvent event) {
             try {
                 ExampleClientPanel.this.client.startScanning();
-            } catch (ExecutionException | InterruptedException | IOException e) {
+            } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -136,7 +135,7 @@ public class ExampleClientPanel extends Fragment {
         public void invoke(ButtplugEvent event) {
             try {
                 ExampleClientPanel.this.client.stopScanning();
-            } catch (ExecutionException | InterruptedException | IOException e) {
+            } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -235,7 +234,7 @@ public class ExampleClientPanel extends Fragment {
 
     private void onClientConnect() {
         if (this.isUiReady()) {
-            ((Button) this.activity.findViewById(R.id.client_toggle)).setEnabled(false);
+            this.activity.findViewById(R.id.client_toggle).setEnabled(false);
             this.activity.findViewById(R.id.address).setEnabled(false);
             ((TextView) this.activity.findViewById(R.id.last_error)).setText("");
         }

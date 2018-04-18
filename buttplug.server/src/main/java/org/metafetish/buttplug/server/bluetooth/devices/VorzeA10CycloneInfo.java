@@ -20,6 +20,7 @@ public class VorzeA10CycloneInfo implements IBluetoothDeviceInfo {
         add("CycSA");
     }};
 
+    @NonNull
     public List<String> getNames() {
         return this.names;
     }
@@ -28,6 +29,7 @@ public class VorzeA10CycloneInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("40ee1111-63ec-4b7f-8ce7-712efd55b90e"));
     }};
 
+    @NonNull
     public List<UUID> getServices() {
         return this.services;
     }
@@ -37,6 +39,7 @@ public class VorzeA10CycloneInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("40ee2222-63ec-4b7f-8ce7-712efd55b90e"));
     }};
 
+    @NonNull
     public List<UUID> getCharacteristics() {
         return this.characteristics;
     }

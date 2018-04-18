@@ -197,6 +197,7 @@ public abstract class ButtplugClient {
         return sendMessageExpectOk(new StartScanning(msgId.incrementAndGet()));
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean stopScanning() throws ExecutionException, InterruptedException {
         return sendMessageExpectOk(new StopScanning(msgId.incrementAndGet()));
     }

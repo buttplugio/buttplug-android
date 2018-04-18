@@ -17,7 +17,6 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInfo;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 

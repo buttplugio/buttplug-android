@@ -6,7 +6,6 @@ import org.metafetish.buttplug.core.IButtplugDeviceMessageCallback;
 import org.metafetish.buttplug.core.Messages.Error;
 import org.metafetish.buttplug.core.Messages.MessageAttributes;
 import org.metafetish.buttplug.core.Messages.Ok;
-import org.metafetish.buttplug.core.Messages.RotateCmd;
 import org.metafetish.buttplug.core.Messages.SingleMotorVibrateCmd;
 import org.metafetish.buttplug.core.Messages.StopDeviceCmd;
 import org.metafetish.buttplug.core.Messages.VibrateCmd;

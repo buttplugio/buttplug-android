@@ -140,16 +140,14 @@ public class ButtplugServer {
                 Error.ErrorClass.ERROR_PING, ButtplugConsts.SystemMsgId)));
         try {
             this.sendMessage(new StopAllDevices()).get();
-        } catch (InterruptedException | ExecutionException | IllegalAccessException | InvocationTargetException e) {
+        } catch (InterruptedException | ExecutionException e) {
             this.bpLogger.error("Failed to issue StopAllDevices.");
             this.bpLogger.logException(e);
         }
         this.pingTimedOut = true;
     }
 
-    public Future<ButtplugMessage> sendMessage(final ButtplugMessage msg) throws
-            ExecutionException, InterruptedException, InvocationTargetException,
-            IllegalAccessException {
+    public Future<ButtplugMessage> sendMessage(final ButtplugMessage msg) {
         final SettableFuture<ButtplugMessage> promise = SettableFuture.create();
         Executors.newSingleThreadExecutor().submit(new Runnable() {
             @Override
@@ -205,8 +203,7 @@ public class ButtplugServer {
         return promise;
     }
 
-    public Future<Void> shutdown() throws ExecutionException, InterruptedException,
-            InvocationTargetException, IllegalAccessException {
+    public Future<Void> shutdown() {
         final SettableFuture<Void> promise = SettableFuture.create();
         Executors.newSingleThreadExecutor().submit(new Runnable() {
             @Override
@@ -232,9 +229,7 @@ public class ButtplugServer {
         return promise;
     }
 
-    public Future<List<ButtplugMessage>> sendMessage(final String jsonMsgs) throws
-            ExecutionException, InterruptedException, IOException, InvocationTargetException,
-            IllegalAccessException {
+    public Future<List<ButtplugMessage>> sendMessage(final String jsonMsgs) {
         final SettableFuture<List<ButtplugMessage>> promise = SettableFuture.create();
         Executors.newSingleThreadExecutor().submit(new Runnable() {
             @Override
@@ -249,7 +244,7 @@ public class ButtplugServer {
                         } else {
                             try {
                                 res.add(ButtplugServer.this.sendMessage(msg).get());
-                            } catch (final InterruptedException | ExecutionException | InvocationTargetException | IllegalAccessException e) {
+                            } catch (final InterruptedException | ExecutionException e) {
                                 promise.set(new ArrayList<ButtplugMessage>(){{
                                     add(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.DefaultMsgId));
                                 }});

@@ -199,8 +199,7 @@ public class DeviceManager {
     }
 
     protected Future<ButtplugMessage> sendMessage(ButtplugMessage msg)
-            throws ExecutionException, InterruptedException, InvocationTargetException,
-            IllegalAccessException {
+            throws ExecutionException, InterruptedException {
         SettableFuture<ButtplugMessage> promise = SettableFuture.create();
 
         long id = msg.id;

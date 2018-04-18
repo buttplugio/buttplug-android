@@ -36,7 +36,7 @@ public class ButtplugAboutControl extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_buttplug_about_control, container, false);
@@ -47,7 +47,7 @@ public class ButtplugAboutControl extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         if (this.activity != null) {
 
-            TextView headerText = (TextView) ButtplugAboutControl.this.activity.findViewById(R.id
+            TextView headerText = ButtplugAboutControl.this.activity.findViewById(R.id
                     .header_text);
             try {
                 headerText.setText(getString(R.string.header_title, ButtplugAboutControl.this
@@ -59,11 +59,11 @@ public class ButtplugAboutControl extends Fragment {
 
             //TODO: Implement developer tab?
 
-            TextView linkText = (TextView) ButtplugAboutControl.this.activity.findViewById(R.id
+            TextView linkText = ButtplugAboutControl.this.activity.findViewById(R.id
                     .header_links);
             linkText.setMovementMethod(LinkMovementMethod.getInstance());
 
-            ImageView patreon = (ImageView) ButtplugAboutControl.this.activity.findViewById(R.id
+            ImageView patreon = ButtplugAboutControl.this.activity.findViewById(R.id
                     .patreon);
             patreon.setOnClickListener(new View.OnClickListener() {
                 @Override

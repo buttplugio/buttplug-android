@@ -17,7 +17,6 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -48,7 +47,7 @@ public class KiirooGen2Vibe extends ButtplugBluetoothDevice {
     public KiirooGen2Vibe(@NonNull IBluetoothDeviceInterface iface,
                           @NonNull IBluetoothDeviceInfo info) {
         super(String.format("%s %s", devInfos.get(iface.getName()), iface.getName()), iface, info);
-        this.devInfo = this.devInfos.get(iface.getName());
+        this.devInfo = KiirooGen2Vibe.devInfos.get(iface.getName());
         msgFuncs.put(StopDeviceCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
         msgFuncs.put(VibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleVibrateCmd, new MessageAttributes(devInfo.vibeCount)));
         msgFuncs.put(SingleMotorVibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleSingleMotorVibrateCmd));
@@ -61,7 +60,7 @@ public class KiirooGen2Vibe extends ButtplugBluetoothDevice {
                     String.format("Stopping Device %s", KiirooGen2Vibe.this.getName()));
 
             VibrateCmd vibrateCmd = new VibrateCmd(msg.deviceIndex, null, msg.id);
-            ArrayList<VibrateCmd.VibrateSubcommand> vibrateCommands = new ArrayList<VibrateCmd.VibrateSubcommand>();
+            ArrayList<VibrateCmd.VibrateSubcommand> vibrateCommands = new ArrayList<>();
             for (int i = 0; i < KiirooGen2Vibe.this.devInfo.vibeCount; i++) {
                 vibrateCommands.add(vibrateCmd.new VibrateSubcommand(i, 0));
             }
@@ -85,7 +84,7 @@ public class KiirooGen2Vibe extends ButtplugBluetoothDevice {
             }
 
             VibrateCmd vibrateCmd = new VibrateCmd(msg.deviceIndex, null, msg.id);
-            ArrayList<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<VibrateCmd.VibrateSubcommand>();
+            ArrayList<VibrateCmd.VibrateSubcommand> speeds = new ArrayList<>();
             for (int i = 0; i < KiirooGen2Vibe.this.devInfo.vibeCount; i++) {
                 speeds.add(vibrateCmd.new VibrateSubcommand(i, cmdMsg.getSpeed()));
             }

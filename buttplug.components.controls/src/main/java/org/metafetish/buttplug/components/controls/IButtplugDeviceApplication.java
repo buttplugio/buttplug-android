@@ -7,17 +7,17 @@ import org.metafetish.buttplug.core.ButtplugEventHandler;
 public interface IButtplugDeviceApplication {
 
     @NonNull
-    public ButtplugEventHandler getStartScanning();
+    ButtplugEventHandler getStartScanning();
 
     @NonNull
-    public ButtplugEventHandler getStopScanning();
+    ButtplugEventHandler getStopScanning();
 
     @NonNull
-    public ButtplugEventHandler getDeviceAdded();
+    ButtplugEventHandler getDeviceAdded();
 
     @NonNull
-    public ButtplugEventHandler getDeviceRemoved();
+    ButtplugEventHandler getDeviceRemoved();
 
     @NonNull
-    public ButtplugEventHandler getDevicesReset();
+    ButtplugEventHandler getDevicesReset();
 }

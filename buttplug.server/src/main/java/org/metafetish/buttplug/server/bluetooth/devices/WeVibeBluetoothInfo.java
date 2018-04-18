@@ -35,6 +35,7 @@ public class WeVibeBluetoothInfo implements IBluetoothDeviceInfo {
         add("Wish");
     }};
 
+    @NonNull
     public List<String> getNames() {
         return this.names;
     }
@@ -43,6 +44,7 @@ public class WeVibeBluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("f000bb03-0451-4000-b000-000000000000"));
     }};
 
+    @NonNull
     public List<UUID> getServices() {
         return this.services;
     }
@@ -54,6 +56,7 @@ public class WeVibeBluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("f000b000-0451-4000-b000-000000000000"));
     }};
 
+    @NonNull
     public List<UUID> getCharacteristics() {
         return this.characteristics;
     }

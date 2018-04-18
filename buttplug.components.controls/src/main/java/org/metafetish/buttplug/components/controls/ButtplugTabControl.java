@@ -110,7 +110,7 @@ public class ButtplugTabControl extends Fragment implements IButtplugTabControl,
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (this.activity != null) {
-            Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
+            Toolbar toolbar = activity.findViewById(R.id.toolbar);
             activity.setSupportActionBar(toolbar);
 
             // Create the adapter that will return a fragment for each of the three
@@ -119,10 +119,10 @@ public class ButtplugTabControl extends Fragment implements IButtplugTabControl,
                     .getSupportFragmentManager(), this.hasDevicePanel ? 4 : 3);
 
             // Set up the ViewPager with the sections adapter.
-            this.viewPager = (ViewPager) activity.findViewById(R.id.container);
+            this.viewPager = activity.findViewById(R.id.container);
             this.viewPager.setAdapter(this.sectionsPagerAdapter);
 
-            this.tabLayout = (TabLayout) activity.findViewById(R.id.tabs);
+            this.tabLayout = activity.findViewById(R.id.tabs);
             if (!this.hasDevicePanel) {
                 this.tabLayout.removeTabAt(1);
             }

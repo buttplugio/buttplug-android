@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 
 import org.metafetish.buttplug.core.Messages.MessageAttributes;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 
 public interface IButtplugDevice {
@@ -32,8 +31,7 @@ public interface IButtplugDevice {
     Iterable<String> getAllowedMessageTypes();
 
     @NonNull
-    Future<ButtplugMessage> parseMessage(ButtplugDeviceMessage msg) throws
-            InvocationTargetException, IllegalAccessException;
+    Future<ButtplugMessage> parseMessage(ButtplugDeviceMessage msg);
 
     @NonNull
     Future<ButtplugMessage> initialize();

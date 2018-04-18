@@ -8,7 +8,6 @@ import org.metafetish.buttplug.core.Messages.Error;
 import org.metafetish.buttplug.core.Messages.MessageAttributes;
 import org.metafetish.buttplug.core.Messages.Ok;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -97,6 +96,7 @@ public abstract class ButtplugDevice implements IButtplugDevice {
         return this.msgFuncs.keySet();
     }
 
+    @NonNull
     public MessageAttributes getMessageAttrs(String msgType) {
         if (this.msgFuncs.containsKey(msgType)) {
             return this.msgFuncs.get(msgType).attrs;
@@ -112,8 +112,7 @@ public abstract class ButtplugDevice implements IButtplugDevice {
     }
 
     @NonNull
-    public Future<ButtplugMessage> parseMessage(final @NonNull ButtplugDeviceMessage msg)
-            throws InvocationTargetException, IllegalAccessException {
+    public Future<ButtplugMessage> parseMessage(final @NonNull ButtplugDeviceMessage msg) {
         final SettableFuture<ButtplugMessage> promise = SettableFuture.create();
         Executors.newSingleThreadExecutor().submit(new Runnable() {
             @Override

@@ -1,5 +1,5 @@
 package org.metafetish.buttplug.core;
 
 public interface IButtplugCallback {
-    abstract void invoke(ButtplugEvent event);
+    void invoke(ButtplugEvent event);
 }

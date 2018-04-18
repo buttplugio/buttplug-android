@@ -82,7 +82,7 @@ public class ButtplugLogControl extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_buttplug_log_control, container, false);
@@ -101,7 +101,7 @@ public class ButtplugLogControl extends Fragment {
 
             this.appBarLayout = this.activity.findViewById(R.id.appbar);
 
-            Spinner spinner = (Spinner) this.activity.findViewById(R.id.log_level);
+            Spinner spinner = this.activity.findViewById(R.id.log_level);
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.activity, R
                     .array.log_levels, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -125,7 +125,7 @@ public class ButtplugLogControl extends Fragment {
                 }
             });
 
-            Button clearLog = (Button) this.activity.findViewById(R.id.clear_log);
+            Button clearLog = this.activity.findViewById(R.id.clear_log);
             clearLog.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -133,7 +133,7 @@ public class ButtplugLogControl extends Fragment {
                 }
             });
 
-            Button saveLog = (Button) this.activity.findViewById(R.id.save_log);
+            Button saveLog = this.activity.findViewById(R.id.save_log);
             saveLog.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

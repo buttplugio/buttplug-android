@@ -1,8 +1,5 @@
 package org.metafetish.buttplug.server.bluetooth;
 
-import android.support.annotation.NonNull;
-
-import org.metafetish.buttplug.core.IButtplugLogManager;
 import org.metafetish.buttplug.server.DeviceSubtypeManager;
 import org.metafetish.buttplug.server.bluetooth.devices.FleshlightLaunchBluetoothInfo;
 import org.metafetish.buttplug.server.bluetooth.devices.KiirooBluetoothInfo;

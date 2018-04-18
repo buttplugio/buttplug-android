@@ -24,6 +24,7 @@ public class LovenseRev4BluetoothInfo implements IBluetoothDeviceInfo {
         add("LVS-Domi39");
     }};
 
+    @NonNull
     public List<String> getNames() {
         return this.names;
     }
@@ -32,6 +33,7 @@ public class LovenseRev4BluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("57300001-0023-4bd4-bbd5-a6920e4c5653"));
     }};
 
+    @NonNull
     public List<UUID> getServices() {
         return this.services;
     }
@@ -43,6 +45,7 @@ public class LovenseRev4BluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("57300003-0023-4bd4-bbd5-a6920e4c5653"));
     }};
 
+    @NonNull
     public List<UUID> getCharacteristics() {
         return this.characteristics;
     }

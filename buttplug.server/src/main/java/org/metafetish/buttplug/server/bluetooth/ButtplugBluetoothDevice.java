@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import org.metafetish.buttplug.core.ButtplugDevice;
 import org.metafetish.buttplug.core.ButtplugEvent;
 import org.metafetish.buttplug.core.IButtplugCallback;
-import org.metafetish.buttplug.core.IButtplugLogManager;
 
 public class ButtplugBluetoothDevice extends ButtplugDevice {
     @NonNull

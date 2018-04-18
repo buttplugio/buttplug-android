@@ -21,6 +21,7 @@ public class YoucupsBluetoothInfo implements IBluetoothDeviceInfo {
         add("Youcups");
     }};
 
+    @NonNull
     public List<String> getNames() {
         return this.names;
     }
@@ -30,6 +31,7 @@ public class YoucupsBluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("0000fee9-0000-1000-8000-00805f9b34fb"));
     }};
 
+    @NonNull
     public List<UUID> getServices() {
         return this.services;
     }
@@ -39,6 +41,7 @@ public class YoucupsBluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("d44bc439-abfd-45a2-b575-925416129600"));
     }};
 
+    @NonNull
     public List<UUID> getCharacteristics() {
         return this.characteristics;
     }

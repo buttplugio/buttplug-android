@@ -27,7 +27,7 @@ public class RotateSubcommandDeserializer extends StdDeserializer<RotateCmd.Rota
 
     @Override
     public RotateCmd.RotateSubcommand deserialize(JsonParser p, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException {
+            throws IOException {
         JsonStreamContext ourContext = p.getParsingContext();
         JsonStreamContext listContext = ourContext.getParent();
         JsonStreamContext containerContext = listContext.getParent();

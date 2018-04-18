@@ -1,5 +1,6 @@
 package org.metafetish.buttplug.components.websocketserver;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -26,7 +27,6 @@ import org.metafetish.buttplug.server.ButtplugServer;
 import org.metafetish.buttplug.server.IButtplugServerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -178,8 +178,7 @@ public class ButtplugWebsocketServer {
                 String remoteId = ws.getRemoteSocketAddress().getHostName();
                 ButtplugWebsocketServer.this.connectionAccepted.invoke(new ButtplugEvent(remoteId));
                 ButtplugServer buttplug = ButtplugWebsocketServer.this.serverFactory.getServer();
-                ButtplugWebsocketServer.this.connections.put(remoteId, new Pair<WebSocket,
-                        ButtplugServer>(ws, buttplug));
+                ButtplugWebsocketServer.this.connections.put(remoteId, new Pair<>(ws, buttplug));
 
                 buttplug.getMessageReceived().addCallback(ButtplugWebsocketServer.this
                         .messageReceivedCallback);
@@ -210,8 +209,7 @@ public class ButtplugWebsocketServer {
                 try {
                     //TODO: Figure out why this sometimes dies on disconnect
                     buttplug.shutdown().get();
-                } catch (ExecutionException | InterruptedException | IllegalAccessException |
-                        InvocationTargetException e) {
+                } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
                 }
                 ButtplugWebsocketServer.this.connections.remove(remoteId);
@@ -229,8 +227,7 @@ public class ButtplugWebsocketServer {
                     List<ButtplugMessage> respMsgs;
                     try {
                         respMsgs = buttplug.sendMessage(msg).get();
-                    } catch (ExecutionException | InterruptedException | IOException |
-                            InvocationTargetException | IllegalAccessException e) {
+                    } catch (ExecutionException | InterruptedException e) {
                         e.printStackTrace();
                         return;
                     }
@@ -378,6 +375,7 @@ public class ButtplugWebsocketServer {
         return new HostnamesTask().execute(loopback).get();
     }
 
+    @SuppressLint("StaticFieldLeak")
     public class HostnamesTask extends AsyncTask<Boolean, Void, Map<String, String>> {
         @Override
         protected Map<String, String> doInBackground(Boolean... booleans) {

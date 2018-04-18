@@ -1,5 +1,7 @@
 package org.metafetish.buttplug.client;
 
+import android.annotation.SuppressLint;
+
 import com.google.common.util.concurrent.SettableFuture;
 
 import org.java_websocket.client.WebSocketClient;
@@ -146,9 +148,11 @@ public class ButtplugWSClient extends ButtplugClient {
                     return null;
                 }
 
+                @SuppressLint("TrustAllX509TrustManager")
                 public void checkClientTrusted(X509Certificate[] certs, String authType) {
                 }
 
+                @SuppressLint("TrustAllX509TrustManager")
                 public void checkServerTrusted(X509Certificate[] certs, String authType) {
                 }
             }}, null);

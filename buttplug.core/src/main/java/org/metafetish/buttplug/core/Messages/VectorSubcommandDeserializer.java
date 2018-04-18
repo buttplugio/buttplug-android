@@ -27,7 +27,7 @@ public class VectorSubcommandDeserializer extends StdDeserializer<LinearCmd.Vect
 
     @Override
     public LinearCmd.VectorSubcommand deserialize(JsonParser p, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException {
+            throws IOException {
         JsonStreamContext ourContext = p.getParsingContext();
         JsonStreamContext listContext = ourContext.getParent();
         JsonStreamContext containerContext = listContext.getParent();

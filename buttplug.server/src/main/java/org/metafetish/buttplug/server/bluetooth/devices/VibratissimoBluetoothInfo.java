@@ -21,6 +21,7 @@ public class VibratissimoBluetoothInfo implements IBluetoothDeviceInfo {
         add("Vibratissimo");
     }};
 
+    @NonNull
     public List<String> getNames() {
         return this.names;
     }
@@ -30,6 +31,7 @@ public class VibratissimoBluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("00001523-1212-efde-1523-785feabcd123"));
     }};
 
+    @NonNull
     public List<UUID> getServices() {
         return this.services;
     }
@@ -43,6 +45,7 @@ public class VibratissimoBluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("00001527-1212-efde-1523-785feabcd123"));
     }};
 
+    @NonNull
     public List<UUID> getCharacteristics() {
         return this.characteristics;
     }

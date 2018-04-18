@@ -21,6 +21,7 @@ public class FleshlightLaunchBluetoothInfo implements IBluetoothDeviceInfo {
         add("Launch");
     }};
 
+    @NonNull
     public List<String> getNames() {
         return this.names;
     }
@@ -29,6 +30,7 @@ public class FleshlightLaunchBluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("88f80580-0000-01e6-aace-0002a5d5c51b"));
     }};
 
+    @NonNull
     public List<UUID> getServices() {
         return this.services;
     }
@@ -42,6 +44,7 @@ public class FleshlightLaunchBluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("88f80583-0000-01e6-aace-0002a5d5c51b"));
     }};
 
+    @NonNull
     public List<UUID> getCharacteristics() {
         return this.characteristics;
     }

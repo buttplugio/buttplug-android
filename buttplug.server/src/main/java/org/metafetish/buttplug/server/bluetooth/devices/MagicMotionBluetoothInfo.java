@@ -20,6 +20,7 @@ public class MagicMotionBluetoothInfo implements IBluetoothDeviceInfo {
         add("Smart Mini Vibe");
     }};
 
+    @NonNull
     public List<String> getNames() {
         return this.names;
     }
@@ -39,6 +40,7 @@ public class MagicMotionBluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("78667579-7b48-43db-b8c5-7928a6b0a335"));
     }};
 
+    @NonNull
     public List<UUID> getServices() {
         return this.services;
     }
@@ -48,6 +50,7 @@ public class MagicMotionBluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("78667579-a914-49a4-8333-aa3c0cd8fedc"));
     }};
 
+    @NonNull
     public List<UUID> getCharacteristics() {
         return this.characteristics;
     }

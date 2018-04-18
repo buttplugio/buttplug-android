@@ -5,13 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 import org.metafetish.buttplug.core.ButtplugJsonMessageParser;
 import org.metafetish.buttplug.core.ButtplugMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class RawCmdTest {

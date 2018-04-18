@@ -9,7 +9,7 @@ import java.io.IOException;
 public class ButtplugLogLevelTest {
 
     @Test
-    public void test() throws IOException {
+    public void test() {
         for (ButtplugLogLevel lvl : ButtplugLogLevel.values()) {
             Assert.assertEquals(lvl.name().toLowerCase(), lvl.toString().toLowerCase());
             Assert.assertEquals(lvl.name(), lvl.toString().toUpperCase());

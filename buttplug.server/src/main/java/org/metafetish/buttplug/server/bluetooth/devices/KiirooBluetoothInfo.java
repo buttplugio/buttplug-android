@@ -22,6 +22,7 @@ public class KiirooBluetoothInfo implements IBluetoothDeviceInfo {
         add("PEARL");
     }};
 
+    @NonNull
     public List<String> getNames() {
         return this.names;
     }
@@ -30,6 +31,7 @@ public class KiirooBluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455"));
     }};
 
+    @NonNull
     public List<UUID> getServices() {
         return this.services;
     }
@@ -41,6 +43,7 @@ public class KiirooBluetoothInfo implements IBluetoothDeviceInfo {
         add(UUID.fromString("49535343-8841-43f4-a8d4-ecbe34729bb3"));
     }};
 
+    @NonNull
     public List<UUID> getCharacteristics() {
         return this.characteristics;
     }

@@ -92,7 +92,7 @@ public class WebsocketServerControl extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_websocket_server_control, container, false);
@@ -123,7 +123,7 @@ public class WebsocketServerControl extends Fragment {
                 }
             });
 
-            Switch loopbackSwitch = (Switch) this.activity.findViewById(R.id.loopback);
+            Switch loopbackSwitch = this.activity.findViewById(R.id.loopback);
             loopbackSwitch.setChecked(this.loopback);
             loopbackSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -136,7 +136,7 @@ public class WebsocketServerControl extends Fragment {
                 }
             });
 
-            Switch secureSwitch = (Switch) this.activity.findViewById(R.id.secure);
+            Switch secureSwitch = this.activity.findViewById(R.id.secure);
             secureSwitch.setChecked(this.secure);
             secureSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -149,7 +149,7 @@ public class WebsocketServerControl extends Fragment {
                 }
             });
 
-            Button serverToggle = (Button) this.activity.findViewById(R.id.server_toggle);
+            Button serverToggle = this.activity.findViewById(R.id.server_toggle);
             serverToggle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -163,7 +163,7 @@ public class WebsocketServerControl extends Fragment {
                 }
             });
 
-            Button clientToggle = (Button) this.activity.findViewById(R.id.client_toggle);
+            Button clientToggle = this.activity.findViewById(R.id.client_toggle);
             clientToggle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

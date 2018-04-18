@@ -43,7 +43,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -97,8 +96,7 @@ public class CertUtils {
                     }
                 }
             } catch (KeyStoreException | IOException | NoSuchAlgorithmException |
-                    CertificateException | OperatorCreationException | UnrecoverableKeyException
-                    | InvalidKeySpecException e) {
+                    CertificateException | OperatorCreationException | InvalidKeySpecException e) {
                 e.printStackTrace();
             }
             if (save) {
@@ -120,7 +118,7 @@ public class CertUtils {
                                                                                   String ipAddress)
             throws
             NoSuchAlgorithmException, IOException, OperatorCreationException,
-            CertificateException, KeyStoreException, UnrecoverableKeyException,
+            CertificateException,
             InvalidKeySpecException {
         Security.addProvider(new BouncyCastleProvider());
 
@@ -202,6 +200,6 @@ public class CertUtils {
         X509Certificate certificate = new JcaX509CertificateConverter().setProvider(new
                 BouncyCastleProvider()).getCertificate(certificateHolder);
 
-        return new Pair<PrivateKey, X509Certificate>(privateKey, certificate);
+        return new Pair<>(privateKey, certificate);
     }
 }

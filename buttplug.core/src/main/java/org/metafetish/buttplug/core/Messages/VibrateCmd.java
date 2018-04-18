@@ -8,7 +8,6 @@ import org.metafetish.buttplug.core.ButtplugConsts;
 import org.metafetish.buttplug.core.ButtplugDeviceMessage;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @JsonPropertyOrder({"Id", "DeviceIndex", "Speeds"})
 public class VibrateCmd extends ButtplugDeviceMessage {

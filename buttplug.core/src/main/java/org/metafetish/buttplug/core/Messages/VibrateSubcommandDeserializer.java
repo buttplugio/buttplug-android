@@ -27,7 +27,7 @@ public class VibrateSubcommandDeserializer extends StdDeserializer<VibrateCmd.Vi
 
     @Override
     public VibrateCmd.VibrateSubcommand deserialize(JsonParser p, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException {
+            throws IOException {
         JsonStreamContext ourContext = p.getParsingContext();
         JsonStreamContext listContext = ourContext.getParent();
         JsonStreamContext containerContext = listContext.getParent();

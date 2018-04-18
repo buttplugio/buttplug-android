@@ -10,8 +10,8 @@ import org.metafetish.buttplug.core.Messages.Error;
 import org.metafetish.buttplug.server.ButtplugServer;
 import org.metafetish.buttplug.server.IButtplugServerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ButtplugEmbeddedClient extends ButtplugClient {
@@ -47,24 +47,24 @@ public class ButtplugEmbeddedClient extends ButtplugClient {
     }
 
     @Override
-    protected Future<ButtplugMessage> sendMessage(ButtplugMessage msg) {
-        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
-
-
-        this.waitingMsgs.put(msg.id, promise);
-        if (this.server == null) {
-            promise.set(new Error("Bad server state!", Error.ErrorClass.ERROR_UNKNOWN,
-                    ButtplugConsts.SystemMsgId));
-            return promise;
-        }
-
-        try {
-            return this.server.sendMessage(msg);
-        } catch (IllegalAccessException | ExecutionException | InterruptedException | InvocationTargetException e) {
-            this.bpLogger.debug("exception sending message");
-            promise.set(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, msg.id));
-        }
-
+    protected Future<ButtplugMessage> sendMessage(final ButtplugMessage msg) {
+        final SettableFuture<ButtplugMessage> promise = SettableFuture.create();
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                ButtplugEmbeddedClient.this.waitingMsgs.put(msg.id, promise);
+                if (ButtplugEmbeddedClient.this.server == null) {
+                    promise.set(new Error("Bad server state!", Error.ErrorClass.ERROR_UNKNOWN,
+                            ButtplugConsts.SystemMsgId));
+                }
+                try {
+                    promise.set(ButtplugEmbeddedClient.this.server.sendMessage(msg).get());
+                } catch (InterruptedException | ExecutionException e) {
+                    ButtplugEmbeddedClient.this.bpLogger.debug("exception sending message");
+                    promise.set(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, msg.id));
+                }
+            }
+        });
         return promise;
     }
 

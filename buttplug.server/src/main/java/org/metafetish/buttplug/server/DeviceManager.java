@@ -26,7 +26,6 @@ import org.metafetish.buttplug.core.Messages.StopAllDevices;
 import org.metafetish.buttplug.core.Messages.StopDeviceCmd;
 import org.metafetish.buttplug.core.Messages.StopScanning;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -198,76 +198,83 @@ public class DeviceManager {
         return this.devices;
     }
 
-    protected Future<ButtplugMessage> sendMessage(ButtplugMessage msg)
-            throws ExecutionException, InterruptedException {
-        SettableFuture<ButtplugMessage> promise = SettableFuture.create();
-
-        long id = msg.id;
-        if (msg instanceof StartScanning) {
-            this.bpLogger.debug("Got StartScanning Message");
-            this.startScanning();
-            promise.set(new Ok(id));
-            return promise;
-        } else if (msg instanceof StopScanning) {
-            this.bpLogger.debug("Got StopScanning Message");
-            this.stopScanning();
-            promise.set(new Ok(id));
-            return promise;
-        } else if (msg instanceof StopAllDevices) {
-            this.bpLogger.debug("Got StopAllDevices Message");
-            boolean isOk = true;
-            String errorMsg = "";
-            for (Map.Entry<Long, IButtplugDevice> device : this.devices.entrySet()) {
-                if (!device.getValue().isConnected()) {
-                    continue;
+    protected Future<ButtplugMessage> sendMessage(final ButtplugMessage msg) {
+        final SettableFuture<ButtplugMessage> promise = SettableFuture.create();
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                long id = msg.id;
+                if (msg instanceof StartScanning) {
+                    DeviceManager.this.bpLogger.debug("Got StartScanning Message");
+                    DeviceManager.this.startScanning();
+                    promise.set(new Ok(id));
+                } else if (msg instanceof StopScanning) {
+                    DeviceManager.this.bpLogger.debug("Got StopScanning Message");
+                    DeviceManager.this.stopScanning();
+                    promise.set(new Ok(id));
+                } else if (msg instanceof StopAllDevices) {
+                    DeviceManager.this.bpLogger.debug("Got StopAllDevices Message");
+                    boolean isOk = true;
+                    String errorMsg = "";
+                    for (Map.Entry<Long, IButtplugDevice> device : DeviceManager.this.devices.entrySet()) {
+                        if (!device.getValue().isConnected()) {
+                            continue;
+                        }
+                        ButtplugMessage r = null;
+                        try {
+                            r = device.getValue().parseMessage(new StopDeviceCmd(device.getKey(), msg.id)).get();
+                        } catch (InterruptedException | ExecutionException e) {
+                            isOk = false;
+                            errorMsg = errorMsg.concat(String.format("%s; ", e.getMessage()));
+                            continue;
+                        }
+                        if (r instanceof Ok) {
+                            continue;
+                        }
+                        isOk = false;
+                        errorMsg = errorMsg.concat(String.format("%s; ", ((Error) r).errorMessage));
+                    }
+                    if (isOk) {
+                        promise.set(new Ok(id));
+                    } else {
+                        promise.set(new Error(errorMsg, Error.ErrorClass.ERROR_DEVICE, msg.id));
+                    }
+                } else if (msg instanceof RequestDeviceList) {
+                    DeviceManager.this.bpLogger.debug("Got RequestDeviceList Message");
+                    ArrayList<DeviceMessageInfo> msgDevices = new ArrayList<>();
+                    for (Map.Entry<Long, IButtplugDevice> x : DeviceManager.this.devices.entrySet()) {
+                        if (x.getValue().isConnected()) {
+                            msgDevices.add(new DeviceMessageInfo(x.getKey(), x.getValue().getName(),
+                                    DeviceManager.getAllowedMessageTypesAsDictionary(x.getValue())));
+                        }
+                    }
+                    promise.set(new DeviceList(msgDevices, id));
+                } else if (msg instanceof ButtplugDeviceMessage) {
+                    DeviceManager.this.bpLogger.trace(String.format("Sending %s to device index %s",
+                            msg.getClass().getSimpleName(), ((ButtplugDeviceMessage) msg).deviceIndex));
+                    // If it's a device message, it's most likely not ours.
+                    ButtplugDeviceMessage deviceMessage = (ButtplugDeviceMessage) msg;
+                    if (DeviceManager.this.devices.containsKey(deviceMessage.deviceIndex)) {
+                        ButtplugMessage result = null;
+                        try {
+                            result = DeviceManager.this.devices.get(deviceMessage.deviceIndex)
+                                    .parseMessage(deviceMessage).get();
+                            promise.set(result);
+                        } catch (InterruptedException | ExecutionException e) {
+                            DeviceManager.this.bpLogger.debug("exception sending message");
+                            promise.set(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, msg.id));
+                        }
+                    } else {
+                        promise.set(DeviceManager.this.bpLogger.logErrorMsg(id, Error.ErrorClass.ERROR_DEVICE,
+                                String.format("Dropping message for unknown device index %s", deviceMessage.deviceIndex)));
+                    }
+                } else {
+                    promise.set(
+                            new Error(String.format("Message type %s unhandled by this server.",
+                                    msg.getClass().getSimpleName()), Error.ErrorClass.ERROR_MSG, id));
                 }
-                ButtplugMessage r = device.getValue().parseMessage(new StopDeviceCmd(device
-                        .getKey(), msg.id)).get();
-                if (r instanceof Ok) {
-                    continue;
-                }
-                isOk = false;
-                errorMsg = errorMsg.concat(String.format("%s; ", ((Error) r).errorMessage));
             }
-            if (isOk) {
-                promise.set(new Ok(id));
-                return promise;
-            }
-
-            promise.set(new Error(errorMsg, Error.ErrorClass.ERROR_DEVICE, msg.id));
-            return promise;
-        } else if (msg instanceof RequestDeviceList) {
-            this.bpLogger.debug("Got RequestDeviceList Message");
-            ArrayList<DeviceMessageInfo> msgDevices = new ArrayList<>();
-            for (Map.Entry<Long, IButtplugDevice> x : this.devices.entrySet()) {
-                if (x.getValue().isConnected()) {
-                    msgDevices.add(new DeviceMessageInfo(x.getKey(), x.getValue().getName(),
-                            DeviceManager.getAllowedMessageTypesAsDictionary(x.getValue())
-                    ));
-                }
-            }
-            promise.set(new DeviceList(msgDevices, id));
-            return promise;
-        } else if (msg instanceof ButtplugDeviceMessage) {
-            this.bpLogger.trace(String.format("Sending %s to device index %s",
-                    msg.getClass().getSimpleName(),
-                    ((ButtplugDeviceMessage) msg).deviceIndex));
-            // If it's a device message, it's most likely not ours.
-            ButtplugDeviceMessage deviceMessage = (ButtplugDeviceMessage) msg;
-            if (this.devices.containsKey(deviceMessage.deviceIndex)) {
-                ButtplugMessage result = this.devices.get(deviceMessage.deviceIndex)
-                        .parseMessage(deviceMessage).get();
-                promise.set(result);
-                return promise;
-            }
-            promise.set(this.bpLogger.logErrorMsg(id, Error.ErrorClass.ERROR_DEVICE,
-                    String.format("Dropping message for unknown device index %s", deviceMessage.deviceIndex)));
-            return promise;
-        }
-        promise.set(
-                new Error(String.format("Message type %s unhandled by this server.",
-                        msg.getClass().getSimpleName()),
-                        Error.ErrorClass.ERROR_MSG, id));
+        });
         return promise;
     }
 

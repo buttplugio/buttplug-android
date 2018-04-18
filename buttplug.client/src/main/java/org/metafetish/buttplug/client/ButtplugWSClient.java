@@ -108,31 +108,23 @@ public class ButtplugWSClient extends ButtplugClient {
     @Override
     protected Future<ButtplugMessage> sendMessage(final ButtplugMessage msg) {
         final SettableFuture<ButtplugMessage> promise = SettableFuture.create();
-
-        this.waitingMsgs.put(msg.id, promise);
-        if (this.ws == null) {
-            promise.set(new Error("Bad WS state!", Error.ErrorClass.ERROR_UNKNOWN,
-                    ButtplugConsts.SystemMsgId));
-            return promise;
-        }
-
-        try {
-            Executors.newSingleThreadExecutor().submit(new Runnable() {
-                @Override
-                public void run() {
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                ButtplugWSClient.this.waitingMsgs.put(msg.id, promise);
+                if (ButtplugWSClient.this.ws == null) {
+                    promise.set(new Error("Bad WS state!", Error.ErrorClass.ERROR_UNKNOWN,
+                            ButtplugConsts.SystemMsgId));
+                } else {
                     try {
-                        ButtplugWSClient.this.ws.send(ButtplugWSClient.this.parser.serialize(msg,
-                                    1));
-                    } catch (IOException e) {
+                        ButtplugWSClient.this.ws.send(ButtplugWSClient.this.parser.serialize(msg, 1));
+                    } catch (IOException | WebsocketNotConnectedException e) {
+                        ButtplugWSClient.this.bpLogger.debug("exception sending message");
                         promise.set(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, msg.id));
                     }
                 }
-            });
-        } catch (WebsocketNotConnectedException e) {
-            this.bpLogger.debug("exception sending message");
-            promise.set(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, msg.id));
-        }
-
+            }
+        });
         return promise;
     }
 

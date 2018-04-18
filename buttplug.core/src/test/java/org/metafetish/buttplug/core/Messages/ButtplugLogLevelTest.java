@@ -4,8 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.metafetish.buttplug.core.ButtplugLogLevel;
 
-import java.io.IOException;
-
 public class ButtplugLogLevelTest {
 
     @Test

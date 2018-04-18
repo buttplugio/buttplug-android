@@ -26,7 +26,6 @@ import org.metafetish.buttplug.core.Messages.StopAllDevices;
 import org.metafetish.buttplug.core.Messages.Test;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -193,9 +192,8 @@ public class ButtplugServer {
                 } else {
                     try {
                         promise.set(ButtplugServer.this.deviceManager.sendMessage(msg).get());
-                    } catch (InterruptedException | ExecutionException | InvocationTargetException | IllegalAccessException e) {
+                    } catch (InterruptedException | ExecutionException e) {
                         promise.set(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.DefaultMsgId));
-
                     }
                 }
             }
@@ -211,7 +209,7 @@ public class ButtplugServer {
                 ButtplugMessage msg = null;
                 try {
                     msg = ButtplugServer.this.deviceManager.sendMessage(new StopAllDevices()).get();
-                } catch (InterruptedException | ExecutionException | IllegalAccessException | InvocationTargetException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     ButtplugServer.this.bpLogger.logException(e);
                 }
                 if (msg instanceof Error) {

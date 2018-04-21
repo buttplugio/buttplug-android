@@ -129,7 +129,7 @@ public class Lovense extends ButtplugBluetoothDevice {
                             Lovense.this.info.getCharacteristics().get(LovenseRev1BluetoothInfo.Chrs.Tx.ordinal()),
                             String.format("Vibrate%s:%s;",
                                     Lovense.this.vibratorCount == 1 ? "" : speed.index + 1,
-                                    speed.getSpeed()).getBytes()).get();
+                                    (int) (speed.getSpeed() * 20)).getBytes()).get();
                     if (!(res instanceof Ok)) {
                         return res;
                     }

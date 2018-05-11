@@ -34,7 +34,7 @@ public class VorzeA10CycloneCmdTest {
         Assert.assertEquals(1, msgs.get(0).id);
         Assert.assertEquals(0, ((VorzeA10CycloneCmd) msgs.get(0)).deviceIndex);
         Assert.assertEquals(50, ((VorzeA10CycloneCmd) msgs.get(0)).getSpeed());
-        Assert.assertEquals(true, ((VorzeA10CycloneCmd) msgs.get(0)).clockwise);
+        Assert.assertEquals(true, ((VorzeA10CycloneCmd) msgs.get(0)).isClockwise());
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readValue(testStr, JsonNode.class);

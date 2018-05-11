@@ -15,6 +15,7 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 
@@ -123,7 +124,7 @@ public class WeVibe extends ButtplugBluetoothDevice {
             try {
                 ButtplugMessage res = WeVibe.this.iface.writeValue(
                         cmdMsg.id,
-                        WeVibe.this.info.getCharacteristics().get(WeVibeBluetoothInfo.Chrs.Tx.ordinal()),
+                        UUID.fromString(WeVibe.this.info.getCharacteristics().get(WeVibeBluetoothInfo.Chrs.Tx.ordinal())),
                         data).get();
                 if (!(res instanceof Ok)) {
                     return res;

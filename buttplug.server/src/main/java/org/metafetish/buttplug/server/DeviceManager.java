@@ -69,6 +69,7 @@ public class DeviceManager {
             }
         }
     };
+
     private IButtplugCallback deviceRemovedCallback = new IButtplugCallback() {
         @Override
         public void invoke(ButtplugEvent event) {
@@ -105,6 +106,7 @@ public class DeviceManager {
             }
         }
     };
+
     private IButtplugCallback deviceAddedCallback = new IButtplugCallback() {
         @Override
         public void invoke(ButtplugEvent event) {
@@ -147,11 +149,10 @@ public class DeviceManager {
                     device.getName(),
                     DeviceManager.getAllowedMessageTypesAsDictionary(device)
             );
-            if (deviceMessageReceived != null) {
-                deviceMessageReceived.invoke(new ButtplugEvent(msg));
-            }
+            DeviceManager.this.deviceMessageReceived.invoke(new ButtplugEvent(msg));
         }
     };
+
     private IButtplugCallback scanningFinishedCallback = new IButtplugCallback() {
         @Override
         public void invoke(ButtplugEvent event) {

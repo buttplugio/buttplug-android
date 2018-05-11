@@ -43,6 +43,7 @@ import org.metafetish.buttplug.server.util.FleshlightHelper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     private ButtplugLogManager bpLogManager = new ButtplugLogManager();
@@ -223,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
 
             this.bpLogger.trace(String.format("Setting service: %s", deviceInfo.getServices().get(0)));
             BluetoothGattService service = new BluetoothGattService(
-                    deviceInfo.getServices().get(0),
+                    UUID.fromString(deviceInfo.getServices().get(0)),
                     BluetoothGattService.SERVICE_TYPE_PRIMARY);
             int txIndex = 0;
             if (deviceInfo instanceof KiirooBluetoothInfo) {
@@ -232,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
             this.bpLogger.trace(String.format("Setting tx: %s",
                     deviceInfo.getCharacteristics().get(txIndex)));
             this.tx = new BluetoothGattCharacteristic(
-                    deviceInfo.getCharacteristics().get(txIndex),
+                    UUID.fromString(deviceInfo.getCharacteristics().get(txIndex)),
                     BluetoothGattCharacteristic.PROPERTY_WRITE,
                     BluetoothGattCharacteristic.PERMISSION_WRITE);
             service.addCharacteristic(this.tx);
@@ -240,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                 this.bpLogger.trace(String.format("Setting rx: %s",
                         deviceInfo.getCharacteristics().get(1 - txIndex)));
                 BluetoothGattCharacteristic rx = new BluetoothGattCharacteristic(
-                        deviceInfo.getCharacteristics().get(1 - txIndex),
+                        UUID.fromString(deviceInfo.getCharacteristics().get(1 - txIndex)),
                         BluetoothGattCharacteristic.PROPERTY_WRITE,
                         BluetoothGattCharacteristic.PERMISSION_WRITE);
                 service.addCharacteristic(rx);
@@ -249,8 +250,7 @@ public class MainActivity extends AppCompatActivity {
                             deviceInfo.getCharacteristics().get(
                                     FleshlightLaunchBluetoothInfo.Chrs.Cmd.ordinal())));
                     BluetoothGattCharacteristic cmd = new BluetoothGattCharacteristic(
-                            deviceInfo.getCharacteristics().get(
-                                    FleshlightLaunchBluetoothInfo.Chrs.Cmd.ordinal()),
+                            UUID.fromString(deviceInfo.getCharacteristics().get(FleshlightLaunchBluetoothInfo.Chrs.Cmd.ordinal())),
                             BluetoothGattCharacteristic.PROPERTY_WRITE,
                             BluetoothGattCharacteristic.PERMISSION_WRITE);
                     service.addCharacteristic(cmd);

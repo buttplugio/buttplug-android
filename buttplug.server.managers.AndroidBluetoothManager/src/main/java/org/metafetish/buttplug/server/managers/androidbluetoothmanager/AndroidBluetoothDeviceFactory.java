@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
 class AndroidBluetoothDeviceFactory {
     private Context context;
@@ -51,20 +52,51 @@ class AndroidBluetoothDeviceFactory {
         this.deviceInfo = info;
     }
 
-    boolean mayBeDevice(String advertName, List<UUID> advertGUIDs) {
-        if (!deviceInfo.getNames().isEmpty() && !deviceInfo.getNames().contains(advertName)) {
+    boolean mayBeDevice(String advertName) {
+        List<String> names = deviceInfo.getNames();
+        if (!names.isEmpty() && !names.contains(advertName) && !regexContains(names, advertName)) {
             return false;
         }
 
         this.bpLogger.trace(String.format("Found %s for %s", advertName, deviceInfo.getClass().getSimpleName()));
+
+        return true;
+    }
+
+    boolean mayBeDevice(String advertName, List<UUID> advertGUIDs) {
+        if (!this.mayBeDevice(advertName)) {
+            return false;
+        }
 
         if (!deviceInfo.getNames().isEmpty() && advertGUIDs.isEmpty()) {
             this.bpLogger.trace("No advertised services?");
             return true;
         }
 
+        List<String> services = deviceInfo.getServices();
         //TODO: Print debug info
-        return advertGUIDs.containsAll(deviceInfo.getServices());
+        return advertGUIDs.containsAll(services) || regexContainsAll(services, advertGUIDs);
+    }
+
+    private boolean regexContains(List<String> regexes, String advertName) {
+        for (String regex : regexes) {
+            if (Pattern.matches(regex, advertName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean regexContainsAll(List<String> regexes, List<UUID> advertGUIDs) {
+        listLoop: for (String regex : regexes) {
+            for (UUID advertGUID : advertGUIDs) {
+                if (Pattern.matches(regex, advertGUID.toString())) {
+                    continue listLoop;
+                }
+            }
+            return false;
+        }
+        return true;
     }
 
     // TODO Have this throw exceptions instead of return null.
@@ -108,7 +140,7 @@ class AndroidBluetoothDeviceFactory {
                     serviceUuids.add(service.getUuid());
                 }
 
-                if (!serviceUuids.containsAll(deviceInfo.getServices())) {
+                if (!regexContainsAll(deviceInfo.getServices(), serviceUuids)) {
                     AndroidBluetoothDeviceFactory.this.bpLogger.trace(
                             String.format("Cannot find service for device (%s)",
                                     bluetoothDevice.getName()));
@@ -120,7 +152,7 @@ class AndroidBluetoothDeviceFactory {
                     deviceCreated.invoke(new ButtplugEvent(btAddr));
                 }
 
-                UUID firstUuid = deviceInfo.getServices().get(0);
+                UUID firstUuid = UUID.fromString(deviceInfo.getServices().get(0));
                 int serviceUuidIndex = serviceUuids.indexOf(firstUuid);
                 BluetoothGattService service = services.get(serviceUuidIndex);
 
@@ -141,7 +173,7 @@ class AndroidBluetoothDeviceFactory {
                     characteristicUuids.add(characteristic.getUuid());
                 }
 
-                if (!characteristicUuids.containsAll(deviceInfo.getCharacteristics())) {
+                if (!regexContainsAll(deviceInfo.getCharacteristics(), characteristicUuids)) {
                     AndroidBluetoothDeviceFactory.this.bpLogger.trace(
                             String.format("Cannot find characteristic for device (%s)",
                                     bluetoothDevice.getName()));
@@ -150,9 +182,9 @@ class AndroidBluetoothDeviceFactory {
                 }
 
                 Map<UUID, BluetoothGattCharacteristic> gattCharacteristics = new HashMap<>();
-                for (UUID uuid : deviceInfo.getCharacteristics()) {
-                    gattCharacteristics.put(uuid, characteristics.get(characteristicUuids.indexOf
-                            (uuid)));
+                for (String uuid : deviceInfo.getCharacteristics()) {
+                    gattCharacteristics.put(UUID.fromString(uuid), characteristics.get(
+                            characteristicUuids.indexOf(UUID.fromString(uuid))));
                 }
                 bleInterface.setGattCharacteristics(gattCharacteristics);
 

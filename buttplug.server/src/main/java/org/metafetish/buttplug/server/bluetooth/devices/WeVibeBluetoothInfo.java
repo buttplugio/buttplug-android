@@ -8,7 +8,6 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 
 public class WeVibeBluetoothInfo implements IBluetoothDeviceInfo {
@@ -17,6 +16,7 @@ public class WeVibeBluetoothInfo implements IBluetoothDeviceInfo {
         Rx
     }
 
+    @SuppressWarnings("SpellCheckingInspection")
     private List<String> names = new ArrayList<String>() {{
         add("Cougar");
         add("4 Plus");
@@ -40,24 +40,24 @@ public class WeVibeBluetoothInfo implements IBluetoothDeviceInfo {
         return this.names;
     }
 
-    private List<UUID> services = new ArrayList<UUID>() {{
-        add(UUID.fromString("f000bb03-0451-4000-b000-000000000000"));
+    private List<String> services = new ArrayList<String>() {{
+        add("f000bb03-0451-4000-b000-000000000000");
     }};
 
     @NonNull
-    public List<UUID> getServices() {
+    public List<String> getServices() {
         return this.services;
     }
 
-    private List<UUID> characteristics = new ArrayList<UUID>() {{
+    private List<String> characteristics = new ArrayList<String>() {{
         // tx
-        add(UUID.fromString("f000c000-0451-4000-b000-000000000000"));
+        add("f000c000-0451-4000-b000-000000000000");
         // rx
-        add(UUID.fromString("f000b000-0451-4000-b000-000000000000"));
+        add("f000b000-0451-4000-b000-000000000000");
     }};
 
     @NonNull
-    public List<UUID> getCharacteristics() {
+    public List<String> getCharacteristics() {
         return this.characteristics;
     }
 

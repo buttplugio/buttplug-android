@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public abstract class ButtplugDevice implements IButtplugDevice {
-    private String name;
+    protected String name;
 
     @NonNull
     public String getName() {

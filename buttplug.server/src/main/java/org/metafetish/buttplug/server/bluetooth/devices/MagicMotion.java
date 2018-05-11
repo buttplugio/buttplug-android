@@ -16,6 +16,7 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInfo;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 
@@ -94,8 +95,7 @@ public class MagicMotion extends ButtplugBluetoothDevice {
             try {
                 return MagicMotion.this.iface.writeValue(
                         cmdMsg.id,
-                        MagicMotion.this.info.getCharacteristics().get(
-                                MagicMotionBluetoothInfo.Chrs.Tx.ordinal()),
+                        UUID.fromString(MagicMotion.this.info.getCharacteristics().get(MagicMotionBluetoothInfo.Chrs.Tx.ordinal())),
                         data
                 ).get();
             } catch (InterruptedException | ExecutionException e) {

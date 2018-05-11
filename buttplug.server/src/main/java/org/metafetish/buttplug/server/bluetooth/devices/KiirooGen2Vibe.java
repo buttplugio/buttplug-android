@@ -18,6 +18,7 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 
@@ -140,7 +141,7 @@ public class KiirooGen2Vibe extends ButtplugBluetoothDevice {
             try {
                 return KiirooGen2Vibe.this.iface.writeValue(
                         cmdMsg.id,
-                        KiirooGen2Vibe.this.info.getCharacteristics().get(KiirooGen2VibeBluetoothInfo.Chrs.Tx.ordinal()),
+                        UUID.fromString(KiirooGen2Vibe.this.info.getCharacteristics().get(KiirooGen2VibeBluetoothInfo.Chrs.Tx.ordinal())),
                         data
                 ).get();
             } catch (InterruptedException | ExecutionException e) {

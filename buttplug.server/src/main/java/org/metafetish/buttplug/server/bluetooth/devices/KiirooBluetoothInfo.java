@@ -8,7 +8,6 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 
 public class KiirooBluetoothInfo implements IBluetoothDeviceInfo {
@@ -27,24 +26,26 @@ public class KiirooBluetoothInfo implements IBluetoothDeviceInfo {
         return this.names;
     }
 
-    private List<UUID> services = new ArrayList<UUID>() {{
-        add(UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455"));
+    @SuppressWarnings("SpellCheckingInspection")
+    private List<String> services = new ArrayList<String>() {{
+        add("49535343-fe7d-4ae5-8fa9-9fafd205e455");
     }};
 
     @NonNull
-    public List<UUID> getServices() {
+    public List<String> getServices() {
         return this.services;
     }
 
-    private List<UUID> characteristics = new ArrayList<UUID>() {{
+    @SuppressWarnings("SpellCheckingInspection")
+    private List<String> characteristics = new ArrayList<String>() {{
         // rx
-        add(UUID.fromString("49535343-1e4d-4bd9-ba61-23c647249616"));
+        add("49535343-1e4d-4bd9-ba61-23c647249616");
         // tx
-        add(UUID.fromString("49535343-8841-43f4-a8d4-ecbe34729bb3"));
+        add("49535343-8841-43f4-a8d4-ecbe34729bb3");
     }};
 
     @NonNull
-    public List<UUID> getCharacteristics() {
+    public List<String> getCharacteristics() {
         return this.characteristics;
     }
 

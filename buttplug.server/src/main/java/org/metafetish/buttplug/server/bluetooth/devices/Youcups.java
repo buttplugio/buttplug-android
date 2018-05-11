@@ -18,6 +18,7 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 
@@ -97,8 +98,7 @@ public class Youcups extends ButtplugBluetoothDevice {
             try {
                 return Youcups.this.iface.writeValue(
                         cmdMsg.id,
-                        Youcups.this.info.getCharacteristics().get(
-                                YoucupsBluetoothInfo.Chrs.Tx.ordinal()),
+                        UUID.fromString(Youcups.this.info.getCharacteristics().get(YoucupsBluetoothInfo.Chrs.Tx.ordinal())),
                         String.format("$SYS,%s?", Youcups.this.vibratorSpeed * 8).getBytes()
                 ).get();
             } catch (InterruptedException | ExecutionException e) {

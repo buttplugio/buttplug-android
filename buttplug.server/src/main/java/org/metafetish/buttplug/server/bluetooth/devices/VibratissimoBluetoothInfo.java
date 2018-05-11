@@ -8,7 +8,6 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class VibratissimoBluetoothInfo implements IBluetoothDeviceInfo {
     public enum Chrs {
@@ -27,26 +26,28 @@ public class VibratissimoBluetoothInfo implements IBluetoothDeviceInfo {
     }
 
 
-    private List<UUID> services = new ArrayList<UUID>() {{
-        add(UUID.fromString("00001523-1212-efde-1523-785feabcd123"));
+    @SuppressWarnings("SpellCheckingInspection")
+    private List<String> services = new ArrayList<String>() {{
+        add("00001523-1212-efde-1523-785feabcd123");
     }};
 
     @NonNull
-    public List<UUID> getServices() {
+    public List<String> getServices() {
         return this.services;
     }
 
-    private List<UUID> characteristics = new ArrayList<UUID>() {{
+    @SuppressWarnings("SpellCheckingInspection")
+    private List<String> characteristics = new ArrayList<String>() {{
         // tx (mode)
-        add(UUID.fromString("00001524-1212-efde-1523-785feabcd123"));
+        add("00001524-1212-efde-1523-785feabcd123");
         // tx (speed)
-        add(UUID.fromString("00001526-1212-efde-1523-785feabcd123"));
+        add("00001526-1212-efde-1523-785feabcd123");
         // rx
-        add(UUID.fromString("00001527-1212-efde-1523-785feabcd123"));
+        add("00001527-1212-efde-1523-785feabcd123");
     }};
 
     @NonNull
-    public List<UUID> getCharacteristics() {
+    public List<String> getCharacteristics() {
         return this.characteristics;
     }
 

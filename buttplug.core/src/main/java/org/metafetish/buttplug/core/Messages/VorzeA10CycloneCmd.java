@@ -13,7 +13,7 @@ public class VorzeA10CycloneCmd extends ButtplugDeviceMessage {
     private int speed;
 
     @JsonProperty(value = "Clockwise", required = true)
-    public boolean clockwise;
+    private boolean clockwise;
 
     public VorzeA10CycloneCmd(long deviceIndex, int speed, boolean clockwise, long id) {
         super(id, deviceIndex);
@@ -54,5 +54,14 @@ public class VorzeA10CycloneCmd extends ButtplugDeviceMessage {
         }
 
         this.speed = speed;
+    }
+
+    public boolean isClockwise() {
+        return this.clockwise;
+    }
+
+
+    public void setClockwise(boolean clockwise) {
+        this.clockwise = clockwise;
     }
 }

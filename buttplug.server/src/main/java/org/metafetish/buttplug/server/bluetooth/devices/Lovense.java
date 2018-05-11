@@ -17,7 +17,9 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
 
 public class Lovense extends ButtplugBluetoothDevice {
@@ -26,18 +28,21 @@ public class Lovense extends ButtplugBluetoothDevice {
         put("LVS-C011", "Nora");
         put("LVS-B011", "Max");
         put("LVS-L009", "Ambi");
-        put("LVS-S001", "Lush");
-        put("LVS-S35", "Lush");
-        put("LVS-Z36", "Hush");
-        put("LVS-Z001", "Hush");
-        put("LVS_Z001", "Hush");
-        put("LVS-Domi37", "Domi");
-        put("LVS-Domi38", "Domi");
-        put("LVS-Domi39", "Domi");
-        put("LVS-P36", "Edge");
-        put("LVS-Edge37", "Edge");
-        put("LVS-Edge38", "Edge");
+        put("LVS-S0?\\d{2}", "Lush");
+        put("LVS_Z0?\\d{2}", "Hush");
+        put("LVS-Domi\\d{2}", "Domi");
+        put("LVS-P\\d{2}", "Edge");
+        put("LVS-Edge\\d{2}", "Edge");
     }};
+    private static String getFriendlyName(String unfriendlyname) {
+        for (Map.Entry<String, String> entry : friendlyNames.entrySet()) {
+            if (Pattern.matches(entry.getKey(), unfriendlyname)) {
+                return entry.getValue();
+            }
+        }
+        return "Unknown";
+    }
+
 
     private int vibratorCount = 1;
     private double[] vibratorSpeeds = {0, 0};
@@ -46,8 +51,8 @@ public class Lovense extends ButtplugBluetoothDevice {
 
     public Lovense(IBluetoothDeviceInterface iface,
                    IBluetoothDeviceInfo info) {
-        super(String.format("Lovense Device %s", Lovense.friendlyNames.get(iface.getName())), iface, info);
-        if (Lovense.friendlyNames.get(iface.getName()).equals("Edge")) {
+        super(String.format("Lovense Device %s", Lovense.getFriendlyName(iface.getName())), iface, info);
+        if (this.name.equals("Edge")) {
             ++vibratorCount;
         }
 
@@ -55,7 +60,7 @@ public class Lovense extends ButtplugBluetoothDevice {
         msgFuncs.put(VibrateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleVibrateCmd, new MessageAttributes(vibratorCount)));
         msgFuncs.put(StopDeviceCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleStopDeviceCmd));
 
-        if (Lovense.friendlyNames.get(iface.getName()).equals("Nora")) {
+        if (this.name.equals("Nora")) {
             msgFuncs.put(RotateCmd.class.getSimpleName(), new ButtplugDeviceWrapper(this.handleRotateCmd, new MessageAttributes(1)));
         }
     }
@@ -64,7 +69,7 @@ public class Lovense extends ButtplugBluetoothDevice {
         @Override
         public ButtplugMessage invoke(ButtplugDeviceMessage msg) {
             Lovense.this.bpLogger.debug(String.format("Stopping Device %s", Lovense.this.getName()));
-            if (Lovense.friendlyNames.get(iface.getName()).equals("Nora")) {
+            if (Lovense.this.name.equals("Nora")) {
                 RotateCmd rotateCmd = new RotateCmd(msg.deviceIndex, null, msg.id);
                 ArrayList<RotateCmd.RotateSubcommand> rotations = new ArrayList<>();
                 rotations.add(rotateCmd.new RotateSubcommand(0, 0, Lovense.this.clockwise));
@@ -126,7 +131,7 @@ public class Lovense extends ButtplugBluetoothDevice {
                 try {
                     ButtplugMessage res = Lovense.this.iface.writeValue(
                             cmdMsg.id,
-                            Lovense.this.info.getCharacteristics().get(LovenseRev1BluetoothInfo.Chrs.Tx.ordinal()),
+                            UUID.fromString(Lovense.this.info.getCharacteristics().get(LovenseRev1BluetoothInfo.Chrs.Tx.ordinal())),
                             String.format("Vibrate%s:%s;",
                                     Lovense.this.vibratorCount == 1 ? "" : speed.index + 1,
                                     (int) (speed.getSpeed() * 20)).getBytes()).get();
@@ -176,7 +181,7 @@ public class Lovense extends ButtplugBluetoothDevice {
                 try {
                     Lovense.this.iface.writeValue(
                             cmdMsg.id,
-                            Lovense.this.info.getCharacteristics().get(LovenseRev1BluetoothInfo.Chrs.Tx.ordinal()),
+                            UUID.fromString(Lovense.this.info.getCharacteristics().get(LovenseRev1BluetoothInfo.Chrs.Tx.ordinal())),
                             "RotateChange;".getBytes()).get();
                 } catch (InterruptedException | ExecutionException e) {
                     return Lovense.this.bpLogger.logErrorMsg(msg.id, Error.ErrorClass.ERROR_DEVICE,
@@ -192,7 +197,7 @@ public class Lovense extends ButtplugBluetoothDevice {
             try {
                 return Lovense.this.iface.writeValue(
                         cmdMsg.id,
-                        Lovense.this.info.getCharacteristics().get(LovenseRev1BluetoothInfo.Chrs.Tx.ordinal()),
+                        UUID.fromString(Lovense.this.info.getCharacteristics().get(LovenseRev1BluetoothInfo.Chrs.Tx.ordinal())),
                         String.format("Rotate:%s;", Lovense.this.rotateSpeed * 20).getBytes()).get();
             } catch (InterruptedException | ExecutionException e) {
                 return Lovense.this.bpLogger.logErrorMsg(msg.id, Error.ErrorClass.ERROR_DEVICE,

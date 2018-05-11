@@ -8,7 +8,6 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 
 public class KiirooGen2VibeBluetoothInfo implements IBluetoothDeviceInfo {
@@ -29,26 +28,28 @@ public class KiirooGen2VibeBluetoothInfo implements IBluetoothDeviceInfo {
         return this.names;
     }
 
-    private List<UUID> services = new ArrayList<UUID>() {{
-        add(UUID.fromString("88f82580-0000-01e6-aace-0002a5d5c51b"));
+    @SuppressWarnings("SpellCheckingInspection")
+    private List<String> services = new ArrayList<String>() {{
+        add("88f82580-0000-01e6-aace-0002a5d5c51b");
     }};
 
     @NonNull
-    public List<UUID> getServices() {
+    public List<String> getServices() {
         return this.services;
     }
 
-    private List<UUID> characteristics = new ArrayList<UUID>() {{
+    @SuppressWarnings("SpellCheckingInspection")
+    private List<String> characteristics = new ArrayList<String>() {{
         // tx
-        add(UUID.fromString("88f82581-0000-01e6-aace-0002a5d5c51b"));
+        add("88f82581-0000-01e6-aace-0002a5d5c51b");
         // rx (touch: 3 zone bitmask)
-        add(UUID.fromString("88f82582-0000-01e6-aace-0002a5d5c51b"));
+        add("88f82582-0000-01e6-aace-0002a5d5c51b");
         // rx (accellorometer?)
-        add(UUID.fromString("88f82584-0000-01e6-aace-0002a5d5c51b"));
+        add("88f82584-0000-01e6-aace-0002a5d5c51b");
     }};
 
     @NonNull
-    public List<UUID> getCharacteristics() {
+    public List<String> getCharacteristics() {
         return this.characteristics;
     }
 

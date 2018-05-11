@@ -17,6 +17,7 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInfo;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 
@@ -72,8 +73,7 @@ public class Kiiroo extends ButtplugBluetoothDevice {
             try {
                 return Kiiroo.this.iface.writeValue(
                         cmdMsg.id,
-                        Kiiroo.this.info.getCharacteristics().get(
-                                KiirooBluetoothInfo.Chrs.Tx.ordinal()),
+                        UUID.fromString(Kiiroo.this.info.getCharacteristics().get(KiirooBluetoothInfo.Chrs.Tx.ordinal())),
                         (String.format("%s,\n", cmdMsg.getPosition())).getBytes()
                 ).get();
             } catch (InterruptedException | ExecutionException e) {
@@ -83,6 +83,7 @@ public class Kiiroo extends ButtplugBluetoothDevice {
         }
     };
 
+    @SuppressWarnings("FieldCanBeLocal")
     private IButtplugDeviceMessageCallback handleSingleMotorVibrateCmd = new
             IButtplugDeviceMessageCallback() {
         @Override

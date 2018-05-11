@@ -8,7 +8,6 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class LovenseRev1BluetoothInfo implements IBluetoothDeviceInfo {
     public enum Chrs {
@@ -31,24 +30,24 @@ public class LovenseRev1BluetoothInfo implements IBluetoothDeviceInfo {
         return this.names;
     }
 
-    private List<UUID> services = new ArrayList<UUID>() {{
-        add(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb"));
+    private List<String> services = new ArrayList<String>() {{
+        add("0000fff0-0000-1000-8000-00805f9b34fb");
     }};
 
     @NonNull
-    public List<UUID> getServices() {
+    public List<String> getServices() {
         return this.services;
     }
 
-    private List<UUID> characteristics = new ArrayList<UUID>() {{
+    private List<String> characteristics = new ArrayList<String>() {{
         // tx
-        add(UUID.fromString("0000fff2-0000-1000-8000-00805f9b34fb"));
+        add("0000fff2-0000-1000-8000-00805f9b34fb");
         // rx
-        add(UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb"));
+        add("0000fff1-0000-1000-8000-00805f9b34fb");
     }};
 
     @NonNull
-    public List<UUID> getCharacteristics() {
+    public List<String> getCharacteristics() {
         return this.characteristics;
     }
 

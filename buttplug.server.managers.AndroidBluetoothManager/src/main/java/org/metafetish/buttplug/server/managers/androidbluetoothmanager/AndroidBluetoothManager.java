@@ -115,6 +115,17 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
 
             AndroidBluetoothManager.this.bpLogger.trace(String.format("BLE device found: %s", advertName));
 
+            List<AndroidBluetoothDeviceFactory> factories = new ArrayList<>();
+            for (AndroidBluetoothDeviceFactory factory : AndroidBluetoothManager.this.deviceFactories) {
+                if (factory.mayBeDevice(advertName)) {
+                    factories.add(factory);
+                }
+            }
+            if (factories.isEmpty()) {
+                AndroidBluetoothManager.this.bpLogger.trace(String.format("No factories found for %s", advertName));
+                return;
+            }
+
             ParcelUuid[] parcelUuids = device.getUuids();
             if (parcelUuids == null) {
                 device.fetchUuidsWithSdp();
@@ -130,7 +141,7 @@ public class AndroidBluetoothManager extends BluetoothSubtypeManager {
                 AndroidBluetoothManager.this.bpLogger.trace(String.format("No UUIDs found: %s", advertName));
             }
 
-            List<AndroidBluetoothDeviceFactory> factories = new ArrayList<>();
+            factories = new ArrayList<>();
             for (AndroidBluetoothDeviceFactory factory : AndroidBluetoothManager.this
                     .deviceFactories) {
                 if (factory.mayBeDevice(advertName, advertGUIDs)) {

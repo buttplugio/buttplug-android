@@ -16,6 +16,7 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInfo;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 
@@ -93,8 +94,7 @@ public class Vibratissimo extends ButtplugBluetoothDevice {
             try {
                 Vibratissimo.this.iface.writeValue(
                         cmdMsg.id,
-                        Vibratissimo.this.info.getCharacteristics().get(
-                                VibratissimoBluetoothInfo.Chrs.TxMode.ordinal()),
+                        UUID.fromString(Vibratissimo.this.info.getCharacteristics().get(VibratissimoBluetoothInfo.Chrs.TxMode.ordinal())),
                         data
                 ).get();
             } catch (InterruptedException | ExecutionException e) {
@@ -108,8 +108,7 @@ public class Vibratissimo extends ButtplugBluetoothDevice {
             try {
                 return Vibratissimo.this.iface.writeValue(
                         cmdMsg.id,
-                        Vibratissimo.this.info.getCharacteristics().get(
-                                VibratissimoBluetoothInfo.Chrs.TxSpeed.ordinal()),
+                        UUID.fromString(Vibratissimo.this.info.getCharacteristics().get(VibratissimoBluetoothInfo.Chrs.TxSpeed.ordinal())),
                         data
                 ).get();
             } catch (InterruptedException | ExecutionException e) {

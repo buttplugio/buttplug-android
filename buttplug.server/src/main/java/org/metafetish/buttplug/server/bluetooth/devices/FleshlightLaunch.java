@@ -20,6 +20,7 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInfo;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 import org.metafetish.buttplug.server.util.FleshlightHelper;
 
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -46,7 +47,7 @@ public class FleshlightLaunch extends ButtplugBluetoothDevice {
             public void run() {
                 try {
                     promise.set(FleshlightLaunch.this.iface.writeValue(ButtplugConsts.SystemMsgId,
-                            info.getCharacteristics().get(FleshlightLaunchBluetoothInfo.Chrs.Cmd.ordinal()),
+                            UUID.fromString(info.getCharacteristics().get(FleshlightLaunchBluetoothInfo.Chrs.Cmd.ordinal())),
                             new byte[]{0}, true).get());
                 } catch (InterruptedException | ExecutionException e) {
                     promise.set(new Error(e.getMessage(), Error.ErrorClass.ERROR_UNKNOWN, ButtplugConsts.DefaultMsgId));
@@ -125,8 +126,7 @@ public class FleshlightLaunch extends ButtplugBluetoothDevice {
             try {
                 return FleshlightLaunch.this.iface.writeValue(
                         cmdMsg.id,
-                        FleshlightLaunch.this.info.getCharacteristics().get
-                                (FleshlightLaunchBluetoothInfo.Chrs.Tx.ordinal()),
+                        UUID.fromString(FleshlightLaunch.this.info.getCharacteristics().get(FleshlightLaunchBluetoothInfo.Chrs.Tx.ordinal())),
                         new byte[]{(byte) cmdMsg.getPosition(), (byte) cmdMsg.getSpeed()}
                 ).get();
             } catch (InterruptedException | ExecutionException e) {

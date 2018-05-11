@@ -13,6 +13,7 @@ import org.metafetish.buttplug.server.bluetooth.ButtplugBluetoothDevice;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInfo;
 import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 
@@ -77,11 +78,11 @@ public class VorzeA10Cyclone extends ButtplugBluetoothDevice {
             }
             VorzeA10CycloneCmd cmdMsg = (VorzeA10CycloneCmd) msg;
 
-            if (VorzeA10Cyclone.this.clockwise == cmdMsg.clockwise && VorzeA10Cyclone.this.speed == cmdMsg.getSpeed()) {
+            if (VorzeA10Cyclone.this.clockwise == cmdMsg.isClockwise() && VorzeA10Cyclone.this.speed == cmdMsg.getSpeed()) {
                 return new Ok(cmdMsg.id);
             }
 
-            VorzeA10Cyclone.this.clockwise = cmdMsg.clockwise;
+            VorzeA10Cyclone.this.clockwise = cmdMsg.isClockwise();
             VorzeA10Cyclone.this.speed = cmdMsg.getSpeed();
 
 
@@ -92,7 +93,7 @@ public class VorzeA10Cyclone extends ButtplugBluetoothDevice {
             try {
                 return VorzeA10Cyclone.this.iface.writeValue(
                         cmdMsg.id,
-                        VorzeA10Cyclone.this.info.getCharacteristics().get(VorzeA10CycloneInfo.Chrs.Tx.ordinal()),
+                        UUID.fromString(VorzeA10Cyclone.this.info.getCharacteristics().get(VorzeA10CycloneInfo.Chrs.Tx.ordinal())),
                         data).get();
             } catch (InterruptedException | ExecutionException e) {
                 return VorzeA10Cyclone.this.bpLogger.logErrorMsg(msg.id, Error.ErrorClass.ERROR_DEVICE,

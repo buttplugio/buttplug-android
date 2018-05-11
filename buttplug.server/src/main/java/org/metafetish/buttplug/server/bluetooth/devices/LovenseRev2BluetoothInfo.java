@@ -8,7 +8,6 @@ import org.metafetish.buttplug.server.bluetooth.IBluetoothDeviceInterface;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 
 public class LovenseRev2BluetoothInfo implements IBluetoothDeviceInfo {
@@ -30,24 +29,26 @@ public class LovenseRev2BluetoothInfo implements IBluetoothDeviceInfo {
         return this.names;
     }
 
-    private List<UUID> services = new ArrayList<UUID>() {{
-        add(UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e"));
+    @SuppressWarnings("SpellCheckingInspection")
+    private List<String> services = new ArrayList<String>() {{
+        add("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
     }};
 
     @NonNull
-    public List<UUID> getServices() {
+    public List<String> getServices() {
         return this.services;
     }
 
-    private List<UUID> characteristics = new ArrayList<UUID>() {{
+    @SuppressWarnings("SpellCheckingInspection")
+    private List<String> characteristics = new ArrayList<String>() {{
         // tx
-        add(UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e"));
+        add("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
         // rx
-        add(UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e"));
+        add("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
     }};
 
     @NonNull
-    public List<UUID> getCharacteristics() {
+    public List<String> getCharacteristics() {
         return this.characteristics;
     }
 

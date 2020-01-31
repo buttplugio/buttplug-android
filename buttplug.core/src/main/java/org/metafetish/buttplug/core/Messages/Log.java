@@ -35,14 +35,14 @@ public class Log extends ButtplugMessage implements IButtplugMessageOutgoingOnly
     }
 
     public Log(ButtplugLogLevel logLevel, String logMessage, String tag) {
-        super(ButtplugConsts.DefaultMsgId);
+        super(0);
         this.logLevel = logLevel;
         this.logMessage = logMessage;
         this.tag = tag;
     }
 
     public Log(ButtplugLogLevel logLevel, String logMessage) {
-        super(ButtplugConsts.DefaultMsgId);
+        super(0);
         this.logLevel = logLevel;
         this.logMessage = logMessage;
         this.tag = null;

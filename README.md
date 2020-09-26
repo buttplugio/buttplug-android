@@ -1,3 +1,13 @@
+# DEPRECATED
+
+This project has been deprecated and archived. It is an implementation of an
+older version of the Android server that is no longer compatible with newer
+Buttplug updates and libraries. A new Android system is planned for buttplug-rs
+(no timeline is available on this), and information will be posted in the
+[buttplug-rs](https://github.com/buttplugio/buttplug-rs) and
+[buttplug-rs-ffi](https://github.com/buttplugio/buttplug-rs-ffi) repos as it
+becomes available.
+
 # Buttplug - Android Server Implementation
 
 [![Build Status](https://travis-ci.org/metafetish/buttplug-android.svg?branch=master)](https://travis-ci.org/metafetish/buttplug-android) [![Patreon donate button](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/qdot)
